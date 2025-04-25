@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType> implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
+public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType>
+        implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
     private final OxlaGlobalState globalState;
     private final Randomly randomly;
     private List<OxlaTable> tables;
@@ -95,7 +96,10 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         //          - generate cast expression if the cast is explicit.
         //       2. (?) Throw an error if the resulting list is empty.
         //       Potentially add a boolean switch for the behavior above.
-        return new OxlaColumnReference(Randomly.fromList(columns.stream().filter(column -> (column.getType() == type)).collect(Collectors.toList())));
+        return new OxlaColumnReference(Randomly.fromList(columns
+                .stream()
+                .filter(column -> (column.getType() == type))
+                .collect(Collectors.toList())));
     }
 
     @Override
