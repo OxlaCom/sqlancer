@@ -1,19 +1,25 @@
 package sqlancer.oxla.gen;
 
+import com.google.common.collect.Streams;
 import sqlancer.Randomly;
+import sqlancer.common.gen.NoRECGenerator;
 import sqlancer.common.gen.TypedExpressionGenerator;
+import sqlancer.common.schema.AbstractTables;
 import sqlancer.oxla.OxlaGlobalState;
+import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.*;
 import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaDataType;
+import sqlancer.oxla.schema.OxlaTable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType> {
+public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType> implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
     private final OxlaGlobalState globalState;
     private final Randomly randomly;
+    private List<OxlaTable> tables;
 
     public OxlaExpressionGenerator(OxlaGlobalState globalState) {
         this.globalState = globalState;
@@ -89,10 +95,7 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         //          - generate cast expression if the cast is explicit.
         //       2. (?) Throw an error if the resulting list is empty.
         //       Potentially add a boolean switch for the behavior above.
-        return new OxlaColumnReference(Randomly.fromList(columns
-                .stream()
-                .filter(column -> (column.getType() == type))
-                .collect(Collectors.toList())));
+        return new OxlaColumnReference(Randomly.fromList(columns.stream().filter(column -> (column.getType() == type)).collect(Collectors.toList())));
     }
 
     @Override
@@ -118,6 +121,63 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
     @Override
     public OxlaExpression isNull(OxlaExpression expr) {
         return new OxlaUnaryPostfixOperation(expr, OxlaUnaryPostfixOperation.IS_NULL);
+    }
+
+    @Override
+    public OxlaExpressionGenerator setTablesAndColumns(AbstractTables<OxlaTable, OxlaColumn> tables) {
+        this.columns = tables.getColumns();
+        this.tables = tables.getTables();
+        return this;
+    }
+
+    @Override
+    public OxlaExpression generateBooleanExpression() {
+        return generateExpression(OxlaDataType.BOOLEAN);
+    }
+
+    @Override
+    public OxlaSelect generateSelect() {
+        return new OxlaSelect();
+    }
+
+    @Override
+    public List<OxlaJoin> getRandomJoinClauses() {
+        List<OxlaJoin> joinStatements = new ArrayList<>();
+        if (Randomly.getBooleanWithRatherLowProbability()) {
+            return joinStatements;
+        }
+        List<OxlaTableReference> tableReferences = tables.stream().map(OxlaTableReference::new).collect(Collectors.toList());
+        while (tableReferences.size() >= 2 && Randomly.getBoolean()) {
+            OxlaTableReference leftTable = tableReferences.removeLast();
+            OxlaTableReference rightTable = tableReferences.removeLast();
+            List<OxlaColumn> columns = Streams.concat(leftTable.getTable().getColumns().stream(), rightTable.getTable().getColumns().stream()).collect(Collectors.toList());
+            OxlaExpressionGenerator joinGenerator = new OxlaExpressionGenerator(globalState).setColumns(columns);
+            joinStatements.add(new OxlaJoin(leftTable, rightTable, OxlaJoin.JoinType.getRandom(), joinGenerator.generateExpression(OxlaDataType.BOOLEAN)));
+        }
+        tables = tableReferences.stream().map(OxlaTableReference::getTable).collect(Collectors.toList());
+        return joinStatements;
+    }
+
+    @Override
+    public List<OxlaExpression> getTableRefs() {
+        return tables.stream().map(OxlaTableReference::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public String generateOptimizedQueryString(OxlaSelect select, OxlaExpression whereCondition, boolean shouldUseAggregate) {
+        OxlaColumn column = new OxlaColumn("COUNT(*)", OxlaDataType.INT64);
+        select.setWhereClause(whereCondition);
+        if (shouldUseAggregate) {
+            // TODO
+        } else {
+            // TODO
+        }
+        return OxlaToStringVisitor.asString(select);
+    }
+
+    @Override
+    public String generateUnoptimizedQueryString(OxlaSelect select, OxlaExpression whereCondition) {
+        return ""; // TODO
     }
 
     private OxlaExpression generateOperator(List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
