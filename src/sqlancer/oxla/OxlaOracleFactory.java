@@ -2,7 +2,10 @@ package sqlancer.oxla;
 
 import sqlancer.OracleFactory;
 import sqlancer.common.oracle.CompositeTestOracle;
+import sqlancer.common.oracle.NoRECOracle;
 import sqlancer.common.oracle.TestOracle;
+import sqlancer.common.query.ExpectedErrors;
+import sqlancer.oxla.gen.OxlaExpressionGenerator;
 import sqlancer.oxla.oracle.OxlaFuzzer;
 
 import java.util.ArrayList;
@@ -12,7 +15,9 @@ public enum OxlaOracleFactory implements OracleFactory<OxlaGlobalState> {
     NOREC {
         @Override
         public TestOracle<OxlaGlobalState> create(OxlaGlobalState globalState) throws Exception {
-            return null;
+            OxlaExpressionGenerator generator = new OxlaExpressionGenerator(globalState);
+            ExpectedErrors errors = new ExpectedErrors(); // TODO: Errors.
+            return new NoRECOracle<>(globalState, generator, errors);
         }
     },
     QUERY_PARTITIONING {
