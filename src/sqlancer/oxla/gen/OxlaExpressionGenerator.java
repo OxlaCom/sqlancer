@@ -1,6 +1,5 @@
 package sqlancer.oxla.gen;
 
-import com.google.common.collect.Streams;
 import sqlancer.Randomly;
 import sqlancer.common.gen.NoRECGenerator;
 import sqlancer.common.gen.TypedExpressionGenerator;
@@ -15,6 +14,7 @@ import sqlancer.oxla.schema.OxlaTable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType>
         implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
@@ -154,7 +154,7 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         while (tableReferences.size() >= 2 && Randomly.getBoolean()) {
             OxlaTableReference leftTable = tableReferences.removeLast();
             OxlaTableReference rightTable = tableReferences.removeLast();
-            List<OxlaColumn> columns = Streams.concat(leftTable.getTable().getColumns().stream(), rightTable.getTable().getColumns().stream()).collect(Collectors.toList());
+            List<OxlaColumn> columns = Stream.concat(leftTable.getTable().getColumns().stream(), rightTable.getTable().getColumns().stream()).collect(Collectors.toList());
             OxlaExpressionGenerator joinGenerator = new OxlaExpressionGenerator(globalState).setColumns(columns);
             joinStatements.add(new OxlaJoin(leftTable, rightTable, OxlaJoin.JoinType.getRandom(), joinGenerator.generateExpression(OxlaDataType.BOOLEAN)));
         }
@@ -169,19 +169,33 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
 
     @Override
     public String generateOptimizedQueryString(OxlaSelect select, OxlaExpression whereCondition, boolean shouldUseAggregate) {
-        OxlaColumn column = new OxlaColumn("COUNT(*)", OxlaDataType.INT64);
+        select.type = OxlaSelect.SelectType.ALL;
         select.setWhereClause(whereCondition);
         if (shouldUseAggregate) {
-            // TODO
+            // FIXME use `COUNT` Aggregate function instead of hardcoding it here.
+            OxlaExpression aggregate = new OxlaColumnReference(new OxlaColumn("COUNT(*)", OxlaDataType.INT64));
+            select.setFetchColumns(List.of(aggregate));
         } else {
-            // TODO
+            select.setFetchColumns(columns.stream().map(OxlaColumnReference::new).collect(Collectors.toList()));
+            if (Randomly.getBooleanWithSmallProbability()) {
+                // TODO Random order by types.
+                List<OxlaExpression> constants = new ArrayList<>();
+                constants.add(OxlaConstant.createInt32Constant(Randomly.smallNumber() % select.getFetchColumns().size() + 1));
+                select.setOrderByClauses(constants);
+            }
         }
-        return OxlaToStringVisitor.asString(select);
+        return select.asString();
     }
 
     @Override
     public String generateUnoptimizedQueryString(OxlaSelect select, OxlaExpression whereCondition) {
-        return ""; // TODO
+        OxlaExpression asText = new OxlaPostfixText(new OxlaCast(
+                new OxlaPostfixText(whereCondition
+                        , " IS NOT NULL AND " + OxlaToStringVisitor.asString(whereCondition)),
+                OxlaDataType.INT64), " as count");
+        select.setFetchColumns(List.of(asText));
+        select.setWhereClause(null);
+        return "SELECT SUM(COUNT) FROM (" + select.asString() + ") as res";
     }
 
     private OxlaExpression generateOperator(List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {

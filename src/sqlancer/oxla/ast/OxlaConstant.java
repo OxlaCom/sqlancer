@@ -1,5 +1,6 @@
 package sqlancer.oxla.ast;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
@@ -183,7 +184,7 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String toString() {
-            return String.format("TIME '%s'", new SimpleDateFormat("yyyy-MM-dd").format(new Timestamp(value)));
+            return String.format("TIME '%s'", new Time(value));
         }
     }
 
