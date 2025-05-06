@@ -18,6 +18,7 @@ public enum OxlaOracleFactory implements OracleFactory<OxlaGlobalState> {
             OxlaExpressionGenerator generator = new OxlaExpressionGenerator(globalState);
             ExpectedErrors errors = ExpectedErrors.newErrors()
                     .with(OxlaCommon.SYNTAX_ERRORS)
+                    .withRegex(OxlaCommon.SYNTAX_REGEX_ERRORS)
                     .with(OxlaCommon.JOIN_ERRORS)
                     .with(OxlaCommon.GROUP_BY_ERRORS)
                     .with(OxlaCommon.ORDER_BY_ERRORS)

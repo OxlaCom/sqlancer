@@ -1,13 +1,17 @@
 package sqlancer.oxla;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class OxlaCommon {
     private OxlaCommon() {
     }
 
-    public static List<String> SYNTAX_ERRORS = List.of(
+    public static final List<String> SYNTAX_ERRORS = List.of(
             "invalid input syntax for type"
+    );
+    public static final List<Pattern> SYNTAX_REGEX_ERRORS = List.of(
+            Pattern.compile("operator \"[^\"]+\" is not unique")
     );
     public static final List<String> JOIN_ERRORS = List.of(
             "invalid JOIN ON clause condition. Only equi join is supported"

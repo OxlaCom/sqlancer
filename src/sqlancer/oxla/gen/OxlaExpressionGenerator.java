@@ -18,12 +18,10 @@ import java.util.stream.Stream;
 public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType>
         implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
     private final OxlaGlobalState globalState;
-    private final Randomly randomly;
     private List<OxlaTable> tables;
 
     public OxlaExpressionGenerator(OxlaGlobalState globalState) {
         this.globalState = globalState;
-        this.randomly = globalState.getRandomly();
     }
 
     private enum ExpressionType {
@@ -39,9 +37,10 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         if (Randomly.getBooleanWithSmallProbability()) {
             return OxlaConstant.createNullConstant();
         }
-        OxlaExpression expression = OxlaConstant.getRandom(globalState);
+        // FIXME Imho, we should generate a random constant that is implicitly or explicitly cast-able to the wanted type.
+        OxlaExpression expression = OxlaConstant.getRandomForType(globalState, type);
         if (Randomly.getBooleanWithRatherLowProbability()) {
-            return new OxlaCast(expression, type);
+            return new OxlaCast(expression, type); // Explicit cast to self type.
         }
         return expression;
     }

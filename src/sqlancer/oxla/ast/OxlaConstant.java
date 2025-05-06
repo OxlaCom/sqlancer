@@ -13,9 +13,9 @@ public abstract class OxlaConstant implements OxlaExpression {
     private OxlaConstant() {
     }
 
-    public static OxlaConstant getRandom(OxlaGlobalState state) {
+    public static OxlaConstant getRandomForType(OxlaGlobalState state, OxlaDataType type) {
         final Randomly randomly = state.getRandomly();
-        switch (OxlaDataType.getRandomType()) {
+        switch (type) {
             case BOOLEAN:
                 return createBooleanConstant(Randomly.getBoolean());
             case DATE:
@@ -42,6 +42,10 @@ public abstract class OxlaConstant implements OxlaExpression {
             default:
                 throw new AssertionError();
         }
+    }
+
+    public static OxlaConstant getRandom(OxlaGlobalState state) {
+        return getRandomForType(state, OxlaDataType.getRandomType());
     }
 
     public static OxlaConstant createNullConstant() {
