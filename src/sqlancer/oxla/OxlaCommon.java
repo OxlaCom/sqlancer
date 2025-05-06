@@ -11,7 +11,8 @@ public class OxlaCommon {
             "invalid input syntax for type"
     );
     public static final List<Pattern> SYNTAX_REGEX_ERRORS = List.of(
-            Pattern.compile("operator \"[^\"]+\" is not unique")
+            Pattern.compile("operator \"[^\"]+\" is not unique"),
+            Pattern.compile("operator is not unique: (.*)")
     );
     public static final List<String> JOIN_ERRORS = List.of(
             "invalid JOIN ON clause condition. Only equi join is supported"
