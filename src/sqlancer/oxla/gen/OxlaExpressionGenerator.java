@@ -39,34 +39,11 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         if (Randomly.getBooleanWithSmallProbability()) {
             return OxlaConstant.createNullConstant();
         }
-        switch (type) {
-            case BOOLEAN:
-                return OxlaConstant.createBooleanConstant(Randomly.getBoolean());
-            case DATE:
-                return OxlaConstant.createDateConstant(randomly.getInteger32());
-            case FLOAT32:
-                return OxlaConstant.createFloat32Constant(randomly.getFloat());
-            case FLOAT64:
-                return OxlaConstant.createFloat64Constant(randomly.getDouble());
-            case INT32:
-                return OxlaConstant.createInt32Constant(randomly.getInteger32());
-            case INT64:
-                return OxlaConstant.createInt64Constant(randomly.getLong());
-            case INTERVAL:
-                return OxlaConstant.createIntervalConstant(randomly.getInteger32(), randomly.getInteger32(), randomly.getLong());
-            case JSON:
-                return OxlaConstant.createJsonConstant(randomly.getString()); // TODO: Valid JSON generation.
-            case TEXT:
-                return OxlaConstant.createTextConstant(randomly.getString());
-            case TIME:
-                return OxlaConstant.createTimeConstant(randomly.getInteger32());
-            case TIMESTAMP:
-                return OxlaConstant.createTimestampConstant(randomly.getInteger());
-            case TIMESTAMPTZ:
-                return OxlaConstant.createTimestamptzConstant(randomly.getInteger());
-            default:
-                throw new AssertionError(type);
+        OxlaExpression expression = OxlaConstant.getRandom(globalState);
+        if (Randomly.getBooleanWithRatherLowProbability()) {
+            return new OxlaCast(expression, type);
         }
+        return expression;
     }
 
     @Override

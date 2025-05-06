@@ -231,7 +231,7 @@ public abstract class OxlaConstant implements OxlaExpression {
             final String valString = value
                     .replace("'", "")
                     .replace("\\", "\\\\");
-            return String.format("'%s'", valString);
+            return String.format("TEXT '%s'", valString);
         }
     }
 
