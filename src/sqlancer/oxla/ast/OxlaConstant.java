@@ -1,5 +1,9 @@
 package sqlancer.oxla.ast;
 
+import sqlancer.Randomly;
+import sqlancer.oxla.OxlaGlobalState;
+import sqlancer.oxla.schema.OxlaDataType;
+
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -7,6 +11,37 @@ import java.text.SimpleDateFormat;
 public abstract class OxlaConstant implements OxlaExpression {
 
     private OxlaConstant() {
+    }
+
+    public static OxlaConstant getRandom(OxlaGlobalState state) {
+        final Randomly randomly = state.getRandomly();
+        switch (OxlaDataType.getRandomType()) {
+            case BOOLEAN:
+                return createBooleanConstant(Randomly.getBoolean());
+            case DATE:
+                return createDateConstant(randomly.getInteger32());
+            case FLOAT32:
+                return createFloat32Constant(randomly.getFloat());
+            case FLOAT64:
+                return createFloat64Constant(randomly.getDouble());
+            case INT32:
+                return createInt32Constant(randomly.getInteger32());
+            case INT64:
+                return createInt64Constant(randomly.getLong());
+            case INTERVAL:
+                return createIntervalConstant(randomly.getInteger32(), randomly.getInteger32(), randomly.getLong());
+            case JSON:
+                return createJsonConstant(String.format("{\"key\": \"%s\"}", randomly.getString()));
+            case TEXT:
+                return createTextConstant(String.format("TEXT '%s'", randomly.getString()));
+            case TIME:
+                return createTimeConstant(randomly.getInteger32());
+            case TIMESTAMP:
+            case TIMESTAMPTZ:
+                return createTimestampConstant(randomly.getLong());
+            default:
+                throw new AssertionError();
+        }
     }
 
     public static OxlaConstant createNullConstant() {
@@ -111,6 +146,11 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String toString() {
+            if (value == Double.POSITIVE_INFINITY || (float) value == Float.POSITIVE_INFINITY) {
+                return "'infinity'";
+            } else if (value == Double.NEGATIVE_INFINITY || (float) value == Float.NEGATIVE_INFINITY) {
+                return "'-infinity'";
+            }
             return String.valueOf(value);
         }
     }
@@ -158,7 +198,10 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String toString() {
-            return String.format("JSON '%s'", value);
+            final String valString = value
+                    .replace("'", "")
+                    .replace("\\", "\\\\");
+            return String.format("JSON '%s'", String.format("{\"key\":\"%s\"}", valString));
         }
     }
 
@@ -171,7 +214,10 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String toString() {
-            return value;
+            final String valString = value
+                    .replace("'", "")
+                    .replace("\\", "\\\\");
+            return String.format("'%s'", valString);
         }
     }
 
@@ -197,7 +243,7 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String toString() {
-            return String.format("TIMESTAMP WITHOUT TIME ZONE '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value));
+            return String.format("TIMESTAMP '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value));
         }
     }
 
@@ -210,7 +256,7 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String toString() {
-            return String.format("TIMESTAMP WITH TIME ZONE '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss+00").format(value));
+            return String.format("TIMESTAMPTZ '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss+00").format(value));
         }
     }
 }

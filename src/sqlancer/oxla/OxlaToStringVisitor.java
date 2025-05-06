@@ -52,7 +52,10 @@ public class OxlaToStringVisitor extends NewToStringVisitor<OxlaExpression> {
         sb.append(" FROM ");
         visit(select.getFromList());
 
-        if (select.getJoinList() != null) {
+        if (!select.getFromList().isEmpty() && !select.getJoinList().isEmpty()) {
+            sb.append(", ");
+        }
+        if (!select.getJoinList().isEmpty()) {
             visit(select.getJoinList());
         }
         if (select.getWhereClause() != null) {

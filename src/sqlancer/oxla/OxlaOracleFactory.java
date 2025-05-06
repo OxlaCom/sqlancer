@@ -16,7 +16,12 @@ public enum OxlaOracleFactory implements OracleFactory<OxlaGlobalState> {
         @Override
         public TestOracle<OxlaGlobalState> create(OxlaGlobalState globalState) throws Exception {
             OxlaExpressionGenerator generator = new OxlaExpressionGenerator(globalState);
-            ExpectedErrors errors = new ExpectedErrors(); // TODO: Errors.
+            ExpectedErrors errors = ExpectedErrors.newErrors()
+                    .with(OxlaCommon.SYNTAX_ERRORS)
+                    .with(OxlaCommon.JOIN_ERRORS)
+                    .with(OxlaCommon.GROUP_BY_ERRORS)
+                    .with(OxlaCommon.ORDER_BY_ERRORS)
+                    .build();
             return new NoRECOracle<>(globalState, generator, errors);
         }
     },

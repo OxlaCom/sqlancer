@@ -5,7 +5,6 @@ import sqlancer.common.gen.NoRECGenerator;
 import sqlancer.common.gen.TypedExpressionGenerator;
 import sqlancer.common.schema.AbstractTables;
 import sqlancer.oxla.OxlaGlobalState;
-import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.*;
 import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaDataType;
@@ -79,9 +78,9 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         ExpressionType expressionType = ExpressionType.getRandom();
         switch (expressionType) {
             case UNARY_PREFIX:
-                return generateOperator(OxlaUnaryPrefixOperation.ALL, wantReturnType, depth);
+                return generateOperator(OxlaUnaryPrefixOperation::new, OxlaUnaryPrefixOperation.ALL, wantReturnType, depth);
             case UNARY_POSTFIX:
-                return generateOperator(OxlaUnaryPostfixOperation.ALL, wantReturnType, depth);
+                return generateOperator(OxlaUnaryPostfixOperation::new, OxlaUnaryPostfixOperation.ALL, wantReturnType, depth);
             default:
                 throw new AssertionError(expressionType);
         }
@@ -156,7 +155,10 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
             OxlaTableReference rightTable = tableReferences.removeLast();
             List<OxlaColumn> columns = Stream.concat(leftTable.getTable().getColumns().stream(), rightTable.getTable().getColumns().stream()).collect(Collectors.toList());
             OxlaExpressionGenerator joinGenerator = new OxlaExpressionGenerator(globalState).setColumns(columns);
-            joinStatements.add(new OxlaJoin(leftTable, rightTable, OxlaJoin.JoinType.getRandom(), joinGenerator.generateExpression(OxlaDataType.BOOLEAN)));
+            OxlaJoin.JoinType joinType = OxlaJoin.JoinType.getRandom();
+            joinStatements.add(new OxlaJoin(leftTable, rightTable, joinType, joinType != OxlaJoin.JoinType.CROSS
+                    ? joinGenerator.generateExpression(OxlaDataType.BOOLEAN)
+                    : null));
         }
         tables = tableReferences.stream().map(OxlaTableReference::getTable).collect(Collectors.toList());
         return joinStatements;
@@ -172,16 +174,13 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         select.type = OxlaSelect.SelectType.ALL;
         select.setWhereClause(whereCondition);
         if (shouldUseAggregate) {
-            // FIXME use `COUNT` Aggregate function instead of hardcoding it here.
-            OxlaExpression aggregate = new OxlaColumnReference(new OxlaColumn("COUNT(*)", OxlaDataType.INT64));
+            // TODO OXLA-8194 use `COUNT` Aggregate function instead of hardcoding it here.
+            final OxlaExpression aggregate = new OxlaColumnReference(new OxlaColumn("COUNT(*)", OxlaDataType.INT64));
             select.setFetchColumns(List.of(aggregate));
         } else {
             select.setFetchColumns(columns.stream().map(OxlaColumnReference::new).collect(Collectors.toList()));
             if (Randomly.getBooleanWithSmallProbability()) {
-                // TODO Random order by types.
-                List<OxlaExpression> constants = new ArrayList<>();
-                constants.add(OxlaConstant.createInt32Constant(Randomly.smallNumber() % select.getFetchColumns().size() + 1));
-                select.setOrderByClauses(constants);
+                select.setOrderByClauses(List.of(OxlaConstant.getRandom(globalState)));
             }
         }
         return select.asString();
@@ -189,16 +188,18 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
 
     @Override
     public String generateUnoptimizedQueryString(OxlaSelect select, OxlaExpression whereCondition) {
-        OxlaExpression asText = new OxlaPostfixText(new OxlaCast(
-                new OxlaPostfixText(whereCondition
-                        , " IS NOT NULL AND " + OxlaToStringVisitor.asString(whereCondition)),
-                OxlaDataType.INT64), " as count");
+        final OxlaPostfixText asText = new OxlaPostfixText(new OxlaCast(whereCondition, OxlaDataType.INT32), " as count");
         select.setFetchColumns(List.of(asText));
         select.setWhereClause(null);
         return "SELECT SUM(COUNT) FROM (" + select.asString() + ") as res";
     }
 
-    private OxlaExpression generateOperator(List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
+    @FunctionalInterface
+    interface OxlaUnaryOperatorFactory {
+        OxlaExpression create(OxlaExpression expr, OxlaOperator op);
+    }
+
+    private OxlaExpression generateOperator(OxlaUnaryOperatorFactory factory, List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
         List<OxlaOperator> validOperators = new ArrayList<>(operators);
         validOperators.removeIf(operator -> operator.overload.returnType != wantReturnType);
 
@@ -209,6 +210,6 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
 
         OxlaOperator randomOperator = Randomly.fromList(validOperators);
         OxlaExpression inputExpression = generateExpression(randomOperator.overload.inputTypes[0], depth + 1);
-        return new OxlaUnaryPrefixOperation(inputExpression, randomOperator);
+        return factory.create(inputExpression, randomOperator);
     }
 }
