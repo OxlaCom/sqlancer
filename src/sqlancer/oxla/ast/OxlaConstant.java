@@ -57,11 +57,11 @@ public abstract class OxlaConstant implements OxlaExpression {
     }
 
     public static OxlaConstant createFloat32Constant(float value) {
-        return new OxlaFloatConstant(value);
+        return new OxlaFloat32Constant(value);
     }
 
     public static OxlaConstant createFloat64Constant(double value) {
-        return new OxlaFloatConstant(value);
+        return new OxlaFloat64Constant(value);
     }
 
     public static OxlaConstant createInt32Constant(int value) {
@@ -133,22 +133,36 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
     }
 
-    public static class OxlaFloatConstant extends OxlaConstant {
-        public final double value;
+    public static class OxlaFloat32Constant extends OxlaConstant {
+        public final float value;
 
-        public OxlaFloatConstant(double value) {
-            this.value = value;
-        }
-
-        public OxlaFloatConstant(float value) {
+        public OxlaFloat32Constant(float value) {
             this.value = value;
         }
 
         @Override
         public String toString() {
-            if (value == Double.POSITIVE_INFINITY || (float) value == Float.POSITIVE_INFINITY) {
+            if (value == Float.POSITIVE_INFINITY) {
                 return "'infinity'";
-            } else if (value == Double.NEGATIVE_INFINITY || (float) value == Float.NEGATIVE_INFINITY) {
+            } else if (value == Float.NEGATIVE_INFINITY) {
+                return "'-infinity'";
+            }
+            return String.valueOf(value);
+        }
+    }
+
+    public static class OxlaFloat64Constant extends OxlaConstant {
+        public final double value;
+
+        public OxlaFloat64Constant(double value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            if (value == Double.POSITIVE_INFINITY) {
+                return "'infinity'";
+            } else if (value == Double.NEGATIVE_INFINITY) {
                 return "'-infinity'";
             }
             return String.valueOf(value);
