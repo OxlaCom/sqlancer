@@ -18,8 +18,10 @@ public class OxlaCommon {
             "invalid JOIN ON clause condition. Only equi join is supported"
     );
     public static final List<String> GROUP_BY_ERRORS = List.of(
-            "non-integer constant in GROUP BY",
-            "is not in select list"
+            "non-integer constant in GROUP BY"
+    );
+    public static final List<Pattern> GROUP_BY_REGEX_ERRORS = List.of(
+            Pattern.compile("GROUP BY position (\\d+) is not in select list")
     );
     public static final List<String> ORDER_BY_ERRORS = List.of(
             "non-integer constant in ORDER BY"
