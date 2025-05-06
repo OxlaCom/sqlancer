@@ -31,14 +31,15 @@ public abstract class OxlaConstant implements OxlaExpression {
             case INTERVAL:
                 return createIntervalConstant(randomly.getInteger32(), randomly.getInteger32(), randomly.getLong());
             case JSON:
-                return createJsonConstant(String.format("{\"key\": \"%s\"}", randomly.getString()));
+                return createJsonConstant(randomly.getString());
             case TEXT:
-                return createTextConstant(String.format("TEXT '%s'", randomly.getString()));
+                return createTextConstant(randomly.getString());
             case TIME:
                 return createTimeConstant(randomly.getInteger32());
             case TIMESTAMP:
-            case TIMESTAMPTZ:
                 return createTimestampConstant(randomly.getLong());
+            case TIMESTAMPTZ:
+                return createTimestamptzConstant(randomly.getLong());
             default:
                 throw new AssertionError();
         }
