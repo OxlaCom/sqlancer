@@ -261,7 +261,7 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String toString() {
-            return String.format("TIMESTAMP '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value));
+            return String.format("TIMESTAMP WITHOUT TIME ZONE '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value));
         }
     }
 
@@ -274,7 +274,7 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String toString() {
-            return String.format("TIMESTAMPTZ '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss+00").format(value));
+            return String.format("TIMESTAMP WITH TIME ZONE '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss+00").format(value));
         }
     }
 }
