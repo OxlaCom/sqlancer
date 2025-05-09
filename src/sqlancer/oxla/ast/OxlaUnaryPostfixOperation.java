@@ -44,7 +44,13 @@ public class OxlaUnaryPostfixOperation extends NewUnaryPostfixOperatorNode<OxlaE
             new OxlaUnaryPostfixOperator("IS NOT NULL", new OxlaTypeOverload(OxlaDataType.TEXT, OxlaDataType.BOOLEAN)),
             new OxlaUnaryPostfixOperator("IS NOT NULL", new OxlaTypeOverload(OxlaDataType.TIME, OxlaDataType.BOOLEAN)),
             new OxlaUnaryPostfixOperator("IS NOT NULL", new OxlaTypeOverload(OxlaDataType.TIMESTAMP, OxlaDataType.BOOLEAN)),
-            new OxlaUnaryPostfixOperator("IS NOT NULL", new OxlaTypeOverload(OxlaDataType.TIMESTAMPTZ, OxlaDataType.BOOLEAN))
+            new OxlaUnaryPostfixOperator("IS NOT NULL", new OxlaTypeOverload(OxlaDataType.TIMESTAMPTZ, OxlaDataType.BOOLEAN)),
+            new OxlaUnaryPostfixOperator("IS TRUE", new OxlaTypeOverload(OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN)),
+            new OxlaUnaryPostfixOperator("IS NOT TRUE", new OxlaTypeOverload(OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN)),
+            new OxlaUnaryPostfixOperator("IS FALSE", new OxlaTypeOverload(OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN)),
+            new OxlaUnaryPostfixOperator("IS NOT FALSE", new OxlaTypeOverload(OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN))
     );
     public static final OxlaOperator IS_NULL = ALL.get(0);
+    public static final OxlaOperator IS_TRUE = ALL.get(24);
+    public static final OxlaOperator IS_FALSE = ALL.get(26);
 }
