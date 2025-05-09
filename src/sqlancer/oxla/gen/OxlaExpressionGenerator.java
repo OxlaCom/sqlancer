@@ -8,6 +8,7 @@ import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.ast.*;
 import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaDataType;
+import sqlancer.oxla.schema.OxlaRowValue;
 import sqlancer.oxla.schema.OxlaTable;
 
 import java.util.ArrayList;
@@ -17,19 +18,25 @@ import java.util.stream.Stream;
 
 public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType>
         implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
-    private final OxlaGlobalState globalState;
-    private List<OxlaTable> tables;
-
-    public OxlaExpressionGenerator(OxlaGlobalState globalState) {
-        this.globalState = globalState;
-    }
-
     private enum ExpressionType {
         UNARY_PREFIX, UNARY_POSTFIX;
 
         public static ExpressionType getRandom() {
             return Randomly.fromOptions(values());
         }
+    }
+
+    private final OxlaGlobalState globalState;
+    private List<OxlaTable> tables;
+    private OxlaRowValue rowValue;
+
+    public OxlaExpressionGenerator(OxlaGlobalState globalState) {
+        this.globalState = globalState;
+    }
+
+    public OxlaExpressionGenerator setRowValue(OxlaRowValue rowValue) {
+        this.rowValue = rowValue;
+        return this;
     }
 
     @Override

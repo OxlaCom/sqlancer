@@ -5,6 +5,7 @@ import sqlancer.SQLConnection;
 import sqlancer.common.oracle.PivotedQuerySynthesisBase;
 import sqlancer.common.query.Query;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaExpectedValueVisitor;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.*;
@@ -72,18 +73,19 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
 
         // WHERE
         {
-            OxlaExpression expr = new OxlaExpressionGenerator(globalState)
-                    .setColumns(fetchColumns)
-                    .setRowValue(pivotRow)
-                    .generateExpression(OxlaDataType.BOOLEAN);
+            OxlaExpressionGenerator generator = new OxlaExpressionGenerator(globalState);
+            generator.setColumns(fetchColumns);
+            generator.setRowValue(pivotRow);
+            OxlaExpression expr = generator.generateExpression(OxlaDataType.BOOLEAN);
             OxlaExpression result = null;
             if (expr.getExpectedValue() instanceof OxlaConstant.OxlaNullConstant) {
-                result = new OxlaUnaryPostfixOperation(expr, OxlaUnaryPostfixOperation.IS_NULL)
+                result = new OxlaUnaryPostfixOperation(expr, OxlaUnaryPostfixOperation.IS_NULL);
             } else {
-                result = new OxlaUnaryPostfixOperation(expr, expr.getExpectedValue().cast(OxlaDataType.BOOLEAN) ? OxlaUnaryPostfixOperation.OxlaUnaryPostfixOperator.)
+                result = new OxlaUnaryPostfixOperation(expr, ((OxlaConstant.OxlaBooleanConstant) expr).value
+                        ? OxlaUnaryPostfixOperation.IS_TRUE : OxlaUnaryPostfixOperation.IS_FALSE);
             }
             rectifiedPredicates.add(result);
-            select.setWhereClause();
+            select.setWhereClause(result);
         }
 
         // GROUP BY
@@ -121,7 +123,7 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
 
     @Override
     protected String getExpectedValues(OxlaExpression expr) {
-        return "";
+        return OxlaExpectedValueVisitor.asString(expr);
     }
 
     private OxlaColumn getAliasedColumn(OxlaColumn column) {

@@ -7,6 +7,10 @@ public class OxlaColumnReference extends ColumnReferenceNode<OxlaExpression, Oxl
         implements OxlaExpression {
     private final OxlaConstant expectedValue;
 
+    public OxlaColumnReference(OxlaColumn oxlaColumn) {
+        this(oxlaColumn, null);
+    }
+
     public OxlaColumnReference(OxlaColumn oxlaColumn, OxlaConstant expectedValue) {
         super(oxlaColumn);
         this.expectedValue = expectedValue;
