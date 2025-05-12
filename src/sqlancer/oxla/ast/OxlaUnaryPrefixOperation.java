@@ -2,7 +2,6 @@ package sqlancer.oxla.ast;
 
 import sqlancer.common.ast.BinaryOperatorNode;
 import sqlancer.common.ast.newast.NewUnaryPrefixOperatorNode;
-import sqlancer.oxla.ast.util.OxlaApplyFunction;
 import sqlancer.oxla.schema.OxlaDataType;
 
 import java.util.List;
