@@ -15,6 +15,11 @@ public abstract class OxlaConstant implements OxlaExpression {
 
     public abstract OxlaConstant cast(OxlaDataType toType);
 
+    @Override
+    public OxlaConstant getExpectedValue() {
+        return this;
+    }
+
     public static OxlaConstant getRandomForType(OxlaGlobalState state, OxlaDataType type) {
         final Randomly randomly = state.getRandomly();
         switch (type) {
@@ -115,7 +120,7 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant cast(OxlaDataType unused) {
-            return this; // No-op; can be cast to any type - still results in a NULL.
+            return createNullConstant(); // No-op.
         }
     }
 

@@ -9,6 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,13 +88,23 @@ public class OxlaTables extends AbstractTables<OxlaTable, OxlaColumn> {
                             break;
                         }
                         case TIMESTAMP: {
-                            // TODO: FROM STRING!
-                            constant = OxlaConstant.createTimestampConstant(randomRowValues.getLong(columnIndex));
+                            try {
+                                final Date parsedTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                                        .parse(randomRowValues.getString(columnIndex));
+                                constant = OxlaConstant.createTimestampConstant(parsedTimestamp.getTime());
+                            } catch (ParseException e) {
+                                throw new AssertionError("OxlaTables::getRandomRowValue: failed to parse timestamp without time zone: %s", e);
+                            }
                             break;
                         }
                         case TIMESTAMPTZ: {
-                            // TODO: FROM STRING!
-                            constant = OxlaConstant.createTimestamptzConstant(randomRowValues.getLong(columnIndex));
+                            try {
+                                final Date parsedTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss+00")
+                                        .parse(randomRowValues.getString(columnIndex));
+                                constant = OxlaConstant.createTimestamptzConstant(parsedTimestamp.getTime());
+                            } catch (ParseException e) {
+                                throw new AssertionError("OxlaTables::getRandomRowValue: failed to parse timestamp with time zone: %s", e);
+                            }
                             break;
                         }
                         default:
