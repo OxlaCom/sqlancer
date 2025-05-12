@@ -3,7 +3,7 @@ package sqlancer.oxla;
 import sqlancer.oxla.ast.*;
 
 public class OxlaExpectedValueVisitor {
-    private static final OxlaToStringVisitor visitor = new OxlaToStringVisitor();
+    private static final OxlaExpectedValueVisitor visitor = new OxlaExpectedValueVisitor();
     private final StringBuilder sb = new StringBuilder();
 
     public static synchronized String asString(OxlaExpression expr) {
@@ -60,6 +60,8 @@ public class OxlaExpectedValueVisitor {
     }
 
     private void visit(OxlaAlias expr) {
+        toValue(expr);
+        visit(expr.getExpr());
     }
 
     private void visit(OxlaBetweenOperator expr) {
@@ -70,9 +72,29 @@ public class OxlaExpectedValueVisitor {
     }
 
     private void visit(OxlaBinaryOperation expr) {
+        toValue(expr);
+        visit(expr.getLeft());
+        visit(expr.getRight());
     }
 
     private void visit(OxlaCase expr) {
+        toValue(expr);
+        if (expr.getSwitchCondition() != null) {
+            toValue(expr.getSwitchCondition());
+            visit((expr.getSwitchCondition()));
+        }
+        for (int index = 0; index < expr.getConditions().size(); ++index) {
+            final OxlaExpression condition = expr.getConditions().get(index);
+            final OxlaExpression then = expr.getExpressions().get(index);
+            toValue(condition);
+            visit(condition);
+            toValue(then);
+            visit(then);
+        }
+        if (expr.getElseExpr() != null) {
+            toValue(expr.getElseExpr());
+            visit(expr.getElseExpr());
+        }
     }
 
     private void visit(OxlaCast expr) {
@@ -89,19 +111,32 @@ public class OxlaExpectedValueVisitor {
     }
 
     private void visit(OxlaFunction<?> expr) {
+        toValue(expr);
+        for (OxlaExpression arg : expr.getArgs()) {
+            visit(arg);
+        }
     }
 
     private void visit(OxlaInOperator expr) {
+        toValue(expr);
+        visit(expr.getLeft());
+        for (OxlaExpression right : expr.getRight()) {
+            visit(right);
+        }
     }
 
     private void visit(OxlaJoin expr) {
+        toValue(expr.onClause);
     }
 
     private void visit(OxlaOrderingTerm expr) {
-        // No-op.
+        toValue(expr);
+        visit(expr.getExpr());
     }
 
     private void visit(OxlaPostfixText expr) {
+        toValue(expr);
+        visit(expr.getExpr());
     }
 
     private void visit(OxlaSelect expr) {
@@ -109,9 +144,14 @@ public class OxlaExpectedValueVisitor {
     }
 
     private void visit(OxlaTableReference expr) {
+        toValue(expr);
     }
 
     private void visit(OxlaTernaryNode expr) {
+        toValue(expr);
+        visit(expr.getLeft());
+        visit(expr.getMiddle());
+        visit(expr.getRight());
     }
 
     private void visit(OxlaUnaryPostfixOperation expr) {
@@ -131,4 +171,7 @@ public class OxlaExpectedValueVisitor {
         sb.append('\n');
     }
 
+    public String get() {
+        return sb.toString();
+    }
 }
