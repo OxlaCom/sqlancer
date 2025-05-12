@@ -81,8 +81,9 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
             if (expr.getExpectedValue() instanceof OxlaConstant.OxlaNullConstant) {
                 result = new OxlaUnaryPostfixOperation(expr, OxlaUnaryPostfixOperation.IS_NULL);
             } else {
-                result = new OxlaUnaryPostfixOperation(expr, ((OxlaConstant.OxlaBooleanConstant) expr).value
-                        ? OxlaUnaryPostfixOperation.IS_TRUE : OxlaUnaryPostfixOperation.IS_FALSE);
+                assert expr.getExpectedValue() instanceof OxlaConstant.OxlaBooleanConstant;
+                final boolean b = ((OxlaConstant.OxlaBooleanConstant) expr.getExpectedValue()).value;
+                result = new OxlaUnaryPostfixOperation(expr, b ? OxlaUnaryPostfixOperation.IS_TRUE : OxlaUnaryPostfixOperation.IS_FALSE);
             }
             rectifiedPredicates.add(result);
             select.setWhereClause(result);

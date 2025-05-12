@@ -34,6 +34,11 @@ public enum OxlaOracleFactory implements OracleFactory<OxlaGlobalState> {
         public TestOracle<OxlaGlobalState> create(OxlaGlobalState globalState) throws Exception {
             return new OxlaPivotedQuerySynthesisOracle(globalState);
         }
+
+        @Override
+        public boolean requiresAllTablesToContainRows() {
+            return true;
+        }
     },
     QUERY_PARTITIONING {
         @Override

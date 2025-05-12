@@ -8,6 +8,7 @@ import sqlancer.oxla.ast.OxlaConstant;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class OxlaTables extends AbstractTables<OxlaTable, OxlaColumn> {
     }
 
     public OxlaRowValue getRandomRowValue(SQLConnection connection) {
-        final String randomRowQuery = String.format("SELECT %s FROM %s ORDER BY ranodm() LIMIT 1",
+        final String randomRowQuery = String.format("SELECT %s FROM %s ORDER BY random() LIMIT 1",
                 columnNamesAsString(c -> String
                         .format("%s.%s AS %s_%s",
                                 c.getTable().getName(),
@@ -33,8 +34,10 @@ public class OxlaTables extends AbstractTables<OxlaTable, OxlaColumn> {
             if (!randomRowValues.next()) {
                 throw new AssertionError("OxlaTables::getRandomRowValue failed to find a random row.");
             }
-            for (int columnIndex = 0; columnIndex < getColumns().size(); ++columnIndex) {
-                final OxlaColumn column = getColumns().get(columnIndex);
+            for (int index = 0; index < getColumns().size(); ++index) {
+                final OxlaColumn column = getColumns().get(index);
+                int columnIndex = randomRowValues.findColumn(String.format("%s_%s", column.getTable().getName(), column.getName()));
+                assert columnIndex == index + 1;
                 OxlaConstant constant = null;
                 if (randomRowValues.getString(columnIndex) == null) {
                     constant = OxlaConstant.createNullConstant();
@@ -78,14 +81,16 @@ public class OxlaTables extends AbstractTables<OxlaTable, OxlaColumn> {
                             break;
                         }
                         case TIME: {
-                            constant = OxlaConstant.createTimeConstant(randomRowValues.getInt(columnIndex));
+                            constant = OxlaConstant.createTimeConstant((int) Time.valueOf(randomRowValues.getString(columnIndex)).getTime());
                             break;
                         }
                         case TIMESTAMP: {
+                            // TODO: FROM STRING!
                             constant = OxlaConstant.createTimestampConstant(randomRowValues.getLong(columnIndex));
                             break;
                         }
                         case TIMESTAMPTZ: {
+                            // TODO: FROM STRING!
                             constant = OxlaConstant.createTimestamptzConstant(randomRowValues.getLong(columnIndex));
                             break;
                         }

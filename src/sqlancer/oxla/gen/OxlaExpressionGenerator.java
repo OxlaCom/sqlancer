@@ -78,10 +78,12 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         //          - generate cast expression if the cast is explicit.
         //       2. (?) Throw an error if the resulting list is empty.
         //       Potentially add a boolean switch for the behavior above.
-        return new OxlaColumnReference(Randomly.fromList(columns
+        final OxlaColumn column = Randomly.fromList(columns
                 .stream()
-                .filter(column -> (column.getType() == type))
-                .collect(Collectors.toList())));
+                .filter(c -> (c.getType() == type))
+                .collect(Collectors.toList()));
+        final OxlaConstant value = rowValue != null ? rowValue.getValues().get(column) : null;
+        return new OxlaColumnReference(column, value);
     }
 
     @Override

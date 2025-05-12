@@ -15,4 +15,9 @@ public class OxlaColumnReference extends ColumnReferenceNode<OxlaExpression, Oxl
         super(oxlaColumn);
         this.expectedValue = expectedValue;
     }
+
+    @Override
+    public OxlaConstant getExpectedValue() {
+        return expectedValue;
+    }
 }
