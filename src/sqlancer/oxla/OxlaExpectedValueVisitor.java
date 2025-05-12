@@ -12,7 +12,7 @@ public class OxlaExpectedValueVisitor {
         return visitor.get();
     }
 
-    public void reset() {
+    public synchronized void reset() {
         // Java's STL is stupid; to reset a StringBuilder they recommended to allocate a new one - in performance
         // critical scenarios such as this we get stupid performance hits - reset the string's length to 0 instead.
         sb.setLength(0);
