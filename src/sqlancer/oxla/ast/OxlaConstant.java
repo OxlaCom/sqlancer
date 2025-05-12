@@ -13,6 +13,8 @@ public abstract class OxlaConstant implements OxlaExpression {
     private OxlaConstant() {
     }
 
+    public abstract OxlaConstant cast(OxlaDataType toType);
+
     public static OxlaConstant getRandomForType(OxlaGlobalState state, OxlaDataType type) {
         final Randomly randomly = state.getRandomly();
         switch (type) {
@@ -110,6 +112,11 @@ public abstract class OxlaConstant implements OxlaExpression {
         public String toString() {
             return "NULL";
         }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType unused) {
+            return this; // No-op; can be cast to any type - still results in a NULL.
+        }
     }
 
     public static class OxlaBooleanConstant extends OxlaConstant {
@@ -123,6 +130,11 @@ public abstract class OxlaConstant implements OxlaExpression {
         public String toString() {
             return String.valueOf(value);
         }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
+        }
     }
 
     public static class OxlaDateConstant extends OxlaConstant {
@@ -135,6 +147,11 @@ public abstract class OxlaConstant implements OxlaExpression {
         @Override
         public String toString() {
             return String.format("DATE '%s'", new SimpleDateFormat("yyyy-MM-dd").format(new Timestamp(value)));
+        }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
         }
     }
 
@@ -154,6 +171,11 @@ public abstract class OxlaConstant implements OxlaExpression {
             }
             return String.valueOf(value);
         }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
+        }
     }
 
     public static class OxlaFloat64Constant extends OxlaConstant {
@@ -172,6 +194,11 @@ public abstract class OxlaConstant implements OxlaExpression {
             }
             return String.valueOf(value);
         }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
+        }
     }
 
     public static class OxlaIntegerConstant extends OxlaConstant {
@@ -188,6 +215,11 @@ public abstract class OxlaConstant implements OxlaExpression {
         @Override
         public String toString() {
             return String.valueOf(value);
+        }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
         }
     }
 
@@ -206,6 +238,11 @@ public abstract class OxlaConstant implements OxlaExpression {
         public String toString() {
             return String.format("INTERVAL '%d months %d days %d microseconds'", months, days, microseconds);
         }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
+        }
     }
 
     public static class OxlaJsonConstant extends OxlaConstant {
@@ -221,6 +258,11 @@ public abstract class OxlaConstant implements OxlaExpression {
                     .replace("'", "")
                     .replace("\\", "\\\\");
             return String.format("JSON '%s'", String.format("{\"key\":\"%s\"}", valString));
+        }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
         }
     }
 
@@ -238,6 +280,11 @@ public abstract class OxlaConstant implements OxlaExpression {
                     .replace("\\", "\\\\");
             return String.format("TEXT '%s'", valString);
         }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
+        }
     }
 
     public static class OxlaTimeConstant extends OxlaConstant {
@@ -250,6 +297,11 @@ public abstract class OxlaConstant implements OxlaExpression {
         @Override
         public String toString() {
             return String.format("TIME '%s'", new Time(value));
+        }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
         }
     }
 
@@ -264,6 +316,11 @@ public abstract class OxlaConstant implements OxlaExpression {
         public String toString() {
             return String.format("TIMESTAMP WITHOUT TIME ZONE '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value));
         }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
+        }
     }
 
     public static class OxlaTimestamptzConstant extends OxlaConstant {
@@ -276,6 +333,11 @@ public abstract class OxlaConstant implements OxlaExpression {
         @Override
         public String toString() {
             return String.format("TIMESTAMP WITH TIME ZONE '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss+00").format(value));
+        }
+
+        @Override
+        public OxlaConstant cast(OxlaDataType toType) {
+            return this; // FIXME: Implement casting.
         }
     }
 }

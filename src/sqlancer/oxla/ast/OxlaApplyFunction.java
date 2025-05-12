@@ -1,6 +1,4 @@
-package sqlancer.oxla.ast.util;
-
-import sqlancer.oxla.ast.OxlaConstant;
+package sqlancer.oxla.ast;
 
 @FunctionalInterface
 public interface OxlaApplyFunction {
