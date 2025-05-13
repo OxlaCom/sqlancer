@@ -5,7 +5,7 @@ public final class OxlaBugs {
     }
 
     // https://oxla.atlassian.net/browse/OXLA-3376
-    // Valid INT_MIN value results in "Integer literal error. Value of literal exceeds range." parser error.
+    // Valid INT_MIN value results in a "Integer literal error. Value of literal exceeds range." parsing error.
     public static boolean bugOxla3376 = true;
 
     // https://oxla.atlassian.net/browse/OXLA-8323
