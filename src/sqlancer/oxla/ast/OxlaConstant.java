@@ -172,9 +172,9 @@ public abstract class OxlaConstant implements OxlaExpression {
                 case DATE:
                     return this;
                 case TIMESTAMP:
-                    return OxlaTimestamptzConstant.createTimestampConstant();
+                    return OxlaTimestamptzConstant.createTimestampConstant(value);
                 case TIMESTAMPTZ:
-                    return OxlaTimestamptzConstant.createTimestamptzConstant();
+                    return OxlaTimestamptzConstant.createTimestamptzConstant(value);
                 default:
                     return null; // Impossible.
             }
@@ -437,11 +437,23 @@ public abstract class OxlaConstant implements OxlaExpression {
                 case TEXT:
                     return this;
                 case TIME:
-                    return OxlaConstant.createTimeConstant();
+                    try {
+                        return OxlaConstant.createTimeConstant((int) new SimpleDateFormat("HH:mm::ss").parse(value).getTime());
+                    } catch (ParseException e) {
+                        throw new IgnoreMeException();
+                    }
                 case TIMESTAMP:
-                    return OxlaConstant.createTimestampConstant();
+                    try {
+                        return OxlaConstant.createTimestampConstant(new SimpleDateFormat("yyyy-MM-dd HH:mm::ss").parse(value).getTime());
+                    } catch (ParseException e) {
+                        throw new IgnoreMeException();
+                    }
                 case TIMESTAMPTZ:
-                    return OxlaConstant.createTimestamptzConstant();
+                    try {
+                        return OxlaConstant.createTimestamptzConstant(new SimpleDateFormat("yyyy-MM-dd HH:mm::ss+00").parse(value).getTime());
+                    } catch (ParseException e) {
+                        throw new IgnoreMeException();
+                    }
                 default:
                     return null; // Impossible.
             }
@@ -464,9 +476,9 @@ public abstract class OxlaConstant implements OxlaExpression {
         public OxlaConstant tryCast(OxlaDataType toType) {
             switch (toType) {
                 case INTERVAL:
-                    break;
+                    return OxlaConstant.createIntervalConstant(0, 0, value);
                 case TEXT:
-                    break;
+                    return OxlaConstant.createTextConstant(toString());
                 case TIME:
                     return this;
                 default:
@@ -491,15 +503,15 @@ public abstract class OxlaConstant implements OxlaExpression {
         public OxlaConstant tryCast(OxlaDataType toType) {
             switch (toType) {
                 case DATE:
-                    break;
+                    return OxlaConstant.createDateConstant((int) value);
                 case TEXT:
-                    break;
+                    return OxlaConstant.createTextConstant(toString());
                 case TIME:
-                    break;
+                    return OxlaConstant.createTimeConstant((int) value);
                 case TIMESTAMP:
                     return this;
                 case TIMESTAMPTZ:
-                    break;
+                    return OxlaConstant.createTimestamptzConstant(value);
                 default:
                     return null; // Impossible.
             }
@@ -522,13 +534,13 @@ public abstract class OxlaConstant implements OxlaExpression {
         public OxlaConstant tryCast(OxlaDataType toType) {
             switch (toType) {
                 case DATE:
-                    break;
+                    return OxlaConstant.createDateConstant((int) value);
                 case TEXT:
-                    break;
+                    return OxlaConstant.createTextConstant(toString());
                 case TIME:
-                    break;
+                    return OxlaConstant.createTimeConstant((int) value);
                 case TIMESTAMP:
-                    break;
+                    return OxlaConstant.createTimestampConstant(value);
                 case TIMESTAMPTZ:
                     return this;
                 default:
