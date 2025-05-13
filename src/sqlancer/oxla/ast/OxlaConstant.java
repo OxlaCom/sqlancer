@@ -1,19 +1,24 @@
 package sqlancer.oxla.ast;
 
+import sqlancer.IgnoreMeException;
 import sqlancer.Randomly;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.schema.OxlaDataType;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public abstract class OxlaConstant implements OxlaExpression {
-
     private OxlaConstant() {
     }
 
-    public abstract OxlaConstant cast(OxlaDataType toType);
+    /**
+     * @param toType Data type to cast the OxlaConstant to.
+     * @return OxlaConstant of a given type if successful, nullptr if the cast couldn't be performed.
+     */
+    public abstract OxlaConstant tryCast(OxlaDataType toType);
 
     @Override
     public OxlaConstant getExpectedValue() {
@@ -92,8 +97,8 @@ public abstract class OxlaConstant implements OxlaExpression {
         return new OxlaJsonConstant(json);
     }
 
-    public static OxlaConstant createTextConstant(String json) {
-        return new OxlaTextConstant(json);
+    public static OxlaConstant createTextConstant(String text) {
+        return new OxlaTextConstant(text);
     }
 
     public static OxlaConstant createTimeConstant(int value) {
@@ -119,7 +124,7 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType unused) {
+        public OxlaConstant tryCast(OxlaDataType unused) {
             return createNullConstant(); // No-op.
         }
     }
@@ -137,8 +142,15 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case BOOLEAN:
+                    return this;
+                case INT32:
+                    return createInt32Constant(value ? 1 : 0);
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -155,8 +167,17 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case DATE:
+                    return this;
+                case TIMESTAMP:
+                    return OxlaTimestamptzConstant.createTimestampConstant();
+                case TIMESTAMPTZ:
+                    return OxlaTimestamptzConstant.createTimestamptzConstant();
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -178,8 +199,21 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case FLOAT32:
+                    return this;
+                case FLOAT64:
+                    OxlaConstant.createFloat64Constant(value);
+                case INT32:
+                    OxlaConstant.createInt32Constant((int) value);
+                case INT64:
+                    OxlaConstant.createInt64Constant((long) value);
+                case TEXT:
+                    return OxlaConstant.createTextConstant(toString());
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -201,8 +235,21 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case FLOAT32:
+                    return OxlaConstant.createFloat32Constant((float) value);
+                case FLOAT64:
+                    return this;
+                case INT32:
+                    return OxlaConstant.createInt32Constant((int) value);
+                case INT64:
+                    return OxlaConstant.createInt64Constant((long) value);
+                case TEXT:
+                    return OxlaConstant.createTextConstant(toString());
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -223,8 +270,22 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case BOOLEAN:
+                    return OxlaConstant.createBooleanConstant(value != 0);
+                case FLOAT32:
+                    return OxlaConstant.createFloat32Constant(value);
+                case FLOAT64:
+                    return OxlaConstant.createFloat64Constant(value);
+                case INT32:
+                case INT64:
+                    return this;
+                case TEXT:
+                    return OxlaConstant.createTextConstant(toString());
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -245,8 +306,15 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case INTERVAL:
+                    return this;
+                case TEXT:
+                    return OxlaConstant.createTextConstant(toString());
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -266,8 +334,41 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case BOOLEAN:
+                    return OxlaConstant.createBooleanConstant(Boolean.parseBoolean(value));
+                case FLOAT32:
+                    try {
+                        return OxlaConstant.createFloat32Constant(Float.parseFloat(value));
+                    } catch (NumberFormatException ignored) {
+                        throw new IgnoreMeException();
+                    }
+                case FLOAT64:
+                    try {
+                        return OxlaConstant.createFloat64Constant(Double.parseDouble(value));
+                    } catch (NumberFormatException ignored) {
+                        throw new IgnoreMeException();
+                    }
+                case INT32:
+                    try {
+                        return OxlaConstant.createInt32Constant(Integer.parseInt(value));
+                    } catch (NumberFormatException ignored) {
+                        throw new IgnoreMeException();
+                    }
+                case INT64:
+                    try {
+                        return OxlaConstant.createInt64Constant(Long.parseLong(value));
+                    } catch (NumberFormatException ignored) {
+                        throw new IgnoreMeException();
+                    }
+                case JSON:
+                    return this;
+                case TEXT:
+                    return OxlaConstant.createTextConstant(toString());
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -287,8 +388,63 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case BOOLEAN:
+                    try {
+                        return OxlaConstant.createBooleanConstant(Boolean.parseBoolean(value));
+                    } catch (NumberFormatException e) {
+                        throw new IgnoreMeException();
+                    }
+                case DATE:
+                    try {
+                        return OxlaConstant.createDateConstant((int) new SimpleDateFormat("yyyy-MM-dd").parse(value).getTime());
+                    } catch (ParseException e) {
+                        throw new IgnoreMeException();
+                    }
+                case FLOAT32:
+                    try {
+                        return OxlaConstant.createFloat32Constant(Float.parseFloat(value));
+                    } catch (NumberFormatException e) {
+                        throw new IgnoreMeException();
+                    }
+                case FLOAT64:
+                    try {
+                        return OxlaConstant.createFloat64Constant(Double.parseDouble(value));
+                    } catch (NumberFormatException e) {
+                        throw new IgnoreMeException();
+                    }
+                case INT32:
+                    try {
+                        return OxlaConstant.createInt32Constant(Integer.parseInt(value));
+                    } catch (NumberFormatException e) {
+                        throw new IgnoreMeException();
+                    }
+                case INT64:
+                    try {
+                        return OxlaConstant.createInt64Constant(Long.parseLong(value));
+                    } catch (NumberFormatException e) {
+                        throw new IgnoreMeException();
+                    }
+                case INTERVAL:
+                    // FIXME: Invalid for now; silently ignore the query that tries this.
+                    //        Implementing this correctly would require me to duplicate our `parseInterval` code here,
+                    //        which would take a lot of time, also we cannot do it naively here in our defined toString()
+                    //        format, because the potential values can come from the database itself.
+                    throw new IgnoreMeException();
+                case JSON:
+                    return OxlaConstant.createJsonConstant(value);
+                case TEXT:
+                    return this;
+                case TIME:
+                    return OxlaConstant.createTimeConstant();
+                case TIMESTAMP:
+                    return OxlaConstant.createTimestampConstant();
+                case TIMESTAMPTZ:
+                    return OxlaConstant.createTimestamptzConstant();
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -305,8 +461,17 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case INTERVAL:
+                    break;
+                case TEXT:
+                    break;
+                case TIME:
+                    return this;
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -323,8 +488,21 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case DATE:
+                    break;
+                case TEXT:
+                    break;
+                case TIME:
+                    break;
+                case TIMESTAMP:
+                    return this;
+                case TIMESTAMPTZ:
+                    break;
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 
@@ -341,8 +519,21 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public OxlaConstant cast(OxlaDataType toType) {
-            return this; // FIXME: Implement casting.
+        public OxlaConstant tryCast(OxlaDataType toType) {
+            switch (toType) {
+                case DATE:
+                    break;
+                case TEXT:
+                    break;
+                case TIME:
+                    break;
+                case TIMESTAMP:
+                    break;
+                case TIMESTAMPTZ:
+                    return this;
+                default:
+                    return null; // Impossible.
+            }
         }
     }
 }

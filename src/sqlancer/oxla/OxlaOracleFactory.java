@@ -25,6 +25,9 @@ public enum OxlaOracleFactory implements OracleFactory<OxlaGlobalState> {
                     .withRegex(OxlaCommon.GROUP_BY_REGEX_ERRORS)
                     .with(OxlaCommon.ORDER_BY_ERRORS)
                     .withRegex(OxlaCommon.ORDER_BY_REGEX_ERRORS)
+                    .with(OxlaCommon.EXPRESSION_ERRORS)
+                    .withRegex(OxlaCommon.EXPRESSION_REGEX_ERRORS)
+                    .with(OxlaCommon.bugErrors())
                     .build();
             return new NoRECOracle<>(globalState, generator, errors);
         }

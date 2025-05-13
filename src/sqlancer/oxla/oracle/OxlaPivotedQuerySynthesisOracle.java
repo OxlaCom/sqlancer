@@ -32,6 +32,9 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
         errors.addAllRegexes(OxlaCommon.GROUP_BY_REGEX_ERRORS);
         errors.addAll(OxlaCommon.ORDER_BY_ERRORS);
         errors.addAllRegexes(OxlaCommon.ORDER_BY_REGEX_ERRORS);
+        errors.addAll(OxlaCommon.EXPRESSION_ERRORS);
+        errors.addAllRegexes(OxlaCommon.EXPRESSION_REGEX_ERRORS);
+        errors.addAll(OxlaCommon.bugErrors());
     }
 
     @Override

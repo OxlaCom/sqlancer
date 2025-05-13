@@ -16,6 +16,6 @@ public class OxlaCast implements OxlaExpression {
 
     @Override
     public OxlaConstant getExpectedValue() {
-        return expression.getExpectedValue().cast(dataType);
+        return expression.getExpectedValue().tryCast(dataType);
     }
 }
