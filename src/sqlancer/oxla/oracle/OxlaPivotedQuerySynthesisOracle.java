@@ -82,6 +82,12 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
                 .map(column -> new OxlaColumnReference(getAliasedColumn(column), pivotRow.getValues().get(column)))
                 .collect(Collectors.toList()));
 
+        // JOIN
+        // NOTE: Pivoted Query Synthesis (PQS) oracle does not require any JOIN statements to perform its operations.
+        //       Of course, it is possible to tests these queries too, but this requires a bit more of a manual setup
+        //       see SQLite3PivotedQuerySynthesisOracle for details.
+        select.setJoinClauses(List.of());
+
         // WHERE
         {
             OxlaExpressionGenerator generator = new OxlaExpressionGenerator(globalState);
