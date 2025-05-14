@@ -5,6 +5,7 @@ import sqlancer.common.ast.newast.NewBinaryOperatorNode;
 import sqlancer.oxla.schema.OxlaDataType;
 
 import java.util.List;
+import java.util.function.IntPredicate;
 
 public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
         implements OxlaExpression {
@@ -162,39 +163,34 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
             new OxlaBinaryOperator(">=", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.TIME}, OxlaDataType.BOOLEAN), OxlaBinaryOperation::applyGreaterEqual)
     );
 
+    private static OxlaConstant applyComparison(OxlaConstant[] constants, IntPredicate comparisonFunction) {
+        if (constants[0] instanceof OxlaConstant.OxlaNullConstant || constants[1] instanceof OxlaConstant.OxlaNullConstant) {
+            return OxlaConstant.createNullConstant();
+        }
+        return OxlaConstant.createBooleanConstant(comparisonFunction.test(constants[0].compareTo(constants[1])));
+    }
+
     private static OxlaConstant applyLess(OxlaConstant[] constants) {
-        final OxlaConstant left = constants[0];
-        final OxlaConstant right = constants[1];
-        throw new AssertionError(String.format("OxlaBinaryOperation::applyLess failed: %s < %s", left.getClass(), right.getClass()));
+        return applyComparison(constants, (a) -> a < 0);
     }
 
     private static OxlaConstant applyLessEqual(OxlaConstant[] constants) {
-        final OxlaConstant left = constants[0];
-        final OxlaConstant right = constants[1];
-        throw new AssertionError(String.format("OxlaBinaryOperation::applyLessEqual failed: %s < %s", left.getClass(), right.getClass()));
+        return applyComparison(constants, (a) -> a <= 0);
     }
 
     private static OxlaConstant applyNotEqual(OxlaConstant[] constants) {
-        final OxlaConstant left = constants[0];
-        final OxlaConstant right = constants[1];
-        throw new AssertionError(String.format("OxlaBinaryOperation::applyNotEqual failed: %s < %s", left.getClass(), right.getClass()));
+        return applyComparison(constants, (a) -> a != 0);
     }
 
     private static OxlaConstant applyEqual(OxlaConstant[] constants) {
-        final OxlaConstant left = constants[0];
-        final OxlaConstant right = constants[1];
-        throw new AssertionError(String.format("OxlaBinaryOperation::applyEqual failed: %s < %s", left.getClass(), right.getClass()));
+        return applyComparison(constants, (a) -> a == 0);
     }
 
     private static OxlaConstant applyGreater(OxlaConstant[] constants) {
-        final OxlaConstant left = constants[0];
-        final OxlaConstant right = constants[1];
-        throw new AssertionError(String.format("OxlaBinaryOperation::applyGreater failed: %s < %s", left.getClass(), right.getClass()));
+        return applyComparison(constants, (a) -> a > 0);
     }
 
     private static OxlaConstant applyGreaterEqual(OxlaConstant[] constants) {
-        final OxlaConstant left = constants[0];
-        final OxlaConstant right = constants[1];
-        throw new AssertionError(String.format("OxlaBinaryOperation::applyGreaterEqual failed: %s < %s", left.getClass(), right.getClass()));
+        return applyComparison(constants, (a) -> a >= 0);
     }
 }

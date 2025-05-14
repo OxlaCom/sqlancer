@@ -34,7 +34,10 @@ public class OxlaCommon {
     public static final List<String> EXPRESSION_ERRORS = List.of(
             "input is out of range"
     );
-    public static final List<Pattern> EXPRESSION_REGEX_ERRORS = List.of();
+    public static final List<Pattern> EXPRESSION_REGEX_ERRORS = List.of(
+            Pattern.compile("operator is not unique:\\s+(.+)"),
+            Pattern.compile("operator does not exist:\\s+(.+)")
+            );
 
     public static List<String> bugErrors() {
         List<String> list = new ArrayList<>();
