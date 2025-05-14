@@ -13,6 +13,7 @@ import sqlancer.oxla.schema.OxlaTable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -185,37 +186,36 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         return "SELECT SUM(COUNT) FROM (" + select.asString() + ") as res";
     }
 
+    private OxlaExpression generateOperatorImpl(List<OxlaOperator> operators, OxlaDataType wantReturnType, Function<OxlaOperator, OxlaExpression> generator) {
+        List<OxlaOperator> validOperators = new ArrayList<>(operators);
+        validOperators.removeIf(operator -> operator.overload.returnType != wantReturnType);
+
+        if (validOperators.isEmpty()) {
+            // In case no operator matches the criteria - we can safely generate a leaf expression instead.
+            return generateLeafNode(wantReturnType);
+        }
+
+        final OxlaOperator randomOperator = Randomly.fromList(validOperators);
+        return generator.apply(randomOperator);
+    }
+
     @FunctionalInterface
     interface OxlaUnaryOperatorFactory {
         OxlaExpression create(OxlaExpression expr, OxlaOperator op);
     }
 
     private OxlaExpression generateUnaryOperator(OxlaUnaryOperatorFactory factory, List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
-        List<OxlaOperator> validOperators = new ArrayList<>(operators);
-        validOperators.removeIf(operator -> operator.overload.returnType != wantReturnType);
-
-        if (validOperators.isEmpty()) {
-            // In case no operator matches the criteria - we can safely generate a leaf expression instead.
-            return generateLeafNode(wantReturnType);
-        }
-
-        OxlaOperator randomOperator = Randomly.fromList(validOperators);
-        OxlaExpression inputExpression = generateExpression(randomOperator.overload.inputTypes[0], depth + 1);
-        return factory.create(inputExpression, randomOperator);
+        return generateOperatorImpl(operators, wantReturnType, (operator) -> {
+            OxlaExpression inputExpression = generateExpression(operator.overload.inputTypes[0], depth + 1);
+            return factory.create(inputExpression, operator);
+        });
     }
 
     private OxlaExpression generateBinaryOperator(List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
-        List<OxlaOperator> validOperators = new ArrayList<>(operators);
-        validOperators.removeIf(operator -> operator.overload.returnType != wantReturnType);
-
-        if (validOperators.isEmpty()) {
-            // In case no operator matches the criteria - we can safely generate a leaf expression instead.
-            return generateLeafNode(wantReturnType);
-        }
-
-        OxlaOperator randomOperator = Randomly.fromList(validOperators);
-        OxlaExpression left = generateExpression(randomOperator.overload.inputTypes[0], depth + 1);
-        OxlaExpression right = generateExpression(randomOperator.overload.inputTypes[1], depth + 1);
-        return new OxlaBinaryOperation(left, right, randomOperator);
+        return generateOperatorImpl(operators, wantReturnType, (operator) -> {
+            OxlaExpression left = generateExpression(operator.overload.inputTypes[0], depth + 1);
+            OxlaExpression right = generateExpression(operator.overload.inputTypes[1], depth + 1);
+            return new OxlaBinaryOperation(left, right, operator);
+        });
     }
 }
