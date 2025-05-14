@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType>
         implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
     private enum ExpressionType {
-        UNARY_PREFIX, UNARY_POSTFIX;
+        BINARY_COMPARISON, UNARY_PREFIX, UNARY_POSTFIX;
 
         public static ExpressionType getRandom() {
             return Randomly.fromOptions(values());
@@ -61,9 +61,11 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         ExpressionType expressionType = ExpressionType.getRandom();
         switch (expressionType) {
             case UNARY_PREFIX:
-                return generateOperator(OxlaUnaryPrefixOperation::new, OxlaUnaryPrefixOperation.ALL, wantReturnType, depth);
+                return generateUnaryOperator(OxlaUnaryPrefixOperation::new, OxlaUnaryPrefixOperation.ALL, wantReturnType, depth);
             case UNARY_POSTFIX:
-                return generateOperator(OxlaUnaryPostfixOperation::new, OxlaUnaryPostfixOperation.ALL, wantReturnType, depth);
+                return generateUnaryOperator(OxlaUnaryPostfixOperation::new, OxlaUnaryPostfixOperation.ALL, wantReturnType, depth);
+            case BINARY_COMPARISON:
+                return generateBinaryOperator(OxlaBinaryOperation::new, OxlaBinaryOperation.COMPARISON, wantReturnType, depth);
             default:
                 throw new AssertionError(expressionType);
         }
@@ -184,7 +186,7 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         OxlaExpression create(OxlaExpression expr, OxlaOperator op);
     }
 
-    private OxlaExpression generateOperator(OxlaUnaryOperatorFactory factory, List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
+    private OxlaExpression generateUnaryOperator(OxlaUnaryOperatorFactory factory, List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
         List<OxlaOperator> validOperators = new ArrayList<>(operators);
         validOperators.removeIf(operator -> operator.overload.returnType != wantReturnType);
 
@@ -196,5 +198,25 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         OxlaOperator randomOperator = Randomly.fromList(validOperators);
         OxlaExpression inputExpression = generateExpression(randomOperator.overload.inputTypes[0], depth + 1);
         return factory.create(inputExpression, randomOperator);
+    }
+
+    @FunctionalInterface
+    interface OxlaBinaryOperatorFactory {
+        OxlaExpression create(OxlaExpression left, OxlaExpression right, OxlaOperator op);
+    }
+
+    private OxlaExpression generateBinaryOperator(OxlaBinaryOperatorFactory factory, List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
+        List<OxlaOperator> validOperators = new ArrayList<>(operators);
+        validOperators.removeIf(operator -> operator.overload.returnType != wantReturnType);
+
+        if (validOperators.isEmpty()) {
+            // In case no operator matches the criteria - we can safely generate a leaf expression instead.
+            return generateLeafNode(wantReturnType);
+        }
+
+        OxlaOperator randomOperator = Randomly.fromList(validOperators);
+        OxlaExpression left = generateExpression(randomOperator.overload.inputTypes[0], depth + 1);
+        OxlaExpression right = generateExpression(randomOperator.overload.inputTypes[1], depth + 1);
+        return factory.create(left, right, randomOperator);
     }
 }
