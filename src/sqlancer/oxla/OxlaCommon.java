@@ -1,5 +1,7 @@
 package sqlancer.oxla;
 
+import sqlancer.common.query.ExpectedErrors;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -60,4 +62,17 @@ public class OxlaCommon {
         }
         return list;
     }
+
+    public static final ExpectedErrors ALL_ERRORS = ExpectedErrors.newErrors()
+            .with(OxlaCommon.SYNTAX_ERRORS)
+            .withRegex(OxlaCommon.SYNTAX_REGEX_ERRORS)
+            .with(OxlaCommon.JOIN_ERRORS)
+            .with(OxlaCommon.GROUP_BY_ERRORS)
+            .withRegex(OxlaCommon.GROUP_BY_REGEX_ERRORS)
+            .with(OxlaCommon.ORDER_BY_ERRORS)
+            .withRegex(OxlaCommon.ORDER_BY_REGEX_ERRORS)
+            .with(OxlaCommon.EXPRESSION_ERRORS)
+            .withRegex(OxlaCommon.EXPRESSION_REGEX_ERRORS)
+            .with(OxlaCommon.bugErrors())
+            .build();
 }
