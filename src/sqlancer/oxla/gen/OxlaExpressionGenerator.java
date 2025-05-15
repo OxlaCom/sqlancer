@@ -4,6 +4,7 @@ import sqlancer.Randomly;
 import sqlancer.common.gen.NoRECGenerator;
 import sqlancer.common.gen.TypedExpressionGenerator;
 import sqlancer.common.schema.AbstractTables;
+import sqlancer.oxla.OxlaBugs;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.ast.*;
 import sqlancer.oxla.schema.OxlaColumn;
@@ -12,6 +13,7 @@ import sqlancer.oxla.schema.OxlaRowValue;
 import sqlancer.oxla.schema.OxlaTable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -79,6 +81,9 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
             case BINARY_LOGIC_OPERATOR:
                 return generateBinaryOperator(OxlaBinaryOperation.LOGIC, wantReturnType, depth);
             case BINARY_REGEX_OPERATOR:
+                if (OxlaBugs.bugOxla8329) {
+                    return generateLeafNode(wantReturnType);
+                }
                 return generateBinaryOperator(OxlaBinaryOperation.REGEX, wantReturnType, depth);
             case BINARY_BINARY_OPERATOR:
                 return generateBinaryOperator(OxlaBinaryOperation.BINARY, wantReturnType, depth);
@@ -202,6 +207,22 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
     private OxlaExpression generateOperatorImpl(List<OxlaOperator> operators, OxlaDataType wantReturnType, Function<OxlaOperator, OxlaExpression> generator) {
         List<OxlaOperator> validOperators = new ArrayList<>(operators);
         validOperators.removeIf(operator -> operator.overload.returnType != wantReturnType);
+
+        // TODO OXLA-8328 Remove this check after the crash is resolved.
+        if (OxlaBugs.bugOxla8328) {
+            validOperators.removeIf(operator -> {
+                if (operator.overload.inputTypes.length != 2) {
+                    return false;
+                }
+                final String textRepresentation = operator.getTextRepresentation();
+                if (!textRepresentation.equalsIgnoreCase("-") ||
+                        !textRepresentation.equalsIgnoreCase("+")) {
+                    return false;
+                }
+                final OxlaDataType[] inputTypes = operator.overload.inputTypes;
+                return inputTypes[0] == OxlaDataType.DATE && Arrays.asList(OxlaDataType.NUMERIC).contains(inputTypes[1]);
+            });
+        }
 
         if (validOperators.isEmpty()) {
             // In case no operator matches the criteria - we can safely generate a leaf expression instead.

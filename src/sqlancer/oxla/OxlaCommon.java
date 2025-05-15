@@ -13,7 +13,9 @@ public class OxlaCommon {
     );
     public static final List<Pattern> SYNTAX_REGEX_ERRORS = List.of(
             Pattern.compile("operator \"[^\"]+\" is not unique"),
-            Pattern.compile("operator is not unique: (.*)")
+            Pattern.compile("operator is not unique: (.*)"),
+            Pattern.compile("Failed to compile '[^']+' as a regular expression pattern"),
+            Pattern.compile("Could not locate this time zone:\\s+.*(, because:)\\s+.*")
     );
     public static final List<String> JOIN_ERRORS = List.of(
             "invalid JOIN ON clause condition. Only equi join is supported",
@@ -32,12 +34,13 @@ public class OxlaCommon {
             Pattern.compile("ORDER BY position (\\d+) is not in select list")
     );
     public static final List<String> EXPRESSION_ERRORS = List.of(
-            "input is out of range"
+            "out of range",
+            "division by zero"
     );
     public static final List<Pattern> EXPRESSION_REGEX_ERRORS = List.of(
             Pattern.compile("operator is not unique:\\s+(.+)"),
             Pattern.compile("operator does not exist:\\s+(.+)")
-            );
+    );
 
     public static List<String> bugErrors() {
         List<String> list = new ArrayList<>();
@@ -46,6 +49,9 @@ public class OxlaCommon {
         }
         if (OxlaBugs.bugOxla8323) {
             list.add("Invalidated shared object in join processors");
+        }
+        if (OxlaBugs.bugOxla8330) {
+            list.add("syntax error, unexpected RE_CI_MATCH");
         }
         return list;
     }
