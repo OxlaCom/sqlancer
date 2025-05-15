@@ -19,7 +19,8 @@ public class OxlaCommon {
     );
     public static final List<String> JOIN_ERRORS = List.of(
             "invalid JOIN ON clause condition. Only equi join is supported",
-            "both sides of \"=\" operator in JOIN ON condition must come from different sources"
+            "both sides of \"=\" operator in JOIN ON condition must come from different sources",
+            "expression on one side of \"=\" operator in JOIN ON condition must come from exactly one source"
     );
     public static final List<String> GROUP_BY_ERRORS = List.of(
             "non-integer constant in GROUP BY"
