@@ -23,4 +23,8 @@ public final class OxlaBugs {
     /// See: https://oxla.atlassian.net/browse/OXLA-8330
     /// Oxla parses ~~, !~~, ~~*, !~~* operators incorrectly.
     public static boolean bugOxla8330 = true;
+
+    /// See: https://oxla.atlassian.net/browse/OXLA-8332
+    /// Oxla returns Internal Compiler Error for NULL literal JSON extract(s).
+    public static boolean bugOxla8332 = true;
 }

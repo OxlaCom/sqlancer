@@ -36,7 +36,8 @@ public class OxlaCommon {
     );
     public static final List<String> EXPRESSION_ERRORS = List.of(
             "out of range",
-            "division by zero"
+            "division by zero",
+            "zero raised to a negative power is undefined"
     );
     public static final List<Pattern> EXPRESSION_REGEX_ERRORS = List.of(
             Pattern.compile("operator is not unique:\\s+(.+)"),
@@ -53,6 +54,9 @@ public class OxlaCommon {
         }
         if (OxlaBugs.bugOxla8330) {
             list.add("syntax error, unexpected RE_CI_MATCH");
+        }
+        if (OxlaBugs.bugOxla8332) {
+            list.add("std::get: wrong index for variant");
         }
         return list;
     }
