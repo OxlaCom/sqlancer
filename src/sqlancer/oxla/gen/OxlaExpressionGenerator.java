@@ -20,7 +20,14 @@ import java.util.stream.Stream;
 public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType>
         implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
     private enum ExpressionType {
-        BINARY_ARITHMETIC_OPERATOR, BINARY_COMPARISON_OPERATOR, BINARY_LOGIC_OPERATOR, UNARY_PREFIX_OPERATOR, UNARY_POSTFIX_OPERATOR;
+        BINARY_ARITHMETIC_OPERATOR,
+        BINARY_BINARY_OPERATOR,
+        BINARY_COMPARISON_OPERATOR,
+        BINARY_LOGIC_OPERATOR,
+        BINARY_MISC_OPERATOR,
+        BINARY_REGEX_OPERATOR,
+        UNARY_PREFIX_OPERATOR,
+        UNARY_POSTFIX_OPERATOR;
 
         public static ExpressionType getRandom() {
             return Randomly.fromOptions(values());
@@ -70,7 +77,13 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
             case BINARY_COMPARISON_OPERATOR:
                 return generateBinaryOperator(OxlaBinaryOperation.COMPARISON, wantReturnType, depth);
             case BINARY_LOGIC_OPERATOR:
-                return generateBinaryOperator(OxlaBinaryOperation.LOGICAL, wantReturnType, depth);
+                return generateBinaryOperator(OxlaBinaryOperation.LOGIC, wantReturnType, depth);
+            case BINARY_REGEX_OPERATOR:
+                return generateBinaryOperator(OxlaBinaryOperation.REGEX, wantReturnType, depth);
+            case BINARY_BINARY_OPERATOR:
+                return generateBinaryOperator(OxlaBinaryOperation.BINARY, wantReturnType, depth);
+            case BINARY_MISC_OPERATOR:
+                return generateBinaryOperator(OxlaBinaryOperation.MISC, wantReturnType, depth);
             default:
                 throw new AssertionError(expressionType);
         }

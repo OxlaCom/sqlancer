@@ -64,7 +64,6 @@ public class OxlaUnaryPrefixOperation extends NewUnaryPrefixOperatorNode<OxlaExp
             new OxlaUnaryPrefixOperator("||/", new OxlaTypeOverload(OxlaDataType.FLOAT64, OxlaDataType.FLOAT64), OxlaUnaryPrefixOperation::applyCbrt),
             new OxlaUnaryPrefixOperator("~", new OxlaTypeOverload(OxlaDataType.INT32, OxlaDataType.INT32), OxlaUnaryPrefixOperation::applyBitNot),
             new OxlaUnaryPrefixOperator("~", new OxlaTypeOverload(OxlaDataType.INT64, OxlaDataType.INT64), OxlaUnaryPrefixOperation::applyBitNot)
-//            new OxlaUnaryPrefixOperator("~", new OxlaTypeOverload(OxlaDataType.TEXT, OxlaDataType.TEXT)) // FIXME Generate only for REGEXes.
     );
     public static final OxlaOperator NOT = ALL.get(13);
 

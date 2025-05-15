@@ -1,5 +1,6 @@
 package sqlancer.oxla.ast;
 
+import sqlancer.IgnoreMeException;
 import sqlancer.common.ast.BinaryOperatorNode;
 import sqlancer.common.ast.newast.NewBinaryOperatorNode;
 import sqlancer.oxla.schema.OxlaDataType;
@@ -33,6 +34,10 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
         }
 
         public OxlaConstant apply(OxlaConstant[] constants) {
+            if (applyFunction == null) {
+                // NOTE: `applyFunction` is not implemented, thus PQS oracle should ignore this operator.
+                throw new IgnoreMeException();
+            }
             if (constants.length != 2) {
                 throw new AssertionError(String.format("OxlaUnaryBinaryOperation::apply* failed: expected 2 arguments, but got %d", constants.length));
             }
@@ -163,7 +168,10 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
             new OxlaBinaryOperator(">=", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.TIME}, OxlaDataType.BOOLEAN), OxlaBinaryOperation::applyGreaterEqual)
     );
 
-    public static final List<OxlaOperator> LOGICAL = List.of();
+    public static final List<OxlaOperator> LOGIC = List.of(
+            new OxlaBinaryOperator("AND", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("OR", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN}, OxlaDataType.BOOLEAN), null)
+    );
 
     public static final List<OxlaOperator> ARITHMETIC = List.of(
             // Addition
@@ -241,7 +249,43 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
             new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyMod),
             new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyMod),
             new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyMod)
+    );
 
+    public static final List<OxlaOperator> REGEX = List.of(
+            new OxlaBinaryOperator("!~", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("!~*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("!~~", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("!~~", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
+            new OxlaBinaryOperator("!~~*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("!~~*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
+            new OxlaBinaryOperator("~", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("~*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("~~", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("~~", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
+            new OxlaBinaryOperator("~~*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
+            new OxlaBinaryOperator("~~*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT), null)
+    );
+
+    public static final List<OxlaOperator> BINARY = List.of(
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), null),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), null),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
+            new OxlaBinaryOperator("&", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
+            new OxlaBinaryOperator("&", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
+            new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
+            new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
+            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
+            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null)
+    );
+
+    public static final List<OxlaOperator> MISC = List.of(
+            new OxlaBinaryOperator("AT TIME ZONE", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.TEXT}, OxlaDataType.TIMESTAMPTZ), null),
+            new OxlaBinaryOperator("AT TIME ZONE", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ, OxlaDataType.TEXT}, OxlaDataType.TIMESTAMP), null),
+            new OxlaBinaryOperator("->", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.INT32}, OxlaDataType.JSON), null),
+            new OxlaBinaryOperator("->", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.TEXT}, OxlaDataType.JSON), null),
+            new OxlaBinaryOperator("->>", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.INT32}, OxlaDataType.TEXT), null),
+            new OxlaBinaryOperator("->>", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.TEXT}, OxlaDataType.TEXT), null)
     );
 
     private static OxlaConstant applyComparison(OxlaConstant[] constants, IntPredicate comparisonFunction) {
