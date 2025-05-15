@@ -208,22 +208,6 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         List<OxlaOperator> validOperators = new ArrayList<>(operators);
         validOperators.removeIf(operator -> operator.overload.returnType != wantReturnType);
 
-        // TODO OXLA-8328 Remove this check after the crash is resolved.
-        if (OxlaBugs.bugOxla8328) {
-            validOperators.removeIf(operator -> {
-                if (operator.overload.inputTypes.length != 2) {
-                    return false;
-                }
-                final String textRepresentation = operator.getTextRepresentation();
-                if (!textRepresentation.equalsIgnoreCase("-") ||
-                        !textRepresentation.equalsIgnoreCase("+")) {
-                    return false;
-                }
-                final OxlaDataType[] inputTypes = operator.overload.inputTypes;
-                return inputTypes[0] == OxlaDataType.DATE && Arrays.asList(OxlaDataType.NUMERIC).contains(inputTypes[1]);
-            });
-        }
-
         if (validOperators.isEmpty()) {
             // In case no operator matches the criteria - we can safely generate a leaf expression instead.
             return generateLeafNode(wantReturnType);
@@ -246,7 +230,24 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
     }
 
     private OxlaExpression generateBinaryOperator(List<OxlaOperator> operators, OxlaDataType wantReturnType, int depth) {
-        return generateOperatorImpl(operators, wantReturnType, (operator) -> {
+        // TODO OXLA-8328 Remove this check and `validOperators` after the crash is resolved.
+        List<OxlaOperator> validOperators = new ArrayList<>(operators);
+        if (OxlaBugs.bugOxla8328) {
+            validOperators.removeIf(operator -> {
+                if (operator.overload.inputTypes.length != 2) {
+                    return false;
+                }
+                final String textRepresentation = operator.getTextRepresentation();
+                if (!(textRepresentation.equalsIgnoreCase("-") ||
+                        textRepresentation.equalsIgnoreCase("+"))) {
+                    return false;
+                }
+                final OxlaDataType[] inputTypes = operator.overload.inputTypes;
+                return (inputTypes[0] == OxlaDataType.DATE && Arrays.asList(OxlaDataType.NUMERIC).contains(inputTypes[1])) ||
+                        (Arrays.asList(OxlaDataType.NUMERIC).contains(inputTypes[0]) && inputTypes[1] == OxlaDataType.DATE);
+            });
+        }
+        return generateOperatorImpl(validOperators, wantReturnType, (operator) -> {
             OxlaExpression left = generateExpression(operator.overload.inputTypes[0], depth + 1);
             OxlaExpression right = generateExpression(operator.overload.inputTypes[1], depth + 1);
             return new OxlaBinaryOperation(left, right, operator);
