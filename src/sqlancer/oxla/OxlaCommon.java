@@ -17,7 +17,7 @@ public class OxlaCommon {
             Pattern.compile("operator \"[^\"]+\" is not unique"),
             Pattern.compile("operator is not unique: (.*)"),
             Pattern.compile("Failed to compile '[^']+' as a regular expression pattern"),
-            Pattern.compile("Could not locate this time zone:\\s+.*(, because:)\\s+.*")
+            Pattern.compile("Could not locate this time zone:.*")
     );
     public static final List<String> JOIN_ERRORS = List.of(
             "invalid JOIN ON clause condition. Only equi join is supported",
