@@ -24,6 +24,9 @@ public class OxlaCommon {
             "both sides of \"=\" operator in JOIN ON condition must come from different sources",
             "expression on one side of \"=\" operator in JOIN ON condition must come from exactly one source"
     );
+    public static final List<Pattern> JOIN_REGEX_ERRORS = List.of(
+            Pattern.compile("could not identify an ordering operator for type\\s+.*")
+    );
     public static final List<String> GROUP_BY_ERRORS = List.of(
             "non-integer constant in GROUP BY"
     );
@@ -69,6 +72,7 @@ public class OxlaCommon {
             .with(OxlaCommon.SYNTAX_ERRORS)
             .withRegex(OxlaCommon.SYNTAX_REGEX_ERRORS)
             .with(OxlaCommon.JOIN_ERRORS)
+            .withRegex(OxlaCommon.JOIN_REGEX_ERRORS)
             .with(OxlaCommon.GROUP_BY_ERRORS)
             .withRegex(OxlaCommon.GROUP_BY_REGEX_ERRORS)
             .with(OxlaCommon.ORDER_BY_ERRORS)
