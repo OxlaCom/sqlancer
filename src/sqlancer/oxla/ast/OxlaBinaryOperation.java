@@ -402,7 +402,7 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
         final OxlaConstant left = constants[0];
         final OxlaConstant right = constants[1];
         if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
-            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value & ((OxlaConstant.OxlaIntegerConstant) right).value);
+            return OxlaConstant.createInt64Constant((long) Math.pow(((OxlaConstant.OxlaIntegerConstant) left).value, ((OxlaConstant.OxlaIntegerConstant) right).value));
         } else if (left instanceof OxlaConstant.OxlaFloat32Constant && right instanceof OxlaConstant.OxlaFloat32Constant) {
             return OxlaConstant.createFloat32Constant((float) Math.pow(((OxlaConstant.OxlaFloat32Constant) left).value, ((OxlaConstant.OxlaFloat32Constant) right).value));
         } else if (left instanceof OxlaConstant.OxlaFloat64Constant && right instanceof OxlaConstant.OxlaFloat64Constant) {
