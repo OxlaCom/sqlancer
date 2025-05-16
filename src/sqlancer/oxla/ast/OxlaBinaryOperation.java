@@ -270,16 +270,16 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
     );
 
     public static final List<OxlaOperator> BINARY = List.of(
-            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
-            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
-            new OxlaBinaryOperator("&", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
-            new OxlaBinaryOperator("&", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
-            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), null),
-            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), null),
-            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
-            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
-            new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
-            new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null)
+            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyBitXor),
+            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyBitXor),
+            new OxlaBinaryOperator("&", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyBitAnd),
+            new OxlaBinaryOperator("&", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyBitAnd),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyBitPower),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyBitPower),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyBitPower),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyBitPower),
+            new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyBitOr),
+            new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyBitOr)
     );
 
     public static final List<OxlaOperator> MISC = List.of(
@@ -378,5 +378,45 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
             return OxlaConstant.createFloat64Constant(((OxlaConstant.OxlaFloat64Constant) left).value % ((OxlaConstant.OxlaFloat64Constant) right).value);
         }
         throw new AssertionError(String.format("OxlaBinaryOperationOperation::applyMod failed: %s vs %s", left.getClass(), right.getClass()));
+    }
+
+    private static OxlaConstant applyBitXor(OxlaConstant[] constants) {
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value ^ ((OxlaConstant.OxlaIntegerConstant) right).value);
+        }
+        throw new AssertionError(String.format("OxlaBinaryOperationOperation::applyBitXor failed: %s vs %s", constants[0].getClass(), constants[1].getClass()));
+    }
+
+    private static OxlaConstant applyBitAnd(OxlaConstant[] constants) {
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value & ((OxlaConstant.OxlaIntegerConstant) right).value);
+        }
+        throw new AssertionError(String.format("OxlaBinaryOperationOperation::applyBitAnd failed: %s vs %s", constants[0].getClass(), constants[1].getClass()));
+    }
+
+    private static OxlaConstant applyBitPower(OxlaConstant[] constants) {
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value & ((OxlaConstant.OxlaIntegerConstant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat32Constant && right instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant((float) Math.pow(((OxlaConstant.OxlaFloat32Constant) left).value, ((OxlaConstant.OxlaFloat32Constant) right).value));
+        } else if (left instanceof OxlaConstant.OxlaFloat64Constant && right instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(Math.pow(((OxlaConstant.OxlaFloat64Constant) left).value, ((OxlaConstant.OxlaFloat64Constant) right).value));
+        }
+        throw new AssertionError(String.format("OxlaBinaryOperationOperation::applyBitPower failed: %s vs %s", constants[0].getClass(), constants[1].getClass()));
+    }
+
+    private static OxlaConstant applyBitOr(OxlaConstant[] constants) {
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value | ((OxlaConstant.OxlaIntegerConstant) right).value);
+        }
+        throw new AssertionError(String.format("OxlaBinaryOperationOperation::applyBitOr failed: %s vs %s", constants[0].getClass(), constants[1].getClass()));
     }
 }
