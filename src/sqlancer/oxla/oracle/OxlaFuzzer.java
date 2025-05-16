@@ -88,6 +88,6 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         if (Randomly.getBoolean()) {
             select.setOffsetClause(generator.generateConstant(Randomly.fromOptions(OxlaDataType.NUMERIC)));
         }
-        return new SQLQueryAdapter(select.toString());
+        return new SQLQueryAdapter(select.toString(), this.errors);
     }
 }

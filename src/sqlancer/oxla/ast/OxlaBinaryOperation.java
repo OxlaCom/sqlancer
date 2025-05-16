@@ -6,7 +6,6 @@ import sqlancer.common.ast.newast.NewBinaryOperatorNode;
 import sqlancer.oxla.schema.OxlaDataType;
 
 import java.util.List;
-import java.util.function.IntPredicate;
 
 public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
         implements OxlaExpression {
@@ -21,8 +20,10 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
         if (leftValue == null || rightValue == null) {
             return null;
         }
+        if (leftValue instanceof OxlaConstant.OxlaNullConstant || rightValue instanceof OxlaConstant.OxlaNullConstant) {
+            return OxlaConstant.createNullConstant();
+        }
         return ((OxlaBinaryOperation.OxlaBinaryOperator) op).apply(new OxlaConstant[]{leftValue, rightValue});
-
     }
 
     public static class OxlaBinaryOperator extends OxlaOperator {
@@ -175,80 +176,80 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
 
     public static final List<OxlaOperator> ARITHMETIC = List.of(
             // Addition
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT32}, OxlaDataType.INT64), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.INT32}, OxlaDataType.DATE), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.INTERVAL}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.TIME}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.DATE}, OxlaDataType.DATE), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT32}, OxlaDataType.INT64), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.DATE}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.TIMESTAMP}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.TIMESTAMPTZ}, OxlaDataType.TIMESTAMPTZ), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.INTERVAL}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ, OxlaDataType.INTERVAL}, OxlaDataType.TIMESTAMPTZ), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.TIMESTAMP}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.TIME}, OxlaDataType.TIME), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.DATE}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applyAdd),
             new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.INTERVAL}, OxlaDataType.TIME), OxlaBinaryOperation::applyAdd),
-            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.TIME}, OxlaDataType.TIME), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.INTERVAL}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applyAdd),
+            new OxlaBinaryOperator("+", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ, OxlaDataType.INTERVAL}, OxlaDataType.TIMESTAMPTZ), OxlaBinaryOperation::applyAdd),
             // Subtraction
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT32}, OxlaDataType.INT64), OxlaBinaryOperation::applySub),
             new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.DATE}, OxlaDataType.INT32), OxlaBinaryOperation::applySub),
             new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.INT32}, OxlaDataType.DATE), OxlaBinaryOperation::applySub),
             new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.INTERVAL}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applySub),
             new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT32}, OxlaDataType.INT64), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.INTERVAL}, OxlaDataType.TIME), OxlaBinaryOperation::applySub),
+            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.TIME}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applySub),
             new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.INTERVAL}, OxlaDataType.TIMESTAMP), OxlaBinaryOperation::applySub),
             new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.TIMESTAMP}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applySub),
             new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ, OxlaDataType.INTERVAL}, OxlaDataType.TIMESTAMPTZ), OxlaBinaryOperation::applySub),
             new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMPTZ}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.INTERVAL}, OxlaDataType.TIME), OxlaBinaryOperation::applySub),
-            new OxlaBinaryOperator("-", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.TIME}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applySub),
             // Multiplication
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT32}, OxlaDataType.INT64), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INT32}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.FLOAT32}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INT64}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.FLOAT64}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
-            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyMul),
             new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT32}, OxlaDataType.INT64), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.FLOAT32}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.FLOAT64}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INT32}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
+            new OxlaBinaryOperator("*", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INT64}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyMul),
             // Division
-            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyDiv),
-            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT32}, OxlaDataType.INT64), OxlaBinaryOperation::applyDiv),
-            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyDiv),
+            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyDiv),
+            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyDiv),
             new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyDiv),
-            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyDiv),
+            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyDiv),
             new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyDiv),
-            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INT32}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyDiv),
-            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INT64}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyDiv),
+            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyDiv),
+            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT32}, OxlaDataType.INT64), OxlaBinaryOperation::applyDiv),
+            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyDiv),
             new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.FLOAT32}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyDiv),
             new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.FLOAT64}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyDiv),
-            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyDiv),
-            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyDiv),
+            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INT32}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyDiv),
+            new OxlaBinaryOperator("/", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INT64}, OxlaDataType.INTERVAL), OxlaBinaryOperation::applyDiv),
             // Modulus
-            new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyMod),
-            new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyMod),
+            new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyMod),
             new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), OxlaBinaryOperation::applyMod),
-            new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), OxlaBinaryOperation::applyMod)
+            new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), OxlaBinaryOperation::applyMod),
+            new OxlaBinaryOperator("%", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), OxlaBinaryOperation::applyMod)
     );
 
     public static final List<OxlaOperator> REGEX = List.of(
@@ -269,75 +270,113 @@ public class OxlaBinaryOperation extends NewBinaryOperatorNode<OxlaExpression>
     );
 
     public static final List<OxlaOperator> BINARY = List.of(
-            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), null),
-            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), null),
-            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
-            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
+            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
+            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
             new OxlaBinaryOperator("&", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
             new OxlaBinaryOperator("&", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), null),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), null),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
+            new OxlaBinaryOperator("^", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
             new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
-            new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null),
-            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32), null),
-            new OxlaBinaryOperator("#", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null)
+            new OxlaBinaryOperator("|", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64), null)
     );
 
     public static final List<OxlaOperator> MISC = List.of(
-            new OxlaBinaryOperator("AT TIME ZONE", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.TEXT}, OxlaDataType.TIMESTAMPTZ), null),
-            new OxlaBinaryOperator("AT TIME ZONE", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ, OxlaDataType.TEXT}, OxlaDataType.TIMESTAMP), null),
             new OxlaBinaryOperator("->", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.INT32}, OxlaDataType.JSON), null),
             new OxlaBinaryOperator("->", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.TEXT}, OxlaDataType.JSON), null),
             new OxlaBinaryOperator("->>", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.INT32}, OxlaDataType.TEXT), null),
-            new OxlaBinaryOperator("->>", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.TEXT}, OxlaDataType.TEXT), null)
+            new OxlaBinaryOperator("->>", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
+            new OxlaBinaryOperator("AT TIME ZONE", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.TEXT}, OxlaDataType.TIMESTAMPTZ), null),
+            new OxlaBinaryOperator("AT TIME ZONE", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ, OxlaDataType.TEXT}, OxlaDataType.TIMESTAMP), null)
     );
 
-    private static OxlaConstant applyComparison(OxlaConstant[] constants, IntPredicate comparisonFunction) {
-        if (constants[0] instanceof OxlaConstant.OxlaNullConstant || constants[1] instanceof OxlaConstant.OxlaNullConstant) {
-            return OxlaConstant.createNullConstant();
-        }
-        return OxlaConstant.createBooleanConstant(comparisonFunction.test(constants[0].compareTo(constants[1])));
-    }
-
     private static OxlaConstant applyLess(OxlaConstant[] constants) {
-        return applyComparison(constants, (a) -> a < 0);
+        return OxlaConstant.createBooleanConstant(constants[0].compareTo(constants[1]) < 0);
     }
 
     private static OxlaConstant applyLessEqual(OxlaConstant[] constants) {
-        return applyComparison(constants, (a) -> a <= 0);
+        return OxlaConstant.createBooleanConstant(constants[0].compareTo(constants[1]) <= 0);
     }
 
     private static OxlaConstant applyNotEqual(OxlaConstant[] constants) {
-        return applyComparison(constants, (a) -> a != 0);
+        return OxlaConstant.createBooleanConstant(constants[0].compareTo(constants[1]) != 0);
     }
 
     private static OxlaConstant applyEqual(OxlaConstant[] constants) {
-        return applyComparison(constants, (a) -> a == 0);
+        return OxlaConstant.createBooleanConstant(constants[0].compareTo(constants[1]) == 0);
     }
 
     private static OxlaConstant applyGreater(OxlaConstant[] constants) {
-        return applyComparison(constants, (a) -> a > 0);
+        return OxlaConstant.createBooleanConstant(constants[0].compareTo(constants[1]) > 0);
     }
 
     private static OxlaConstant applyGreaterEqual(OxlaConstant[] constants) {
-        return applyComparison(constants, (a) -> a >= 0);
+        return OxlaConstant.createBooleanConstant(constants[0].compareTo(constants[1]) >= 0);
     }
 
     private static OxlaConstant applyAdd(OxlaConstant[] constants) {
-        throw new AssertionError("not implemented yet.");
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value + ((OxlaConstant.OxlaIntegerConstant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat32Constant && right instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant(((OxlaConstant.OxlaFloat32Constant) left).value + ((OxlaConstant.OxlaFloat32Constant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat64Constant && right instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(((OxlaConstant.OxlaFloat64Constant) left).value + ((OxlaConstant.OxlaFloat64Constant) right).value);
+        }
+        throw new IgnoreMeException(); // Not implemented for type.
     }
 
     private static OxlaConstant applySub(OxlaConstant[] constants) {
-        throw new AssertionError("not implemented yet.");
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value - ((OxlaConstant.OxlaIntegerConstant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat32Constant && right instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant(((OxlaConstant.OxlaFloat32Constant) left).value - ((OxlaConstant.OxlaFloat32Constant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat64Constant && right instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(((OxlaConstant.OxlaFloat64Constant) left).value - ((OxlaConstant.OxlaFloat64Constant) right).value);
+        }
+        throw new IgnoreMeException(); // Not implemented for type.
     }
 
     private static OxlaConstant applyMul(OxlaConstant[] constants) {
-        throw new AssertionError("not implemented yet.");
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value * ((OxlaConstant.OxlaIntegerConstant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat32Constant && right instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant(((OxlaConstant.OxlaFloat32Constant) left).value * ((OxlaConstant.OxlaFloat32Constant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat64Constant && right instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(((OxlaConstant.OxlaFloat64Constant) left).value * ((OxlaConstant.OxlaFloat64Constant) right).value);
+        }
+        throw new IgnoreMeException(); // Not implemented for type.
     }
 
     private static OxlaConstant applyDiv(OxlaConstant[] constants) {
-        throw new AssertionError("not implemented yet.");
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value / ((OxlaConstant.OxlaIntegerConstant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat32Constant && right instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant(((OxlaConstant.OxlaFloat32Constant) left).value / ((OxlaConstant.OxlaFloat32Constant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat64Constant && right instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(((OxlaConstant.OxlaFloat64Constant) left).value / ((OxlaConstant.OxlaFloat64Constant) right).value);
+        }
+        throw new IgnoreMeException(); // Not implemented for type.
     }
 
     private static OxlaConstant applyMod(OxlaConstant[] constants) {
-        throw new AssertionError("not implemented yet.");
+        OxlaConstant left = constants[0];
+        OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(((OxlaConstant.OxlaIntegerConstant) left).value % ((OxlaConstant.OxlaIntegerConstant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat32Constant && right instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant(((OxlaConstant.OxlaFloat32Constant) left).value % ((OxlaConstant.OxlaFloat32Constant) right).value);
+        } else if (left instanceof OxlaConstant.OxlaFloat64Constant && right instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(((OxlaConstant.OxlaFloat64Constant) left).value % ((OxlaConstant.OxlaFloat64Constant) right).value);
+        }
+        throw new AssertionError(String.format("OxlaBinaryOperationOperation::applyMod failed: %s vs %s", left.getClass(), right.getClass()));
     }
 }

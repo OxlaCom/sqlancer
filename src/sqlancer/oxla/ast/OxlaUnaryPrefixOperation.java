@@ -5,7 +5,6 @@ import sqlancer.common.ast.newast.NewUnaryPrefixOperatorNode;
 import sqlancer.oxla.schema.OxlaDataType;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class OxlaUnaryPrefixOperation extends NewUnaryPrefixOperatorNode<OxlaExpression>
         implements OxlaExpression {
@@ -57,6 +56,7 @@ public class OxlaUnaryPrefixOperation extends NewUnaryPrefixOperatorNode<OxlaExp
             new OxlaUnaryPrefixOperator("@", new OxlaTypeOverload(OxlaDataType.FLOAT64, OxlaDataType.FLOAT64), OxlaUnaryPrefixOperation::applyAbs),
             new OxlaUnaryPrefixOperator("@", new OxlaTypeOverload(OxlaDataType.INT32, OxlaDataType.INT32), OxlaUnaryPrefixOperation::applyAbs),
             new OxlaUnaryPrefixOperator("@", new OxlaTypeOverload(OxlaDataType.INT64, OxlaDataType.INT64), OxlaUnaryPrefixOperation::applyAbs),
+            new OxlaUnaryPrefixOperator("!", new OxlaTypeOverload(OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN), OxlaUnaryPrefixOperation::applyNot),
             new OxlaUnaryPrefixOperator("NOT", new OxlaTypeOverload(OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN), OxlaUnaryPrefixOperation::applyNot),
             new OxlaUnaryPrefixOperator("|/", new OxlaTypeOverload(OxlaDataType.FLOAT32, OxlaDataType.FLOAT64), OxlaUnaryPrefixOperation::applySqrt),
             new OxlaUnaryPrefixOperator("|/", new OxlaTypeOverload(OxlaDataType.FLOAT64, OxlaDataType.FLOAT64), OxlaUnaryPrefixOperation::applySqrt),
@@ -66,12 +66,6 @@ public class OxlaUnaryPrefixOperation extends NewUnaryPrefixOperatorNode<OxlaExp
             new OxlaUnaryPrefixOperator("~", new OxlaTypeOverload(OxlaDataType.INT64, OxlaDataType.INT64), OxlaUnaryPrefixOperation::applyBitNot)
     );
     public static final OxlaOperator NOT = ALL.get(13);
-
-    public static List<OxlaOperator> getForType(OxlaDataType returnType) {
-        return ALL.stream()
-                .filter(op -> (op.overload.returnType == returnType))
-                .collect(Collectors.toList());
-    }
 
     private static OxlaConstant applyPlus(OxlaConstant[] constants) {
         return constants[0]; // No-op.
