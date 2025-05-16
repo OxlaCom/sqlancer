@@ -136,7 +136,7 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
             select.setOffsetClause(OxlaConstant.createInt32Constant(0));
         }
 
-        return new SQLQueryAdapter(OxlaToStringVisitor.asString(select));
+        return new SQLQueryAdapter(OxlaToStringVisitor.asString(select), errors);
     }
 
     @Override

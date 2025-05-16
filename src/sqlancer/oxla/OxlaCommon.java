@@ -39,7 +39,9 @@ public class OxlaCommon {
     public static final List<String> EXPRESSION_ERRORS = List.of(
             "out of range",
             "division by zero",
-            "zero raised to a negative power is undefined"
+            "zero raised to a negative power is undefined",
+            "LIMIT must not be negative",
+            "OFFSET must not be negative"
     );
     public static final List<Pattern> EXPRESSION_REGEX_ERRORS = List.of(
             Pattern.compile("operator is not unique:\\s+(.+)"),
