@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType>
         implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
     private enum ExpressionType {
+        AGGREGATE_FUNCTION,
         BINARY_ARITHMETIC_OPERATOR,
         BINARY_BINARY_OPERATOR,
         BINARY_COMPARISON_OPERATOR,
@@ -70,6 +71,8 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
 
         ExpressionType expressionType = ExpressionType.getRandom();
         switch (expressionType) {
+            case AGGREGATE_FUNCTION:
+                return generateFunction(OxlaFunctionOperation.AGGREGATE, wantReturnType, depth);
             case UNARY_PREFIX_OPERATOR:
                 return generateUnaryOperator(OxlaUnaryPrefixOperation::new, OxlaUnaryPrefixOperation.ALL, wantReturnType, depth);
             case UNARY_POSTFIX_OPERATOR:
@@ -252,5 +255,22 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
             OxlaExpression right = generateExpression(operator.overload.inputTypes[1], depth + 1);
             return new OxlaBinaryOperation(left, right, operator);
         });
+    }
+
+    private OxlaExpression generateFunction(List<OxlaFunctionOperation.OxlaFunction> functions, OxlaDataType wantReturnType, int depth) {
+        List<OxlaFunctionOperation.OxlaFunction> validFunctions = new ArrayList<>(functions);
+        validFunctions.removeIf(function -> function.overload.returnType != wantReturnType);
+
+        if (validFunctions.isEmpty()) {
+            // In case no operator matches the criteria - we can safely generate a leaf expression instead.
+            return generateLeafNode(wantReturnType);
+        }
+
+        final OxlaFunctionOperation.OxlaFunction randomFunction = Randomly.fromList(validFunctions);
+        List<OxlaExpression> args = new ArrayList<>();
+        for (OxlaDataType inputType : randomFunction.overload.inputTypes) {
+            args.add(generateExpression(inputType, depth + 1));
+        }
+        return new OxlaFunctionOperation(args, randomFunction);
     }
 }

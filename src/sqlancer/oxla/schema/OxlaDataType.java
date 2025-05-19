@@ -2,6 +2,8 @@ package sqlancer.oxla.schema;
 
 import sqlancer.Randomly;
 
+import java.util.Arrays;
+
 public enum OxlaDataType {
     BOOLEAN, DATE, FLOAT32, FLOAT64, INT32, INT64, INTERVAL, JSON, TEXT, TIME, TIMESTAMP, TIMESTAMPTZ;
 
@@ -10,7 +12,9 @@ public enum OxlaDataType {
         return OxlaDataType.toString(this);
     }
 
+    public static final OxlaDataType[] ALL = values();
     public static final OxlaDataType[] NUMERIC = new OxlaDataType[]{INT32, INT64, FLOAT32, FLOAT64};
+    public static final OxlaDataType[] AGGREGABLE = Arrays.stream(values()).filter(o -> !(o == JSON || o == TEXT)).toArray(OxlaDataType[]::new);
 
     public static OxlaDataType getRandomType() {
         return Randomly.fromOptions(values());
