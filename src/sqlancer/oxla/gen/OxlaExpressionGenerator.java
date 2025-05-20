@@ -29,7 +29,10 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         BINARY_LOGIC_OPERATOR,
         BINARY_MISC_OPERATOR,
         BINARY_REGEX_OPERATOR,
+        MATH_FUNCTION,
+        MISC_FUNCTION,
         PG_FUNCTION,
+        SYSTEM_FUNCTION,
         UNARY_POSTFIX_OPERATOR,
         UNARY_PREFIX_OPERATOR,
         WINDOW_FUNCTION;
@@ -94,8 +97,14 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
                 return generateBinaryOperator(OxlaBinaryOperation.BINARY, wantReturnType, depth);
             case BINARY_MISC_OPERATOR:
                 return generateBinaryOperator(OxlaBinaryOperation.MISC, wantReturnType, depth);
+            case MATH_FUNCTION:
+                return generateFunction(OxlaFunctionOperation.MATH, wantReturnType, depth);
+            case MISC_FUNCTION:
+                return generateFunction(OxlaFunctionOperation.MISC, wantReturnType, depth);
             case PG_FUNCTION:
                 return generateFunction(OxlaFunctionOperation.PG_FUNCTIONS, wantReturnType, depth);
+            case SYSTEM_FUNCTION:
+                return generateFunction(OxlaFunctionOperation.SYSTEM, wantReturnType, depth);
             case WINDOW_FUNCTION:
                 return generateFunction(OxlaFunctionOperation.WINDOW, wantReturnType, depth);
             default:

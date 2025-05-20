@@ -54,101 +54,95 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
     }
 
     public static List<OxlaFunction> MATH = OxlaFunctionBuilder.create()
-            .addOneParamSameReturn("abs", OxlaDataType.NUMERIC, null)
-            .addOneParamSameReturn("cbrt", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("ceil", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("ceiling", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("degrees", OxlaDataType.FLOAT64, null)
-            .addOneParamSameReturn("exp", OxlaDataType.FLOAT64, null)
-            .addOneParamSameReturn("floor", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("round", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("sin", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("sind", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("asind", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("cos", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("cosd", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("acos", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("cot", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("cotd", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("acosd", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("radians", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("sqrt", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("ln", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("log10", OxlaDataType.FLOATING_POINT, null)
-//            new OxlaFunction("log", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), null),
-//            new OxlaFunction("log", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), null),
-//            new OxlaFunction("log", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), null),
-//            new OxlaFunction("log", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), null),
-//            new OxlaFunction("atan2", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), null),
-//            new OxlaFunction("atan2", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), null),
-//            new OxlaFunction("atan2d", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32), null),
-//            new OxlaFunction("atan2d", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64), null),
-            .addOneParamSameReturn("atan", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("atan2d", OxlaDataType.FLOATING_POINT, null)
-            .addSimpleNoParam("pi", OxlaDataType.FLOAT64, null)
-            .addOneParamSameReturn("tan", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("tand", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamSameReturn("power", OxlaDataType.NUMERIC, null)
-            .addOneParamSameReturn("sign", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("abs", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("cbrt", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("ceil", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("ceiling", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverload("degrees", OxlaDataType.FLOAT64, null)
+            .addOneParamMatchReturnOverload("exp", OxlaDataType.FLOAT64, null)
+            .addOneParamMatchReturnOverloads("floor", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("round", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("sin", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("sind", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("asind", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("cos", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("cosd", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("acos", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("cot", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("cotd", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("acosd", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("radians", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("sqrt", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("ln", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("log10", OxlaDataType.FLOATING_POINT, null)
+            .addMultipleParamOverload("log", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32, null)
+            .addMultipleParamOverload("log", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addOneParamMatchReturnOverloads("log", OxlaDataType.FLOATING_POINT, null)
+            .addMultipleParamOverload("atan2", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32, null)
+            .addMultipleParamOverload("atan2", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("atan2d", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32, null)
+            .addMultipleParamOverload("atan2d", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addOneParamMatchReturnOverloads("atan", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("atan2d", OxlaDataType.FLOATING_POINT, null)
+            .addNoParamOverload("pi", OxlaDataType.FLOAT64, null)
+            .addOneParamMatchReturnOverloads("tan", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("tand", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("power", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("sign", OxlaDataType.NUMERIC, null)
             .build();
 
     public static final List<OxlaFunction> STRING = OxlaFunctionBuilder.create()
-            .addSimple("concat", OxlaDataType.ALL, OxlaDataType.TEXT, null)
-            .addSimple("length", OxlaDataType.TEXT, OxlaDataType.INT32, null)
-            .addSimple("lower", OxlaDataType.TEXT, OxlaDataType.TEXT, null)
-            .addSimple("upper", OxlaDataType.TEXT, OxlaDataType.TEXT, null)
-            .addSimple("replace", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
-            .addSimple("starts_with", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
-            .addSimple("substr", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
-            .addSimple("substr", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
-            .addSimple("substring", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
-            .addSimple("substring", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
-            .addSimple("strpos", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.INT32, null)
-            .addSimple("position", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.INT32, null)
-            .addSimple("regexp_replace", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
-            .addSimple("regexp_replace", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("concat", OxlaDataType.ALL, OxlaDataType.TEXT, null)
+            .addOneParamOverload("length", OxlaDataType.TEXT, OxlaDataType.INT32, null)
+            .addOneParamOverload("lower", OxlaDataType.TEXT, OxlaDataType.TEXT, null)
+            .addOneParamOverload("upper", OxlaDataType.TEXT, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("replace", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("starts_with", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("substr", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("substr", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("substring", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("substring", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("strpos", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.INT32, null)
+            .addMultipleParamOverload("position", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.INT32, null)
+            .addMultipleParamOverload("regexp_replace", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("regexp_replace", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
             .build();
 
-    public static final List<OxlaFunction> PG_FUNCTIONS = List.of(
-            new OxlaFunction("pg_backend_pid", new OxlaTypeOverload(new OxlaDataType[]{}, OxlaDataType.INT32), null),
-            new OxlaFunction("pg_get_expr", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_get_expr", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32, OxlaDataType.BOOLEAN}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_total_relation_size", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT}, OxlaDataType.INT64), null),
-            new OxlaFunction("pg_total_relation_size", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.INT64), null),
-            new OxlaFunction("pg_table_size", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT}, OxlaDataType.INT64), null),
-            new OxlaFunction("pg_table_size", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.INT64), null),
-            new OxlaFunction("pg_encoding_to_char", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_size_pretty", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_get_userbyid", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_get_indexdef", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_get_indexdef", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32, OxlaDataType.BOOLEAN}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_table_is_visible", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.BOOLEAN), null),
+    public static final List<OxlaFunction> PG_FUNCTIONS = OxlaFunctionBuilder.create()
+            .addNoParamOverload("pg_backend_pid", OxlaDataType.INT32, null)
+            .addMultipleParamOverload("pg_get_expr", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("pg_get_expr", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32, OxlaDataType.BOOLEAN}, OxlaDataType.TEXT, null)
+            .addOneParamOverloads("pg_total_relation_size", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.INT64, null)
+            .addOneParamOverloads("pg_table_size", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.INT64, null)
+            .addOneParamOverload("pg_encoding_to_char", OxlaDataType.INT32, OxlaDataType.TEXT, null)
+            .addOneParamOverload("pg_size_pretty", OxlaDataType.INT64, OxlaDataType.TEXT, null)
+            .addOneParamOverload("pg_get_userbyid", OxlaDataType.INT64, OxlaDataType.TEXT, null)
+            .addOneParamOverload("pg_get_indexdef", OxlaDataType.INT32, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("pg_get_indexdef", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32, OxlaDataType.BOOLEAN}, OxlaDataType.TEXT, null)
+            .addOneParamOverload("pg_table_is_visible", OxlaDataType.INT32, OxlaDataType.BOOLEAN, null)
+            .addOneParamOverloads("pg_typeof", OxlaDataType.ALL, OxlaDataType.TEXT, null)
+            .addOneParamOverload("pg_get_constraintdef", OxlaDataType.INT32, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("pg_get_constraintdef", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.BOOLEAN}, OxlaDataType.TEXT, null)
+            .addOneParamOverload("pg_get_statisticsobjdef_c", OxlaDataType.INT32, OxlaDataType.TEXT, null)
+            .addOneParamOverloads("pg_relation_is_publishable", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.BOOLEAN, null)
+            .build();
 
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.DATE}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.JSON}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIME}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_typeof", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ}, OxlaDataType.TEXT), null),
-
-            new OxlaFunction("pg_get_constraintdef", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_get_constraintdef", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.BOOLEAN}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_get_statisticsobjdef_c", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.TEXT), null),
-            new OxlaFunction("pg_relation_is_publishable", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
-            new OxlaFunction("pg_relation_is_publishable", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.BOOLEAN), null)
-    );
-
-    public static final List<OxlaFunction> SYSTEM = List.of(
-            new OxlaFunction("current_database", new OxlaTypeOverload(new OxlaDataType[]{}, OxlaDataType.TEXT), null),
-            new OxlaFunction("current_schema", new OxlaTypeOverload(new OxlaDataType[]{}, OxlaDataType.TEXT), null),
-            new OxlaFunction("version", new OxlaTypeOverload(new OxlaDataType[]{}, OxlaDataType.TEXT), null)
-    );
+    public static final List<OxlaFunction> SYSTEM = OxlaFunctionBuilder.create()
+            .addNoParamOverload("current_database", OxlaDataType.TEXT, null)
+            .addNoParamOverload("current_schema", OxlaDataType.TEXT, null)
+            .addNoParamOverload("version", OxlaDataType.TEXT, null)
+            .addOneParamMatchReturnOverload("quote_ident", OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("format_type", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
+            .addTwoParamMatrixOverloads("to_char", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.TIMESTAMP, OxlaDataType.TIMESTAMPTZ}, new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INTERVAL}, false, null)
+            .addMultipleParamOverload("obj_description", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("shobj_description", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("col_description", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("has_schema_privilege", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN, null)
+            .addMultipleParamOverload("has_schema_privilege", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN, null)
+            .addMultipleParamOverload("has_database_privilege", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN, null)
+            .addMultipleParamOverload("has_database_privilege", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN, null)
+            .addMultipleParamOverload("has_database_privilege", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN, null)
+            .build();
 
     public static final List<OxlaFunction> MISC = List.of(
             new OxlaFunction("date_trunc", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TIMESTAMP}, OxlaDataType.TIMESTAMP), null),
@@ -211,82 +205,59 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             new OxlaFunction("nullif", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.JSON, OxlaDataType.JSON}, OxlaDataType.JSON), null),
             new OxlaFunction("nullif", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
             new OxlaFunction("nullif", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIME, OxlaDataType.TIME}, OxlaDataType.TIME), null),
-            new OxlaFunction("nullif", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIMESTAMP, OxlaDataType.TIMESTAMP}, OxlaDataType.TIMESTAMP), null),
-            new OxlaFunction("nullif", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMPTZ}, OxlaDataType.TIMESTAMPTZ), null),
-
-            // privileges
-            new OxlaFunction("has_schema_privilege", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
-            new OxlaFunction("has_schema_privilege", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
-            new OxlaFunction("has_database_privilege", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
-            new OxlaFunction("has_database_privilege", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
-            new OxlaFunction("has_database_privilege", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN), null),
-
-            // postgres system functions other than pg_*
-            new OxlaFunction("quote_ident", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("format_type", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT), null),
-            new OxlaFunction("to_char", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("to_char", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("to_char", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("to_char", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("to_char", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("to_char", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.TIMESTAMPTZ, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("to_char", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("obj_description", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("shobj_description", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.TEXT}, OxlaDataType.TEXT), null),
-            new OxlaFunction("col_description", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT), null)
+            new OxlaFunction("nullif", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIMESTAMP, OxlaDataType.TIMESTAMP}, OxlaDataType.TIMESTAMP), null)
     );
 
     public static final List<OxlaFunction> WINDOW = OxlaFunctionBuilder.create()
-            .addSimpleNoParam("row_number", OxlaDataType.INT64, null)
-            .addSimpleNoParam("rank", OxlaDataType.INT64, null)
-            .addSimpleNoParam("dense_rank", OxlaDataType.INT64, null)
-            .addSimpleNoParam("percent_rank", OxlaDataType.FLOAT64, null)
-            .addSimpleNoParam("cume_dist", OxlaDataType.FLOAT64, null)
-            .addSimple("ntile", new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.INT32, null)
+            .addNoParamOverload("row_number", OxlaDataType.INT64, null)
+            .addNoParamOverload("rank", OxlaDataType.INT64, null)
+            .addNoParamOverload("dense_rank", OxlaDataType.INT64, null)
+            .addNoParamOverload("percent_rank", OxlaDataType.FLOAT64, null)
+            .addNoParamOverload("cume_dist", OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("ntile", new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.INT32, null)
+            .addOneParamMatchReturnOverloads("lag", OxlaDataType.ALL, null)
+            .addTwoParamMatrixOverloads("lag", OxlaDataType.ALL, new OxlaDataType[]{OxlaDataType.INT32}, true, null)
+//TODO new OxlaFunction("lag", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.ALL(v), OxlaDataType.INT32, OxlaDataType.ALL(v)}, OxlaDataType.ALL(v)), null),
+            .addOneParamMatchReturnOverloads("lead", OxlaDataType.ALL, null)
+//TODO new OxlaFunction("lead", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.ALL(v), OxlaDataType.INT32, OxlaDataType.ALL(v)}, OxlaDataType.ALL(v)), null),
+            .addTwoParamMatrixOverloads("lead", OxlaDataType.ALL, new OxlaDataType[]{OxlaDataType.INT32}, true, null)
+            .addOneParamMatchReturnOverloads("first_value", OxlaDataType.ALL, null)
+            .addOneParamMatchReturnOverloads("last_value", OxlaDataType.ALL, null)
+            .addTwoParamMatrixOverloads("nth_value", OxlaDataType.ALL, new OxlaDataType[]{OxlaDataType.INT32}, true, null)
             .build();
 
-// TODO ANY!
-//new OxlaFunction("lag", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.}, OxlaDataType., null),
-//new OxlaFunction("lag", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType., OxlaDataType.INT32}, OxlaDataType.), null),
-//new OxlaFunction("lag", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType., OxlaDataType.INT32, OxlaDataType.}, OxlaDataType.), null),
-//new OxlaFunction("lead", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.}, OxlaDataType.), null),
-//new OxlaFunction("lead", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType., OxlaDataType.INT32}, OxlaDataType.), null),
-//new OxlaFunction("lead", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType., OxlaDataType.INT32, OxlaDataType.}, OxlaDataType.), null),
-//new OxlaFunction("first_value", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.}, OxlaDataType.), null),
-//new OxlaFunction("last_value", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.}, OxlaDataType.), null),
-//new OxlaFunction("nth_value", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType., OxlaDataType.INT32}, OxlaDataType.), null)
 
     public static final List<OxlaFunction> AGGREGATE = OxlaFunctionBuilder.create()
-            .addOneParamSameReturn("sum", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TIME}, null)
-            .addOneParamSameReturn("min", new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TEXT, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMP, OxlaDataType.TIME}, null)
-            .addOneParamSameReturn("max", new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TEXT, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMP, OxlaDataType.TIME}, null)
-            .addOneParamSameReturn("avg", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TIME}, null)
-            .addSingleParamSpecificReturn("count", OxlaDataType.ALL, OxlaDataType.INT64, null)
-            .addOneParamSameReturn("bool_and", new OxlaDataType[]{OxlaDataType.BOOLEAN}, null)
-            .addOneParamSameReturn("bool_or", new OxlaDataType[]{OxlaDataType.BOOLEAN}, null)
-            .addOneParamSameReturn("mode", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.DATE, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.TEXT, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMP, OxlaDataType.TIME}, null)
-            .addTwoParamMatrix("percentile_disc", new OxlaDataType[]{OxlaDataType.FLOAT64}, OxlaDataType.COMPARABLE_WITHOUT_INTERVAL, false, null)
-            .addTwoParamMatrix("percentile_cont", new OxlaDataType[]{OxlaDataType.FLOAT64}, OxlaDataType.NUMERIC, true, null)
-            .addTwoParamMatrix("for_min", OxlaDataType.AGGREGABLE, OxlaDataType.ALL, false, null)
-            .addTwoParamMatrix("for_max", OxlaDataType.AGGREGABLE, OxlaDataType.ALL, false, null)
-            .addSimple("corr", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("covar_pop", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("covar_samp", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_avgx", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_avgy", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_count", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_intercept", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_r2", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_slope", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_sxx", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_sxy", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addSimple("regr_syy", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addOneParamSameReturn("stddev", OxlaDataType.NUMERIC, null)
-            .addOneParamSameReturn("stddev_pop", OxlaDataType.NUMERIC, null)
-            .addOneParamSameReturn("stddev_samp", OxlaDataType.NUMERIC, null)
-            .addOneParamSameReturn("var_pop", OxlaDataType.NUMERIC, null)
-            .addOneParamSameReturn("var_samp", OxlaDataType.NUMERIC, null)
-            .addOneParamSameReturn("variance", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("sum", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TIME}, null)
+            .addOneParamMatchReturnOverloads("min", new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TEXT, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMP, OxlaDataType.TIME}, null)
+            .addOneParamMatchReturnOverloads("max", new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TEXT, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMP, OxlaDataType.TIME}, null)
+            .addOneParamMatchReturnOverloads("avg", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TIME}, null)
+            .addOneParamOverloads("count", OxlaDataType.ALL, OxlaDataType.INT64, null)
+            .addOneParamMatchReturnOverloads("bool_and", new OxlaDataType[]{OxlaDataType.BOOLEAN}, null)
+            .addOneParamMatchReturnOverloads("bool_or", new OxlaDataType[]{OxlaDataType.BOOLEAN}, null)
+            .addOneParamMatchReturnOverloads("mode", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.DATE, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.TEXT, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMP, OxlaDataType.TIME}, null)
+            .addTwoParamMatrixOverloads("percentile_disc", new OxlaDataType[]{OxlaDataType.FLOAT64}, OxlaDataType.COMPARABLE_WITHOUT_INTERVAL, false, null)
+            .addTwoParamMatrixOverloads("percentile_cont", new OxlaDataType[]{OxlaDataType.FLOAT64}, OxlaDataType.NUMERIC, true, null)
+            .addTwoParamMatrixOverloads("for_min", OxlaDataType.AGGREGABLE, OxlaDataType.ALL, false, null)
+            .addTwoParamMatrixOverloads("for_max", OxlaDataType.AGGREGABLE, OxlaDataType.ALL, false, null)
+            .addMultipleParamOverload("corr", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("covar_pop", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("covar_samp", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_avgx", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_avgy", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_count", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_intercept", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_r2", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_slope", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_sxx", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_sxy", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("regr_syy", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addOneParamMatchReturnOverloads("stddev", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("stddev_pop", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("stddev_samp", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("var_pop", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("var_samp", OxlaDataType.NUMERIC, null)
+            .addOneParamMatchReturnOverloads("variance", OxlaDataType.NUMERIC, null)
             .build();
 
     public static class OxlaFunctionBuilder {
@@ -296,40 +267,44 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             return new OxlaFunctionBuilder();
         }
 
-        public OxlaFunctionBuilder addSimple(String textRepresentation, OxlaDataType[] inputParams, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
+        /**
+         * Creates a new function overload that takes no parameters and return specific function type.
+         */
+        public OxlaFunctionBuilder addNoParamOverload(String textRepresentation, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
+            overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{}, returnType), applyFunction));
+            return this;
+        }
+
+        public OxlaFunctionBuilder addMultipleParamOverload(String textRepresentation, OxlaDataType[] inputParams, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
             overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(inputParams, returnType), applyFunction));
             return this;
         }
 
-        public OxlaFunctionBuilder addSimple(String textRepresentation, OxlaDataType inputParam, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
+        public OxlaFunctionBuilder addOneParamOverload(String textRepresentation, OxlaDataType inputParam, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
             overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{inputParam}, returnType), applyFunction));
             return this;
         }
 
-        public OxlaFunctionBuilder addSimpleNoParam(String textRepresentation, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
-            return addSimple(textRepresentation, new OxlaDataType[]{}, returnType, applyFunction);
-        }
-
-        public OxlaFunctionBuilder addOneParamSameReturn(String textRepresentation, OxlaDataType[] types, OxlaApplyFunction applyFunction) {
-            for (OxlaDataType type : types) {
-                overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{type}, type), applyFunction));
-            }
-            return this;
-        }
-
-        public OxlaFunctionBuilder addOneParamSameReturn(String textRepresentation, OxlaDataType type, OxlaApplyFunction applyFunction) {
-            overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{type}, type), applyFunction));
-            return this;
-        }
-
-        public OxlaFunctionBuilder addSingleParamSpecificReturn(String textRepresentation, OxlaDataType[] types, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
+        public OxlaFunctionBuilder addOneParamOverloads(String textRepresentation, OxlaDataType[] types, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
             for (OxlaDataType type : types) {
                 overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{type}, returnType), applyFunction));
             }
             return this;
         }
 
-        public OxlaFunctionBuilder addTwoParamMatrix(String textRepresentation, OxlaDataType[] firstParam, OxlaDataType[] secondParam, boolean isFirstParamReturnType, OxlaApplyFunction applyFunction) {
+        public OxlaFunctionBuilder addOneParamMatchReturnOverloads(String textRepresentation, OxlaDataType[] types, OxlaApplyFunction applyFunction) {
+            for (OxlaDataType type : types) {
+                overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{type}, type), applyFunction));
+            }
+            return this;
+        }
+
+        public OxlaFunctionBuilder addOneParamMatchReturnOverload(String textRepresentation, OxlaDataType type, OxlaApplyFunction applyFunction) {
+            overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{type}, type), applyFunction));
+            return this;
+        }
+
+        public OxlaFunctionBuilder addTwoParamMatrixOverloads(String textRepresentation, OxlaDataType[] firstParam, OxlaDataType[] secondParam, boolean isFirstParamReturnType, OxlaApplyFunction applyFunction) {
             for (OxlaDataType firstType : firstParam) {
                 for (OxlaDataType secondType : secondParam) {
                     OxlaDataType returnType = isFirstParamReturnType ? firstType : secondType;
