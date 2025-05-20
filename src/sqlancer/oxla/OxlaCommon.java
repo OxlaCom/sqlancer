@@ -54,7 +54,9 @@ public class OxlaCommon {
             Pattern.compile("operator is not unique:\\s+(.+)"),
             Pattern.compile("operator does not exist:\\s+(.+)"),
             Pattern.compile("aggregate functions are not allowed in (.+)"),
-            Pattern.compile("percentile value ((-?\\d+(.\\d*)?)|inf|-inf|nan) is not between 0 and 1")
+            Pattern.compile("percentile value ((-?\\d+(.\\d*)?)|inf|-inf|nan) is not between 0 and 1"),
+            Pattern.compile("window function (.+) requires an OVER clause"),
+            Pattern.compile("relation \"[^\"]*\" does not exist")
     );
 
     public static List<String> bugErrors() {

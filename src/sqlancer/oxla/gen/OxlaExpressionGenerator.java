@@ -29,8 +29,10 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         BINARY_LOGIC_OPERATOR,
         BINARY_MISC_OPERATOR,
         BINARY_REGEX_OPERATOR,
+        PG_FUNCTION,
+        UNARY_POSTFIX_OPERATOR,
         UNARY_PREFIX_OPERATOR,
-        UNARY_POSTFIX_OPERATOR;
+        WINDOW_FUNCTION;
 
         public static ExpressionType getRandom() {
             return Randomly.fromOptions(values());
@@ -92,6 +94,10 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
                 return generateBinaryOperator(OxlaBinaryOperation.BINARY, wantReturnType, depth);
             case BINARY_MISC_OPERATOR:
                 return generateBinaryOperator(OxlaBinaryOperation.MISC, wantReturnType, depth);
+            case PG_FUNCTION:
+                return generateFunction(OxlaFunctionOperation.PG_FUNCTIONS, wantReturnType, depth);
+            case WINDOW_FUNCTION:
+                return generateFunction(OxlaFunctionOperation.WINDOW, wantReturnType, depth);
             default:
                 throw new AssertionError(expressionType);
         }
