@@ -258,9 +258,6 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             return new OxlaFunctionBuilder();
         }
 
-        /**
-         * Creates a new function overload that takes no parameters and return specific function type.
-         */
         public OxlaFunctionBuilder addNoParamOverload(String textRepresentation, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
             overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{}, returnType), applyFunction));
             return this;
