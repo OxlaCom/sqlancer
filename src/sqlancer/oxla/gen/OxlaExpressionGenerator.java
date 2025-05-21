@@ -286,7 +286,8 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
             );
         }
         if (OxlaBugs.bugOxla8350) {
-            validFunctions.removeIf(function -> function.textRepresentation.startsWith("pg_"));
+            validFunctions.removeIf(function -> function.textRepresentation.startsWith("pg_") &&
+                    Arrays.stream(function.overload.inputTypes).anyMatch(type -> type == OxlaDataType.INT32 || type == OxlaDataType.INT64));
         }
 
         if (validFunctions.isEmpty()) {
