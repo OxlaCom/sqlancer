@@ -54,10 +54,10 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
     }
 
     public static List<OxlaFunction> MATH = OxlaFunctionBuilder.create()
-            .addOneParamMatchReturnOverloads("abs", OxlaDataType.NUMERIC, null)
-            .addOneParamMatchReturnOverloads("cbrt", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamMatchReturnOverloads("ceil", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamMatchReturnOverloads("ceiling", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("abs", OxlaDataType.NUMERIC, OxlaFunctionOperation::applyAbs)
+            .addOneParamMatchReturnOverloads("cbrt", OxlaDataType.FLOATING_POINT, OxlaFunctionOperation::applyCbrt)
+            .addOneParamMatchReturnOverloads("ceil", OxlaDataType.FLOATING_POINT, OxlaFunctionOperation::applyCeil)
+            .addOneParamMatchReturnOverloads("ceiling", OxlaDataType.FLOATING_POINT, OxlaFunctionOperation::applyCeil)
             .addOneParamMatchReturnOverload("degrees", OxlaDataType.FLOAT64, null)
             .addOneParamMatchReturnOverload("exp", OxlaDataType.FLOAT64, null)
             .addOneParamMatchReturnOverloads("floor", OxlaDataType.FLOATING_POINT, null)
@@ -72,7 +72,7 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addOneParamMatchReturnOverloads("cotd", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("acosd", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("radians", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamMatchReturnOverloads("sqrt", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("sqrt", OxlaDataType.FLOATING_POINT, OxlaFunctionOperation::applySqrt)
             .addOneParamMatchReturnOverloads("ln", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("log10", OxlaDataType.FLOATING_POINT, null)
             .addMultipleParamOverload("log", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32, null)
@@ -84,7 +84,7 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addMultipleParamOverload("atan2d", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
             .addOneParamMatchReturnOverloads("atan", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("atan2d", OxlaDataType.FLOATING_POINT, null)
-            .addNoParamOverload("pi", OxlaDataType.FLOAT64, null)
+            .addNoParamOverload("pi", OxlaDataType.FLOAT64, (ignored) -> OxlaConstant.createFloat64Constant(Math.PI))
             .addOneParamMatchReturnOverloads("tan", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("tand", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("power", OxlaDataType.NUMERIC, null)
@@ -93,11 +93,25 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
 
     public static final List<OxlaFunction> STRING = OxlaFunctionBuilder.create()
             .addMultipleParamOverload("concat", OxlaDataType.ALL, OxlaDataType.TEXT, null)
-            .addOneParamOverload("length", OxlaDataType.TEXT, OxlaDataType.INT32, null)
-            .addOneParamOverload("lower", OxlaDataType.TEXT, OxlaDataType.TEXT, null)
-            .addOneParamOverload("upper", OxlaDataType.TEXT, OxlaDataType.TEXT, null)
-            .addMultipleParamOverload("replace", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
-            .addMultipleParamOverload("starts_with", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
+            .addOneParamOverload("length", OxlaDataType.TEXT, OxlaDataType.INT32, (constants -> OxlaConstant.createInt32Constant(((OxlaConstant.OxlaTextConstant) constants[0]).value.length())))
+            .addOneParamOverload("lower", OxlaDataType.TEXT, OxlaDataType.TEXT, constants -> OxlaConstant.createTextConstant(((OxlaConstant.OxlaTextConstant) constants[0]).value.toLowerCase()))
+            .addOneParamOverload("upper", OxlaDataType.TEXT, OxlaDataType.TEXT, constants -> OxlaConstant.createTextConstant(((OxlaConstant.OxlaTextConstant) constants[0]).value.toUpperCase()))
+            .addMultipleParamOverload("replace", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, constants -> {
+                final OxlaConstant.OxlaTextConstant base = (OxlaConstant.OxlaTextConstant) constants[0];
+                final OxlaConstant.OxlaTextConstant from = (OxlaConstant.OxlaTextConstant) constants[1];
+                final OxlaConstant.OxlaTextConstant to = (OxlaConstant.OxlaTextConstant) constants[2];
+                return OxlaConstant.createTextConstant(base.value.replace(from.value, to.value));
+            })
+            .addMultipleParamOverload("starts_with", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN, constants -> {
+                final OxlaConstant.OxlaTextConstant base = (OxlaConstant.OxlaTextConstant) constants[0];
+                final OxlaConstant.OxlaTextConstant pattern = (OxlaConstant.OxlaTextConstant) constants[1];
+                return OxlaConstant.createBooleanConstant(base.value.startsWith(pattern.value));
+            })
+            .addMultipleParamOverload("ends_with", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.BOOLEAN, constants -> {
+                final OxlaConstant.OxlaTextConstant base = (OxlaConstant.OxlaTextConstant) constants[0];
+                final OxlaConstant.OxlaTextConstant pattern = (OxlaConstant.OxlaTextConstant) constants[1];
+                return OxlaConstant.createBooleanConstant(base.value.endsWith(pattern.value));
+            })
             .addMultipleParamOverload("substr", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
             .addMultipleParamOverload("substr", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
             .addMultipleParamOverload("substring", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
@@ -128,7 +142,7 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .build();
 
     public static final List<OxlaFunction> SYSTEM = OxlaFunctionBuilder.create()
-            .addNoParamOverload("current_database", OxlaDataType.TEXT, null)
+            .addNoParamOverload("current_database", OxlaDataType.TEXT, (ignored) -> OxlaConstant.createTextConstant("oxla"))
             .addNoParamOverload("current_schema", OxlaDataType.TEXT, null)
             .addNoParamOverload("version", OxlaDataType.TEXT, null)
             .addOneParamMatchReturnOverload("quote_ident", OxlaDataType.TEXT, null)
@@ -306,5 +320,53 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
         public List<OxlaFunction> build() {
             return List.of(overloads.toArray(OxlaFunction[]::new));
         }
+    }
+
+    private static OxlaConstant applyAbs(OxlaConstant[] constants) {
+        final OxlaConstant constant = constants[0];
+        if (constant instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant(Math.abs(((OxlaConstant.OxlaFloat32Constant) constant).value));
+        } else if (constant instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(Math.abs(((OxlaConstant.OxlaFloat64Constant) constant).value));
+        } else if (constant instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant(Math.abs(((OxlaConstant.OxlaIntegerConstant) constant).value));
+        }
+        throw new AssertionError(String.format("OxlaFunctionOperation::applyAbs failed: %s", constant.getClass()));
+    }
+
+    private static OxlaConstant applySqrt(OxlaConstant[] constants) {
+        final OxlaConstant constant = constants[0];
+        if (constant instanceof OxlaConstant.OxlaNullConstant) {
+            return OxlaConstant.createNullConstant();
+        } else if (constant instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant((float) Math.sqrt(((OxlaConstant.OxlaFloat32Constant) constant).value));
+        } else if (constant instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(Math.sqrt(((OxlaConstant.OxlaFloat64Constant) constant).value));
+        }
+        throw new AssertionError(String.format("OxlaFunctionOperation::applySqrt failed: %s", constant.getClass()));
+    }
+
+    private static OxlaConstant applyCbrt(OxlaConstant[] constants) {
+        final OxlaConstant constant = constants[0];
+        if (constant instanceof OxlaConstant.OxlaNullConstant) {
+            return OxlaConstant.createNullConstant();
+        } else if (constant instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant((float) Math.cbrt(((OxlaConstant.OxlaFloat32Constant) constant).value));
+        } else if (constant instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(Math.cbrt(((OxlaConstant.OxlaFloat64Constant) constant).value));
+        }
+        throw new AssertionError(String.format("OxlaFunctionOperation::applyCbrt failed: %s", constant.getClass()));
+    }
+
+    private static OxlaConstant applyCeil(OxlaConstant[] constants) {
+        final OxlaConstant constant = constants[0];
+        if (constant instanceof OxlaConstant.OxlaNullConstant) {
+            return OxlaConstant.createNullConstant();
+        } else if (constant instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant((float) Math.ceil(((OxlaConstant.OxlaFloat32Constant) constant).value));
+        } else if (constant instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(Math.ceil(((OxlaConstant.OxlaFloat64Constant) constant).value));
+        }
+        throw new AssertionError(String.format("OxlaFunctionOperation::applyCbrt failed: %s", constant.getClass()));
     }
 }
