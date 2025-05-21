@@ -48,7 +48,8 @@ public class OxlaCommon {
             "OFFSET must not be negative",
             "aggregate function calls cannot be nested",
             "expecting only literal for percentiles",
-            "could not determine polymorphic type because input has type unknown"
+            "could not determine polymorphic type because input has type unknown",
+            "cannot get array length of a non-array"
     );
     public static final List<Pattern> EXPRESSION_REGEX_ERRORS = List.of(
             Pattern.compile("operator is not unique:\\s+(.+)"),
@@ -56,7 +57,11 @@ public class OxlaCommon {
             Pattern.compile("aggregate functions are not allowed in (.+)"),
             Pattern.compile("percentile value ((-?\\d+(.\\d*)?)|inf|-inf|nan) is not between 0 and 1"),
             Pattern.compile("window function (.+) requires an OVER clause"),
-            Pattern.compile("relation \"[^\"]*\" does not exist")
+            Pattern.compile("relation \"[^\"]*\" does not exist"),
+            Pattern.compile("unit \"[^\"]*\" not recognized for type (.+)"),
+            Pattern.compile("database \"[^\"]*\" does not exist"),
+            Pattern.compile("role \"[^\"]*\" does not exist"),
+            Pattern.compile("HAS_SCHEMA_PRIVILEGE function got unrecognized privilege type:\\s+\"[^\"]*\"")
     );
 
     public static List<String> bugErrors() {

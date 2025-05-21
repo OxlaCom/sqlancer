@@ -58,7 +58,10 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addOneParamMatchReturnOverloads("cbrt", OxlaDataType.FLOATING_POINT, OxlaFunctionOperation::applyCbrt)
             .addOneParamMatchReturnOverloads("ceil", OxlaDataType.FLOATING_POINT, OxlaFunctionOperation::applyCeil)
             .addOneParamMatchReturnOverloads("ceiling", OxlaDataType.FLOATING_POINT, OxlaFunctionOperation::applyCeil)
-            .addOneParamMatchReturnOverload("degrees", OxlaDataType.FLOAT64, null)
+            .addOneParamMatchReturnOverload("degrees", OxlaDataType.FLOAT64, constants -> {
+                OxlaConstant.OxlaFloat64Constant constant = (OxlaConstant.OxlaFloat64Constant) constants[0];
+                return OxlaConstant.createFloat64Constant(Math.toDegrees(constant.value));
+            })
             .addOneParamMatchReturnOverload("exp", OxlaDataType.FLOAT64, null)
             .addOneParamMatchReturnOverloads("floor", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("round", OxlaDataType.FLOATING_POINT, null)
@@ -87,7 +90,10 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addNoParamOverload("pi", OxlaDataType.FLOAT64, (ignored) -> OxlaConstant.createFloat64Constant(Math.PI))
             .addOneParamMatchReturnOverloads("tan", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("tand", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamMatchReturnOverloads("power", OxlaDataType.NUMERIC, null)
+            .addMultipleParamOverload("power", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32, OxlaFunctionOperation::applyBitPower)
+            .addMultipleParamOverload("power", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, OxlaFunctionOperation::applyBitPower)
+            .addMultipleParamOverload("power", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32, OxlaFunctionOperation::applyBitPower)
+            .addMultipleParamOverload("power", new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64, OxlaFunctionOperation::applyBitPower)
             .addOneParamMatchReturnOverloads("sign", OxlaDataType.NUMERIC, null)
             .build();
 
@@ -200,17 +206,17 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addMultipleParamOverload("if", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIME, OxlaDataType.TIME}, OxlaDataType.TIME, null)
             .addMultipleParamOverload("if", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIMESTAMP, OxlaDataType.TIMESTAMP}, OxlaDataType.TIMESTAMP, null)
             .addMultipleParamOverload("if", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMPTZ}, OxlaDataType.TIMESTAMPTZ, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN}, OxlaDataType.BOOLEAN, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.DATE, OxlaDataType.DATE}, OxlaDataType.DATE, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.INTERVAL, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.JSON, OxlaDataType.JSON}, OxlaDataType.JSON, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIME, OxlaDataType.TIME}, OxlaDataType.TIME, null)
-            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.TIMESTAMP, OxlaDataType.TIMESTAMP}, OxlaDataType.TIMESTAMP, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.BOOLEAN, OxlaDataType.BOOLEAN}, OxlaDataType.BOOLEAN, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.DATE}, OxlaDataType.DATE, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.INT32, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.INT64, OxlaDataType.INT64}, OxlaDataType.INT64, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.INTERVAL, OxlaDataType.INTERVAL}, OxlaDataType.INTERVAL, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.JSON, OxlaDataType.JSON}, OxlaDataType.JSON, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.TEXT, OxlaDataType.TEXT}, OxlaDataType.TEXT, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.TIME, OxlaDataType.TIME}, OxlaDataType.TIME, null)
+            .addMultipleParamOverload("nullif", new OxlaDataType[]{OxlaDataType.TIMESTAMP, OxlaDataType.TIMESTAMP}, OxlaDataType.TIMESTAMP, null)
             .build();
 
     public static final List<OxlaFunction> WINDOW = OxlaFunctionBuilder.create()
@@ -222,13 +228,14 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addMultipleParamOverload("ntile", new OxlaDataType[]{OxlaDataType.INT32}, OxlaDataType.INT32, null)
             .addOneParamMatchReturnOverloads("lag", OxlaDataType.ALL, null)
             .addTwoParamMatrixOverloads("lag", OxlaDataType.ALL, new OxlaDataType[]{OxlaDataType.INT32}, true, null)
-//TODO new OxlaFunction("lag", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.ALL(v), OxlaDataType.INT32, OxlaDataType.ALL(v)}, OxlaDataType.ALL(v)), null),
             .addOneParamMatchReturnOverloads("lead", OxlaDataType.ALL, null)
-//TODO new OxlaFunction("lead", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.ALL(v), OxlaDataType.INT32, OxlaDataType.ALL(v)}, OxlaDataType.ALL(v)), null),
             .addTwoParamMatrixOverloads("lead", OxlaDataType.ALL, new OxlaDataType[]{OxlaDataType.INT32}, true, null)
             .addOneParamMatchReturnOverloads("first_value", OxlaDataType.ALL, null)
             .addOneParamMatchReturnOverloads("last_value", OxlaDataType.ALL, null)
             .addTwoParamMatrixOverloads("nth_value", OxlaDataType.ALL, new OxlaDataType[]{OxlaDataType.INT32}, true, null)
+// TODO: Find a way of generating overloads based on constraints and implement these functions:
+//       new OxlaFunction("lag", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.ALL(v), OxlaDataType.INT32, OxlaDataType.ALL(v)}, OxlaDataType.ALL(v)), null),
+//       new OxlaFunction("lead", new OxlaTypeOverload(new OxlaDataType[]{OxlaDataType.ALL(v), OxlaDataType.INT32, OxlaDataType.ALL(v)}, OxlaDataType.ALL(v)), null),
             .build();
 
 
@@ -257,12 +264,12 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addMultipleParamOverload("regr_sxx", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
             .addMultipleParamOverload("regr_sxy", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
             .addMultipleParamOverload("regr_syy", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
-            .addOneParamMatchReturnOverloads("stddev", OxlaDataType.NUMERIC, null)
-            .addOneParamMatchReturnOverloads("stddev_pop", OxlaDataType.NUMERIC, null)
-            .addOneParamMatchReturnOverloads("stddev_samp", OxlaDataType.NUMERIC, null)
-            .addOneParamMatchReturnOverloads("var_pop", OxlaDataType.NUMERIC, null)
-            .addOneParamMatchReturnOverloads("var_samp", OxlaDataType.NUMERIC, null)
-            .addOneParamMatchReturnOverloads("variance", OxlaDataType.NUMERIC, null)
+            .addOneParamOverloads("stddev", OxlaDataType.NUMERIC, OxlaDataType.FLOAT64, null)
+            .addOneParamOverloads("stddev_pop", OxlaDataType.NUMERIC, OxlaDataType.FLOAT64, null)
+            .addOneParamOverloads("stddev_samp", OxlaDataType.NUMERIC, OxlaDataType.FLOAT64, null)
+            .addOneParamOverloads("var_pop", OxlaDataType.NUMERIC, OxlaDataType.FLOAT64, null)
+            .addOneParamOverloads("var_samp", OxlaDataType.NUMERIC, OxlaDataType.FLOAT64, null)
+            .addOneParamOverloads("variance", OxlaDataType.NUMERIC, OxlaDataType.FLOAT64, null)
             .build();
 
     public static class OxlaFunctionBuilder {
@@ -368,5 +375,18 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             return OxlaConstant.createFloat64Constant(Math.ceil(((OxlaConstant.OxlaFloat64Constant) constant).value));
         }
         throw new AssertionError(String.format("OxlaFunctionOperation::applyCbrt failed: %s", constant.getClass()));
+    }
+
+    private static OxlaConstant applyBitPower(OxlaConstant[] constants) {
+        final OxlaConstant left = constants[0];
+        final OxlaConstant right = constants[1];
+        if (left instanceof OxlaConstant.OxlaIntegerConstant && right instanceof OxlaConstant.OxlaIntegerConstant) {
+            return OxlaConstant.createInt64Constant((long) Math.pow(((OxlaConstant.OxlaIntegerConstant) left).value, ((OxlaConstant.OxlaIntegerConstant) right).value));
+        } else if (left instanceof OxlaConstant.OxlaFloat32Constant && right instanceof OxlaConstant.OxlaFloat32Constant) {
+            return OxlaConstant.createFloat32Constant((float) Math.pow(((OxlaConstant.OxlaFloat32Constant) left).value, ((OxlaConstant.OxlaFloat32Constant) right).value));
+        } else if (left instanceof OxlaConstant.OxlaFloat64Constant && right instanceof OxlaConstant.OxlaFloat64Constant) {
+            return OxlaConstant.createFloat64Constant(Math.pow(((OxlaConstant.OxlaFloat64Constant) left).value, ((OxlaConstant.OxlaFloat64Constant) right).value));
+        }
+        throw new AssertionError(String.format("OxlaFunctionOperation::applyBitPower failed: %s vs %s", constants[0].getClass(), constants[1].getClass()));
     }
 }

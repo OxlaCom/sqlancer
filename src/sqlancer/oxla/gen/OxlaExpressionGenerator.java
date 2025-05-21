@@ -276,6 +276,19 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         List<OxlaFunctionOperation.OxlaFunction> validFunctions = new ArrayList<>(functions);
         validFunctions.removeIf(function -> function.overload.returnType != wantReturnType);
 
+        if (OxlaBugs.bugOxla8347) {
+            validFunctions.removeIf(function -> function.textRepresentation.equalsIgnoreCase("pg_typeof"));
+        }
+        if (OxlaBugs.bugOxla8349) {
+            validFunctions.removeIf(function ->
+                    function.textRepresentation.equalsIgnoreCase("for_min") ||
+                            function.textRepresentation.equalsIgnoreCase("for_max")
+            );
+        }
+        if (OxlaBugs.bugOxla8350) {
+            validFunctions.removeIf(function -> function.textRepresentation.startsWith("pg_"));
+        }
+
         if (validFunctions.isEmpty()) {
             // In case no operator matches the criteria - we can safely generate a leaf expression instead.
             return generateLeafNode(wantReturnType);
