@@ -2,6 +2,7 @@ package sqlancer.oxla.gen;
 
 import sqlancer.Randomly;
 import sqlancer.common.gen.NoRECGenerator;
+import sqlancer.common.gen.TLPWhereGenerator;
 import sqlancer.common.gen.TypedExpressionGenerator;
 import sqlancer.common.schema.AbstractTables;
 import sqlancer.oxla.OxlaBugs;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpression, OxlaColumn, OxlaDataType>
-        implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
+        implements NoRECGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn>, TLPWhereGenerator<OxlaSelect, OxlaJoin, OxlaExpression, OxlaTable, OxlaColumn> {
     private enum ExpressionType {
         AGGREGATE_FUNCTION,
         BINARY_ARITHMETIC_OPERATOR,
@@ -195,6 +196,14 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
     @Override
     public List<OxlaExpression> getTableRefs() {
         return tables.stream().map(OxlaTableReference::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OxlaExpression> generateFetchColumns(boolean shouldCreateDummy) {
+        if (shouldCreateDummy || columns.isEmpty()) {
+            return List.of(new OxlaColumnReference(new OxlaColumn("*", null)));
+        }
+        return Randomly.nonEmptySubset(columns.stream().map(OxlaColumnReference::new).collect(Collectors.toList()));
     }
 
     @Override

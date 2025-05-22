@@ -3,9 +3,9 @@ package sqlancer.oxla.oracle;
 import sqlancer.Randomly;
 import sqlancer.SQLConnection;
 import sqlancer.common.oracle.PivotedQuerySynthesisBase;
+import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.Query;
 import sqlancer.common.query.SQLQueryAdapter;
-import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaExpectedValueVisitor;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
@@ -23,19 +23,9 @@ import java.util.stream.Collectors;
 public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<OxlaGlobalState, OxlaRowValue, OxlaExpression, SQLConnection> {
     private List<OxlaColumn> fetchColumns;
 
-    public OxlaPivotedQuerySynthesisOracle(OxlaGlobalState globalState) {
+    public OxlaPivotedQuerySynthesisOracle(OxlaGlobalState globalState, ExpectedErrors errors) {
         super(globalState);
-        errors.addAll(OxlaCommon.SYNTAX_ERRORS);
-        errors.addAllRegexes(OxlaCommon.SYNTAX_REGEX_ERRORS);
-        errors.addAll(OxlaCommon.JOIN_ERRORS);
-        errors.addAllRegexes(OxlaCommon.JOIN_REGEX_ERRORS);
-        errors.addAll(OxlaCommon.GROUP_BY_ERRORS);
-        errors.addAllRegexes(OxlaCommon.GROUP_BY_REGEX_ERRORS);
-        errors.addAll(OxlaCommon.ORDER_BY_ERRORS);
-        errors.addAllRegexes(OxlaCommon.ORDER_BY_REGEX_ERRORS);
-        errors.addAll(OxlaCommon.EXPRESSION_ERRORS);
-        errors.addAllRegexes(OxlaCommon.EXPRESSION_REGEX_ERRORS);
-        errors.addAll(OxlaCommon.bugErrors());
+        this.errors.addAll(errors);
     }
 
     @Override
