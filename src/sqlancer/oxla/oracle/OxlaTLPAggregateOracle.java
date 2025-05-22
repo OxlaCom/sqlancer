@@ -7,7 +7,6 @@ import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.common.query.SQLancerResultSet;
 import sqlancer.oxla.OxlaGlobalState;
-import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.*;
 import sqlancer.oxla.gen.OxlaExpressionGenerator;
 import sqlancer.oxla.schema.OxlaDataType;

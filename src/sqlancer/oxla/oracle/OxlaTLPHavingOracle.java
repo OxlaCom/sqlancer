@@ -40,7 +40,7 @@ public class OxlaTLPHavingOracle extends OxlaTLPBase {
         final String isNullQuery = select.asString();
 
         final List<String> combinedString = new ArrayList<>();
-        final List<String> combinedResult = ComparatorHelper.getCombinedResultSetNoDuplicates(trueQuery, falseQuery, isNullQuery, combinedString, true, state, errors);
+        final List<String> combinedResult = ComparatorHelper.getCombinedResultSetNoDuplicates(trueQuery, falseQuery, isNullQuery, combinedString, !generateOrderBy, state, errors);
         ComparatorHelper.assumeResultSetsAreEqual(originalResult, combinedResult, originalQuery, combinedString, state);
     }
 }

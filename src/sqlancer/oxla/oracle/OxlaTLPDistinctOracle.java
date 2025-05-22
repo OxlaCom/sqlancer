@@ -3,7 +3,6 @@ package sqlancer.oxla.oracle;
 import sqlancer.ComparatorHelper;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.oxla.OxlaGlobalState;
-import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.OxlaSelect;
 
 import java.util.ArrayList;

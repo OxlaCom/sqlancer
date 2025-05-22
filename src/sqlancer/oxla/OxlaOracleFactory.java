@@ -64,7 +64,7 @@ public enum OxlaOracleFactory implements OracleFactory<OxlaGlobalState> {
     WHERE_EXTENDED {
         @Override
         public TestOracle<OxlaGlobalState> create(OxlaGlobalState globalState) throws Exception {
-            return new OxlaTLPWhereExtendedOracle(globalState);
+            return new OxlaTLPWhereExtendedOracle(globalState, OxlaCommon.ALL_ERRORS);
         }
     },
     QUERY_PARTITIONING {
