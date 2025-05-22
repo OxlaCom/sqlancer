@@ -18,13 +18,13 @@ public class OxlaTLPBase extends TernaryLogicPartitioningOracleBase<OxlaExpressi
 
     protected OxlaTLPBase(OxlaGlobalState state) {
         super(state);
-        generator = new OxlaExpressionGenerator(state).setColumns(targetTables.getColumns());
     }
 
     @Override
     public void check() throws Exception {
-        initializeTernaryPredicateVariants();
         targetTables = state.getSchema().getRandomTableNonEmptyTables();
+        generator = new OxlaExpressionGenerator(state).setTablesAndColumns(targetTables).setColumns(targetTables.getColumns());
+        initializeTernaryPredicateVariants();
         select = new OxlaSelect();
         select.setFetchColumns(generator.generateFetchColumns(Randomly.getBoolean()));
         select.setJoinClauses(generator.getRandomJoinClauses());

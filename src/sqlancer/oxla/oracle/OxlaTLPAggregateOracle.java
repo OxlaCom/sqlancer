@@ -30,7 +30,7 @@ public class OxlaTLPAggregateOracle extends OxlaTLPBase {
     public void check() throws Exception {
         super.check();
         final OxlaTables targetTables = state.getSchema().getRandomTableNonEmptyTables();
-        generator = new OxlaExpressionGenerator(state).setColumns(targetTables.getColumns());
+        generator = new OxlaExpressionGenerator(state).setTablesAndColumns(targetTables).setColumns(targetTables.getColumns());
         final OxlaSelect select = new OxlaSelect();
         final OxlaFunctionOperation.OxlaFunction aggregateFunction = Randomly.fromList(OxlaFunctionOperation.AGGREGATE.stream().filter(p -> {
             final String textRepresentation = p.textRepresentation;

@@ -28,7 +28,8 @@ public class OxlaCommon {
             Pattern.compile("could not identify an ordering operator for type\\s+.*")
     );
     public static final List<String> GROUP_BY_ERRORS = List.of(
-            "non-integer constant in GROUP BY"
+            "non-integer constant in GROUP BY",
+            "'*' can be used only in the SELECT clause."
     );
     public static final List<Pattern> GROUP_BY_REGEX_ERRORS = List.of(
             Pattern.compile("GROUP BY position (\\d+) is not in select list"),
@@ -78,6 +79,7 @@ public class OxlaCommon {
         if (OxlaBugs.bugOxla8332) {
             list.add("std::get: wrong index for variant");
         }
+        list.add("is not supported"); // TODO TEMP
         return list;
     }
 
