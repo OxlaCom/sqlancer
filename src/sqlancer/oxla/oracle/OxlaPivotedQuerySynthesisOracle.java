@@ -84,7 +84,7 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
             OxlaExpressionGenerator generator = new OxlaExpressionGenerator(globalState);
             generator.setColumns(fetchColumns);
             generator.setRowValue(pivotRow);
-            OxlaExpression expr = generator.generateExpression(OxlaDataType.BOOLEAN);
+            OxlaExpression expr = generator.generatePredicate();
             OxlaExpression result = null;
             if (expr.getExpectedValue() instanceof OxlaConstant.OxlaNullConstant) {
                 result = new OxlaUnaryPostfixOperation(expr, OxlaUnaryPostfixOperation.IS_NULL);
@@ -127,7 +127,7 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
             select.setOffsetClause(OxlaConstant.createInt32Constant(0));
         }
 
-        return new SQLQueryAdapter(OxlaToStringVisitor.asString(select), errors);
+        return new SQLQueryAdapter(select.asString(), errors);
     }
 
     @Override

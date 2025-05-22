@@ -3,6 +3,7 @@ package sqlancer.oxla;
 import sqlancer.OracleFactory;
 import sqlancer.common.oracle.CompositeTestOracle;
 import sqlancer.common.oracle.NoRECOracle;
+import sqlancer.common.oracle.TLPWhereOracle;
 import sqlancer.common.oracle.TestOracle;
 import sqlancer.oxla.gen.OxlaExpressionGenerator;
 import sqlancer.oxla.oracle.*;
@@ -38,26 +39,26 @@ public enum OxlaOracleFactory implements OracleFactory<OxlaGlobalState> {
     DISTINCT {
         @Override
         public TestOracle<OxlaGlobalState> create(OxlaGlobalState globalState) throws Exception {
-            return new OxlaTLPDistinctOracle(globalState);
+            return new OxlaTLPDistinctOracle(globalState, OxlaCommon.ALL_ERRORS);
         }
     },
     GROUP_BY {
         @Override
         public TestOracle<OxlaGlobalState> create(OxlaGlobalState globalState) throws Exception {
-            return new OxlaTLPGroupByOracle(globalState);
+            return new OxlaTLPGroupByOracle(globalState, OxlaCommon.ALL_ERRORS);
         }
     },
     HAVING {
         @Override
         public TestOracle<OxlaGlobalState> create(OxlaGlobalState globalState) throws Exception {
-            return new OxlaTLPHavingOracle(globalState);
+            return new OxlaTLPHavingOracle(globalState, OxlaCommon.ALL_ERRORS);
         }
     },
     WHERE {
         @Override
         public TestOracle<OxlaGlobalState> create(OxlaGlobalState globalState) throws Exception {
             OxlaExpressionGenerator generator = new OxlaExpressionGenerator(globalState);
-            return new NoRECOracle<>(globalState, generator, OxlaCommon.ALL_ERRORS);
+            return new TLPWhereOracle<>(globalState, generator, OxlaCommon.ALL_ERRORS);
         }
     },
     WHERE_EXTENDED {

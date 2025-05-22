@@ -29,6 +29,7 @@ public class OxlaTLPAggregateOracle extends OxlaTLPBase {
 
     @Override
     public void check() throws Exception {
+        super.check();
         final OxlaTables targetTables = state.getSchema().getRandomTableNonEmptyTables();
         generator = new OxlaExpressionGenerator(state).setColumns(targetTables.getColumns());
         final OxlaSelect select = new OxlaSelect();
@@ -55,7 +56,7 @@ public class OxlaTLPAggregateOracle extends OxlaTLPBase {
             select.setOrderByClauses(generator.generateOrderBys());
         }
 
-        final String originalQuery = OxlaToStringVisitor.asString(select);
+        final String originalQuery = select.asString();
         final String firstResult = getAggregateResult(originalQuery);
         final String metamorphicQuery = createMetamorphicUnionQuery(select, aggregate, select.getFromList());
         final String secondResult = getAggregateResult(metamorphicQuery);
@@ -72,7 +73,7 @@ public class OxlaTLPAggregateOracle extends OxlaTLPBase {
     }
 
     private String createMetamorphicUnionQuery(OxlaSelect select, OxlaFunctionOperation aggregate, List<OxlaExpression> fromClauses) {
-        final OxlaExpression whereClause = generator.generateExpression(OxlaDataType.BOOLEAN);
+        final OxlaExpression whereClause = generator.generatePredicate();
         final OxlaExpression negatedClause = new OxlaUnaryPrefixOperation(whereClause, OxlaUnaryPrefixOperation.NOT);
         final OxlaExpression notNullClause = new OxlaUnaryPostfixOperation(whereClause, OxlaUnaryPostfixOperation.IS_NULL);
 
@@ -83,9 +84,9 @@ public class OxlaTLPAggregateOracle extends OxlaTLPBase {
 
         return String.format("SELECT %s FROM (%s UNION ALL %s UNION ALL %s) as result",
                 getOuterAggregateFunction(aggregate),
-                OxlaToStringVisitor.asString(leftSelect),
-                OxlaToStringVisitor.asString(middleSelect),
-                OxlaToStringVisitor.asString(rightSelect));
+                leftSelect.asString(),
+                middleSelect.asString(),
+                rightSelect.asString());
     }
 
     private OxlaSelect getSelect(List<OxlaExpression> aggregates, List<OxlaExpression> fromClauses, OxlaExpression whereClause, List<OxlaJoin> joinList) {

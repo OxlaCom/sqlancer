@@ -186,8 +186,7 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
             OxlaExpressionGenerator joinGenerator = new OxlaExpressionGenerator(globalState).setColumns(columns);
             OxlaJoin.JoinType joinType = OxlaJoin.JoinType.getRandom();
             joinStatements.add(new OxlaJoin(leftTable, rightTable, joinType, joinType != OxlaJoin.JoinType.CROSS
-                    ? joinGenerator.generateExpression(OxlaDataType.BOOLEAN)
-                    : null));
+                    ? joinGenerator.generatePredicate() : null));
         }
         tables = tableReferences.stream().map(OxlaTableReference::getTable).collect(Collectors.toList());
         return joinStatements;
