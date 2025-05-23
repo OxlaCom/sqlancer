@@ -46,6 +46,7 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
     private final OxlaGlobalState globalState;
     private List<OxlaTable> tables;
     private OxlaRowValue rowValue;
+    private boolean forceLiteralCasts = false;
 
     public OxlaExpressionGenerator(OxlaGlobalState globalState) {
         this.globalState = globalState;
@@ -56,14 +57,20 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
         return this;
     }
 
+    public OxlaExpressionGenerator forceLiteralCasts(boolean forceLiteralCasts) {
+        this.forceLiteralCasts = forceLiteralCasts;
+        return this;
+    }
+
     @Override
     public OxlaExpression generateConstant(OxlaDataType type) {
         if (Randomly.getBooleanWithSmallProbability()) {
-            return OxlaConstant.createNullConstant();
+            return forceLiteralCasts ? new OxlaCast(OxlaConstant.createNullConstant(), type)
+                    : OxlaConstant.createNullConstant();
         }
         // FIXME Imho, we should generate a random constant that is implicitly or explicitly cast-able to the wanted type.
         OxlaExpression expression = OxlaConstant.getRandomForType(globalState, type);
-        if (Randomly.getBooleanWithRatherLowProbability()) {
+        if (forceLiteralCasts || Randomly.getBooleanWithRatherLowProbability()) {
             return new OxlaCast(expression, type); // Explicit cast to self type.
         }
         return expression;

@@ -20,16 +20,16 @@ public class OxlaTLPHavingOracle extends OxlaTLPBase {
         if (Randomly.getBoolean()) {
             select.setWhereClause(generator.generatePredicate());
         }
+        final boolean generateOrderBy = Randomly.getBoolean();
+        if (generateOrderBy) {
+            select.setOrderByClauses(generator.generateOrderBys());
+        }
         select.setGroupByExpressions(generator.generateExpressions(Randomly.smallNumber() + 1));
         select.setHavingClause(null);
 
         final String originalQuery = select.asString();
         final List<String> originalResult = ComparatorHelper.getResultSetFirstColumnAsString(originalQuery, errors, state);
 
-        final boolean generateOrderBy = Randomly.getBoolean();
-        if (generateOrderBy) {
-            select.setOrderByClauses(generator.generateOrderBys());
-        }
         select.setHavingClause(predicate);
         final String trueQuery = select.asString();
 
