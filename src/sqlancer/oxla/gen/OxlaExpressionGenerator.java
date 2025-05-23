@@ -294,8 +294,13 @@ public class OxlaExpressionGenerator extends TypedExpressionGenerator<OxlaExpres
             );
         }
         if (OxlaBugs.bugOxla8350) {
-            validFunctions.removeIf(function -> function.textRepresentation.startsWith("pg_") &&
+            validFunctions.removeIf(function -> (function.textRepresentation.startsWith("pg_") ||
+                    function.textRepresentation.startsWith("has_")) &&
                     Arrays.stream(function.overload.inputTypes).anyMatch(type -> type == OxlaDataType.INT32 || type == OxlaDataType.INT64));
+        }
+
+        if (OxlaBugs.bugOxla8364) {
+            validFunctions.removeIf(function -> (function.textRepresentation.equalsIgnoreCase("timestamp_trunc")));
         }
 
         if (validFunctions.isEmpty()) {

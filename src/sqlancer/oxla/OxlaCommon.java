@@ -62,7 +62,8 @@ public class OxlaCommon {
             Pattern.compile("unit \"[^\"]*\" not recognized for type (.+)"),
             Pattern.compile("database \"[^\"]*\" does not exist"),
             Pattern.compile("role \"[^\"]*\" does not exist"),
-            Pattern.compile("HAS_SCHEMA_PRIVILEGE function got unrecognized privilege type:\\s+\"[^\"]*\"")
+            Pattern.compile("HAS_SCHEMA_PRIVILEGE function got unrecognized privilege type:\\s+\"[^\"]*\""),
+            Pattern.compile("found multiple function overloads taking arguments from different type categories, when trying to match function\\s+(.+)")
     );
 
     public static List<String> bugErrors() {

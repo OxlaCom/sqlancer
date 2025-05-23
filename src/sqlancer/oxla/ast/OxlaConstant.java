@@ -223,9 +223,9 @@ public abstract class OxlaConstant implements OxlaExpression {
         @Override
         public String toString() {
             if (value == Float.POSITIVE_INFINITY) {
-                return "'infinity'";
+                return "'infinity'::FLOAT4";
             } else if (value == Float.NEGATIVE_INFINITY) {
-                return "'-infinity'";
+                return "'-infinity'::FLOAT4";
             }
             return String.valueOf(value);
         }
@@ -271,9 +271,9 @@ public abstract class OxlaConstant implements OxlaExpression {
         @Override
         public String toString() {
             if (value == Double.POSITIVE_INFINITY) {
-                return "'infinity'";
+                return "'infinity'::FLOAT8";
             } else if (value == Double.NEGATIVE_INFINITY) {
-                return "'-infinity'";
+                return "'-infinity'::FLOAT8";
             }
             return String.valueOf(value);
         }

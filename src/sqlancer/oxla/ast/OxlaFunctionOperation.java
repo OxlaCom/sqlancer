@@ -86,7 +86,7 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addMultipleParamOverload("atan2d", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT32}, OxlaDataType.FLOAT32, null)
             .addMultipleParamOverload("atan2d", new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64}, OxlaDataType.FLOAT64, null)
             .addOneParamMatchReturnOverloads("atan", OxlaDataType.FLOATING_POINT, null)
-            .addOneParamMatchReturnOverloads("atan2d", OxlaDataType.FLOATING_POINT, null)
+            .addOneParamMatchReturnOverloads("atand", OxlaDataType.FLOATING_POINT, null)
             .addNoParamOverload("pi", OxlaDataType.FLOAT64, (ignored) -> OxlaConstant.createFloat64Constant(Math.PI))
             .addOneParamMatchReturnOverloads("tan", OxlaDataType.FLOATING_POINT, null)
             .addOneParamMatchReturnOverloads("tand", OxlaDataType.FLOATING_POINT, null)
