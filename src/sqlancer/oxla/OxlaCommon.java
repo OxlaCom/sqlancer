@@ -33,7 +33,8 @@ public class OxlaCommon {
     );
     public static final List<Pattern> GROUP_BY_REGEX_ERRORS = List.of(
             Pattern.compile("GROUP BY position (\\d+) is not in select list"),
-            Pattern.compile("column \"[^\"]+\" must appear in the GROUP BY clause or be used in an aggregate function")
+            Pattern.compile("column \"[^\"]+\" must appear in the GROUP BY clause or be used in an aggregate function"),
+            Pattern.compile("could not identify an equality operator for type\\s+(.*)")
     );
     public static final List<String> ORDER_BY_ERRORS = List.of(
             "non-integer constant in ORDER BY"
