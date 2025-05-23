@@ -240,7 +240,7 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
 
 
     public static final List<OxlaFunction> AGGREGATE = OxlaFunctionBuilder.create()
-            .addOneParamMatchReturnOverloads("sum", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TIME}, null)
+            .addOneParamOverloads("sum", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TIME}, new OxlaDataType[]{OxlaDataType.FLOAT64, OxlaDataType.FLOAT64, OxlaDataType.INT64, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TIME}, null)
             .addOneParamMatchReturnOverloads("min", new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TEXT, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMP, OxlaDataType.TIME}, null)
             .addOneParamMatchReturnOverloads("max", new OxlaDataType[]{OxlaDataType.DATE, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.TEXT, OxlaDataType.TIMESTAMPTZ, OxlaDataType.TIMESTAMP, OxlaDataType.TIME}, null)
             .addOneParamOverloads("avg", new OxlaDataType[]{OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.INT32, OxlaDataType.INT64}, OxlaDataType.FLOAT64, null)
@@ -299,6 +299,14 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
         public OxlaFunctionBuilder addOneParamOverloads(String textRepresentation, OxlaDataType[] types, OxlaDataType returnType, OxlaApplyFunction applyFunction) {
             for (OxlaDataType type : types) {
                 overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{type}, returnType), applyFunction));
+            }
+            return this;
+        }
+
+        public OxlaFunctionBuilder addOneParamOverloads(String textRepresentation, OxlaDataType[] types, OxlaDataType[] returnTypes, OxlaApplyFunction applyFunction) {
+            assert types.length == returnTypes.length;
+            for (int index = 0; index < types.length; ++index) {
+                overloads.add(new OxlaFunction(textRepresentation, new OxlaTypeOverload(new OxlaDataType[]{types[index]}, returnTypes[index]), applyFunction));
             }
             return this;
         }
