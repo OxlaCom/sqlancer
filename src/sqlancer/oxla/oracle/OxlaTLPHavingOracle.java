@@ -30,13 +30,13 @@ public class OxlaTLPHavingOracle extends OxlaTLPBase {
         if (generateOrderBy) {
             select.setOrderByClauses(generator.generateOrderBys());
         }
-        select.setWhereClause(predicate);
+        select.setHavingClause(predicate);
         final String trueQuery = select.asString();
 
-        select.setWhereClause(negatedPredicate);
+        select.setHavingClause(negatedPredicate);
         final String falseQuery = select.asString();
 
-        select.setWhereClause(isNullPredicate);
+        select.setHavingClause(isNullPredicate);
         final String isNullQuery = select.asString();
 
         final List<String> combinedString = new ArrayList<>();
