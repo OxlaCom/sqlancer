@@ -10,11 +10,15 @@ import sqlancer.oxla.ast.OxlaOperator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class OxlaTLPWhereExtendedOracle extends OxlaTLPBase {
     private String originalQueryString;
     private OxlaExpression originalPredicate;
+
+    private static final OxlaOperator andOperator = OxlaBinaryOperation.LOGIC
+            .stream()
+            .filter(o -> o.textRepresentation.equalsIgnoreCase("and"))
+            .findFirst().orElse(null);
 
     public OxlaTLPWhereExtendedOracle(OxlaGlobalState state, ExpectedErrors errors) {
         super(state);
@@ -53,11 +57,7 @@ public class OxlaTLPWhereExtendedOracle extends OxlaTLPBase {
     }
 
     private OxlaExpression combinedPredicate(OxlaExpression expr) {
-        final Optional<OxlaOperator> andOperator = OxlaBinaryOperation.LOGIC
-                .stream()
-                .filter(o -> o.textRepresentation.equalsIgnoreCase("and"))
-                .findFirst();
-        assert andOperator.isPresent();
-        return new OxlaBinaryOperation(originalPredicate, expr, andOperator.get());
+        assert andOperator != null;
+        return new OxlaBinaryOperation(originalPredicate, expr, andOperator);
     }
 }
