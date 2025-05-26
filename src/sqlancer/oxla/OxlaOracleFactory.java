@@ -74,7 +74,10 @@ public enum OxlaOracleFactory implements OracleFactory<OxlaGlobalState> {
             oracles.add(AGGREGATE.create(globalState));
             oracles.add(DISTINCT.create(globalState));
             oracles.add(GROUP_BY.create(globalState));
-            oracles.add(HAVING.create(globalState));
+            // FIXME Cannot test HAVING oracle, because SQLancer generates incorrect testing clauses;
+            //       They ignore possible duplicate values and trigger false-positive cardinality errors.
+            //       Enable after this is supported correctly (https://github.com/sqlancer/sqlancer/issues/1048)
+            //       oracles.add(HAVING.create(globalState));
             oracles.add(WHERE.create(globalState));
             oracles.add(WHERE_EXTENDED.create(globalState));
             return new CompositeTestOracle<>(oracles, globalState);
