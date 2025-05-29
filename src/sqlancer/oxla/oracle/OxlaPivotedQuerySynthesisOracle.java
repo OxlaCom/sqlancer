@@ -58,7 +58,7 @@ public class OxlaPivotedQuerySynthesisOracle extends PivotedQuerySynthesisBase<O
 
         // FROM
         final OxlaSelect select = new OxlaSelect();
-        select.type = OxlaSelect.SelectType.getRandom();
+        select.type = Randomly.fromOptions(OxlaSelect.SelectType.values());
         select.setFromList(randomFromTables
                 .getTables()
                 .stream()

@@ -67,7 +67,8 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
         }
 
         // Create tables
-        final long tableCount = Randomly.getNotCachedInteger(3, globalState.getDbmsSpecificOptions().maxTableCount + 1); // [)
+        final OxlaOptions options = globalState.getDbmsSpecificOptions();
+        final long tableCount = Randomly.getNotCachedInteger(options.minTableCount, options.maxTableCount + 1); // [)
         while (globalState.getSchema().getDatabaseTables().size() < tableCount) {
             SQLQueryAdapter createTableStatement = OxlaCreateTableGenerator.generate(globalState);
             globalState.executeStatement(createTableStatement);
