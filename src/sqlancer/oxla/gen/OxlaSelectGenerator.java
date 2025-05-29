@@ -6,27 +6,30 @@ import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.OxlaExpression;
-import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaDataType;
 import sqlancer.oxla.schema.OxlaTables;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-class OxlaSelectGenerator implements QueryGenerator {
-    enum SelectRule {SIMPLE, UNION, INTERSECT, EXCEPT}
+// TODO OXLA-8192 Implement ORDER BY / LIMIT rules.
+public class OxlaSelectGenerator extends OxlaQueryGenerator {
+    private enum Rule {SIMPLE, UNION, INTERSECT, EXCEPT}
 
     private static final ExpectedErrors errors = new ExpectedErrors();
-    private final OxlaExpressionGenerator generator;
-    private final OxlaGlobalState globalState;
 
     public OxlaSelectGenerator(OxlaGlobalState globalState) {
-        this.globalState = globalState;
-        generator = new OxlaExpressionGenerator(globalState);
+        super(globalState);
+    }
+
+    public static SQLQueryAdapter generate(OxlaGlobalState globalState) {
+        return new OxlaSelectGenerator(globalState).getQuery();
     }
 
     @Override
-    public SQLQueryAdapter getRandomQuery() {
-        final SelectRule rule = Randomly.fromOptions(SelectRule.values());
+    public SQLQueryAdapter getQuery() {
+        final Rule rule = Randomly.fromOptions(Rule.values());
         switch (rule) {
             case SIMPLE:
                 return simpleRule();
@@ -41,58 +44,71 @@ class OxlaSelectGenerator implements QueryGenerator {
         }
     }
 
-    private SQLQueryAdapter Rule() {
-        return new SQLQueryAdapter(null, errors);
-    }
-
     private SQLQueryAdapter simpleRule() {
-        String query = "SELECT ";
+        final StringBuilder queryBuilder = new StringBuilder()
+                .append("SELECT ");
 
         // TOP
         if (Randomly.getBoolean()) {
             final OxlaExpression intValue = generator.generateConstant(Randomly.fromOptions(OxlaDataType.INTEGER));
-            query += String.format("TOP %s ", intValue.toString());
+            queryBuilder.append("TOP ")
+                    .append(intValue)
+                    .append(' ');
         }
 
         // TYPE
         if (Randomly.getBoolean()) {
-            query += "DISTINCT ";
+            queryBuilder.append("DISTINCT ");
         }
 
         // WHAT
         final OxlaTables randomSelectTables = globalState.getSchema().getRandomTableNonEmptyTables();
-        final List<OxlaColumn> fetchColumns = randomSelectTables.getColumns();
+        generator.setTablesAndColumns(randomSelectTables);
+        List<OxlaExpression> what = new ArrayList<>();
+        for (int index = 0; index < Randomly.smallNumber() + 1; ++index) {
+            what.add(generator.generateExpression(OxlaDataType.getRandomType()));
+        }
+        queryBuilder.append(what
+                .stream()
+                .map(OxlaToStringVisitor::asString)
+                .collect(Collectors.joining(", ")));
 
         // INTO
         if (Randomly.getBoolean()) {
-
+            queryBuilder.append(" INTO ");
+            // TODO
         }
 
         // FROM
         if (Randomly.getBoolean()) {
-
+            // TODO
+            query += String.format("FROM %s ", "TODO");
         }
 
         // WHERE
         if (Randomly.getBoolean()) {
             final OxlaExpressionGenerator whereGenerator = new OxlaExpressionGenerator(globalState).setColumns(fetchColumns);
             final OxlaExpression predicate = whereGenerator.generatePredicate();
-            query += OxlaToStringVisitor.asString(predicate);
+            query += String.format("WHERE %s ", OxlaToStringVisitor.asString(predicate));
         }
 
         // GROUP BY
         if (Randomly.getBoolean()) {
-
+            // TODO
+            query += String.format("GROUP BY %s ", "TODO");
         }
 
         // WINDOWS
+        if (Randomly.getBoolean()) {
+            // TODO
+        }
 
         return new SQLQueryAdapter(query, errors);
     }
 
     private SQLQueryAdapter unionRule() {
-        SQLQueryAdapter firstSelectQuery = getRandomQuery();
-        SQLQueryAdapter secondSelectQuery = getRandomQuery();
+        SQLQueryAdapter firstSelectQuery = getQuery();
+        SQLQueryAdapter secondSelectQuery = getQuery();
         boolean isUnionAll = Randomly.getBoolean();
         return new SQLQueryAdapter(
                 String.format("%s UNION%s %s", firstSelectQuery, isUnionAll ? " ALL" : "", secondSelectQuery),
@@ -100,16 +116,16 @@ class OxlaSelectGenerator implements QueryGenerator {
     }
 
     private SQLQueryAdapter intersectRule() {
-        SQLQueryAdapter firstSelectQuery = getRandomQuery();
-        SQLQueryAdapter secondSelectQuery = getRandomQuery();
+        SQLQueryAdapter firstSelectQuery = getQuery();
+        SQLQueryAdapter secondSelectQuery = getQuery();
         return new SQLQueryAdapter(
                 String.format("%s INTERSECT %s", firstSelectQuery, secondSelectQuery),
                 errors);
     }
 
     private SQLQueryAdapter exceptRule() {
-        SQLQueryAdapter firstSelectQuery = getRandomQuery();
-        SQLQueryAdapter secondSelectQuery = getRandomQuery();
+        SQLQueryAdapter firstSelectQuery = getQuery();
+        SQLQueryAdapter secondSelectQuery = getQuery();
         return new SQLQueryAdapter(
                 String.format("%s EXPECT %s", firstSelectQuery, secondSelectQuery),
                 errors);

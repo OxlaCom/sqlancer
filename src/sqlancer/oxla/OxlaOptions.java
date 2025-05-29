@@ -12,6 +12,9 @@ public class OxlaOptions implements DBMSSpecificOptions<OxlaOracleFactory> {
     public static final String DEFAULT_HOST = "localhost";
     public static final int DEFAULT_PORT = 5432;
 
+    @Parameter(names = { "--max-tables-count" }, description = "The maximum number of tables that can be created.")
+    public int maxTableCount = 10;
+
     @Parameter(names = "--oracle", description = "Specifies which test oracle should be used with Oxla")
     public List<OxlaOracleFactory> oracle = List.of(OxlaOracleFactory.FUZZER, OxlaOracleFactory.PQS, OxlaOracleFactory.NOREC);
 
