@@ -13,8 +13,6 @@ import sqlancer.oxla.gen.OxlaInsertIntoGenerator;
 import sqlancer.oxla.gen.OxlaSelectGenerator;
 import sqlancer.oxla.schema.OxlaTable;
 
-import java.util.List;
-
 public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
     private final OxlaGlobalState globalState;
     private final ExpectedErrors errors;
@@ -49,29 +47,34 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         }
     }
 
-    public void ensureValidDatabaseState() throws Exception {
+    public synchronized void ensureValidDatabaseState() throws Exception {
         // 1. Delete random tables until we're not over the specified limit...
         final OxlaOptions options = globalState.getDbmsSpecificOptions();
-        final List<OxlaTable> presentTables = globalState.getSchema().getDatabaseTables();
-        while (presentTables.size() > options.maxTableCount) {
-            globalState.executeStatement(deleteFromGenerator.getQuery());
+        int presentTablesCount = globalState.getSchema().getDatabaseTables().size();
+        while (presentTablesCount > options.maxTableCount) {
+            if (globalState.executeStatement(deleteFromGenerator.getQuery())) {
+                presentTablesCount--;
+            }
         }
 
         // 2. ...but if we're under, then generate them until the upper limit is reached...
-        if (presentTables.size() < options.minTableCount) {
-            while (presentTables.size() < options.maxTableCount) {
-                globalState.executeStatement(createTableGenerator.getQuery());
+        if (presentTablesCount < options.minTableCount) {
+            while (presentTablesCount < options.maxTableCount) {
+                if(globalState.executeStatement(createTableGenerator.getQuery())) {
+                    presentTablesCount++;
+                }
             }
         }
 
         // 3. ... while making sure that each table has sufficient number of rows.
-        for (OxlaTable table : presentTables) {
+        for (OxlaTable table : globalState.getSchema().getDatabaseTables()) {
             final SQLQueryAdapter rowCountQuery = new SQLQueryAdapter(String.format("SELECT COUNT(*) FROM %s", table.getName()));
             try (SQLancerResultSet rowCountResult = globalState.executeStatementAndGet(rowCountQuery)) {
+                rowCountResult.next();
                 int rowCount = rowCountResult.getInt(1);
                 assert !rowCountResult.next();
                 if (rowCount < options.minRowCount) {
-                    globalState.executeStatement(insertIntoGenerator.getQuery());
+                    globalState.executeStatement(insertIntoGenerator.getQueryForTable(table));
                 }
             } catch (Exception e) {
                 throw new AssertionError("[OxlaFuzzer] failed to insert rows to a table '" + table.getName() + "', because: " + e);

@@ -19,7 +19,10 @@ public class OxlaOptions implements DBMSSpecificOptions<OxlaOracleFactory> {
     public int maxTableCount = 10;
 
     @Parameter(names = { "--min-row-count" }, description = "The minimum number of rows that can be created.")
-    public int minRowCount = 15;
+    public int minRowCount = 8;
+
+    @Parameter(names = { "--max-row-count" }, description = "The maximum number of rows that can be created.")
+    public int maxRowCount = 25;
 
     @Parameter(names = "--oracle", description = "Specifies which test oracle should be used with Oxla")
     public List<OxlaOracleFactory> oracle = List.of(OxlaOracleFactory.FUZZER, OxlaOracleFactory.PQS, OxlaOracleFactory.NOREC);

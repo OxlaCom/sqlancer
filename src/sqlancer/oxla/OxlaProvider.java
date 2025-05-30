@@ -2,7 +2,6 @@ package sqlancer.oxla;
 
 import com.google.auto.service.AutoService;
 import sqlancer.*;
-import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.common.query.SQLQueryProvider;
 import sqlancer.common.query.SQLancerResultSet;

@@ -6,7 +6,9 @@ import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.OxlaExpression;
+import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaDataType;
+import sqlancer.oxla.schema.OxlaTable;
 import sqlancer.oxla.schema.OxlaTables;
 
 import java.util.ArrayList;
@@ -63,47 +65,54 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
 
         // WHAT
         final OxlaTables randomSelectTables = globalState.getSchema().getRandomTableNonEmptyTables();
-        generator.setTablesAndColumns(randomSelectTables);
+        generator.setTablesAndColumns(randomSelectTables); // TODO: Separate generator for this?
         List<OxlaExpression> what = new ArrayList<>();
         for (int index = 0; index < Randomly.smallNumber() + 1; ++index) {
             what.add(generator.generateExpression(OxlaDataType.getRandomType()));
         }
-        queryBuilder.append(what
-                .stream()
-                .map(OxlaToStringVisitor::asString)
-                .collect(Collectors.joining(", ")));
+        queryBuilder.append(OxlaToStringVisitor.asString(what));
 
         // INTO
-        if (Randomly.getBoolean()) {
-            queryBuilder.append(" INTO ");
-            // TODO
-        }
+//        if (Randomly.getBoolean()) {
+//            queryBuilder.append(" INTO ");
+//            // TODO
+//        }
 
         // FROM
         if (Randomly.getBoolean()) {
-            // TODO
-            query += String.format("FROM %s ", "TODO");
+            queryBuilder
+                    .append(" FROM ")
+                    .append(randomSelectTables
+                            .getColumns()
+                            .stream()
+                            .map(OxlaColumn::getTable)
+                            .map(OxlaTable::toString)
+                            .collect(Collectors.joining(",")));
         }
 
         // WHERE
         if (Randomly.getBoolean()) {
-            final OxlaExpressionGenerator whereGenerator = new OxlaExpressionGenerator(globalState).setColumns(fetchColumns);
-            final OxlaExpression predicate = whereGenerator.generatePredicate();
-            query += String.format("WHERE %s ", OxlaToStringVisitor.asString(predicate));
+            queryBuilder.append(" WHERE ")
+                    .append(OxlaToStringVisitor.asString(generator.generatePredicate()));
         }
 
         // GROUP BY
         if (Randomly.getBoolean()) {
-            // TODO
-            query += String.format("GROUP BY %s ", "TODO");
+            final List<OxlaExpression> groupByExpressions = generator.generateExpressions(Randomly.smallNumber() + 1);
+            queryBuilder.append(" GROUP BY ").append(OxlaToStringVisitor.asString(groupByExpressions));
+
+            // HAVING
+            if (Randomly.getBoolean()) {
+                queryBuilder.append(" HAVING ").append(OxlaToStringVisitor.asString(generator.generatePredicate()));
+            }
         }
 
         // WINDOWS
-        if (Randomly.getBoolean()) {
-            // TODO
-        }
+//        if (Randomly.getBoolean()) {
+//            // TODO
+//        }
 
-        return new SQLQueryAdapter(query, errors);
+        return new SQLQueryAdapter(queryBuilder.toString(), errors);
     }
 
     private SQLQueryAdapter unionRule() {
