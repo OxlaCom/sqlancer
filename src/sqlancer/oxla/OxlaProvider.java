@@ -2,11 +2,10 @@ package sqlancer.oxla;
 
 import com.google.auto.service.AutoService;
 import sqlancer.*;
-import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.common.query.SQLQueryProvider;
 import sqlancer.common.query.SQLancerResultSet;
-import sqlancer.oxla.gen.OxlaTableGenerator;
+import sqlancer.oxla.gen.OxlaCreateTableGenerator;
 
 import java.sql.DriverManager;
 
@@ -67,10 +66,10 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
         }
 
         // Create tables
-        final long tableCount = Randomly.getNotCachedInteger(3, 7); // [)
+        final OxlaOptions options = globalState.getDbmsSpecificOptions();
+        final long tableCount = Randomly.getNotCachedInteger(options.minTableCount, options.maxTableCount + 1); // [)
         while (globalState.getSchema().getDatabaseTables().size() < tableCount) {
-            String tableName = DBMSCommon.createTableName(globalState.getSchema().getDatabaseTables().size());
-            SQLQueryAdapter createTableStatement = OxlaTableGenerator.generate(tableName, globalState);
+            SQLQueryAdapter createTableStatement = OxlaCreateTableGenerator.generate(globalState);
             globalState.executeStatement(createTableStatement);
         }
 

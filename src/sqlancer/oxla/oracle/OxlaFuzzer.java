@@ -1,37 +1,42 @@
 package sqlancer.oxla.oracle;
 
 import sqlancer.IgnoreMeException;
-import sqlancer.Randomly;
 import sqlancer.common.oracle.TestOracle;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.common.query.SQLancerResultSet;
 import sqlancer.oxla.OxlaGlobalState;
-import sqlancer.oxla.ast.OxlaExpression;
-import sqlancer.oxla.ast.OxlaSelect;
-import sqlancer.oxla.ast.OxlaTableReference;
-import sqlancer.oxla.gen.OxlaExpressionGenerator;
-import sqlancer.oxla.schema.OxlaDataType;
-import sqlancer.oxla.schema.OxlaTables;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import sqlancer.oxla.OxlaOptions;
+import sqlancer.oxla.gen.OxlaCreateTableGenerator;
+import sqlancer.oxla.gen.OxlaDeleteFromGenerator;
+import sqlancer.oxla.gen.OxlaInsertIntoGenerator;
+import sqlancer.oxla.gen.OxlaSelectGenerator;
+import sqlancer.oxla.schema.OxlaTable;
 
 public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
     private final OxlaGlobalState globalState;
-    private final OxlaExpressionGenerator generator;
     private final ExpectedErrors errors;
+
+    private final OxlaCreateTableGenerator createTableGenerator;
+    private final OxlaDeleteFromGenerator deleteFromGenerator;
+    private final OxlaInsertIntoGenerator insertIntoGenerator;
+    private final OxlaSelectGenerator selectGenerator;
 
     public OxlaFuzzer(OxlaGlobalState globalState, ExpectedErrors errors) {
         this.globalState = globalState;
-        this.generator = new OxlaExpressionGenerator(globalState);
         this.errors = errors;
+
+        createTableGenerator = new OxlaCreateTableGenerator(this.globalState);
+        deleteFromGenerator = new OxlaDeleteFromGenerator(this.globalState);
+        insertIntoGenerator = new OxlaInsertIntoGenerator(this.globalState);
+        selectGenerator = new OxlaSelectGenerator(this.globalState);
     }
 
     @Override
     public void check() throws Exception {
         try {
-            SQLQueryAdapter query = getRandomSelectQuery(Randomly.smallNumber() + 1);
+            ensureValidDatabaseState();
+            SQLQueryAdapter query = selectGenerator.getQuery();
             globalState.executeStatement(query);
             globalState.getManager().incrementSelectQueryCount();
         } catch (Error e) {
@@ -42,52 +47,40 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         }
     }
 
-    // TODO OXLA-8191 Temporary code to be removed when implementing OxlaRandomQueryGenerator.
-    private SQLQueryAdapter getRandomSelectQuery(Integer columnCount) {
-        OxlaTables nonEmptyTables = new OxlaTables(Randomly.nonEmptySubset(globalState.getSchema().getDatabaseTables()));
-        generator.setColumns(nonEmptyTables.getColumns());
-        List<OxlaExpression> columns = new ArrayList<>();
-        for (int index = 0; index < columnCount; ++index) {
-            columns.add(generator.generateExpression(OxlaDataType.getRandomType()));
-        }
-        OxlaSelect select = new OxlaSelect();
-        select.type = OxlaSelect.SelectType.getRandom();
-        if (select.type == OxlaSelect.SelectType.DISTINCT && Randomly.getBoolean()) {
-            select.distinctOnClause = generator.generateExpression(OxlaDataType.getRandomType());
-        }
-        // WHAT
-        select.setFetchColumns(columns);
-
-        // FROM
-        select.setFromList(nonEmptyTables.getTables().stream().map(OxlaTableReference::new).collect(Collectors.toList()));
-
-        // JOIN
-        // TODO select.setJoinList();
-
-        // WHERE
-        if (Randomly.getBoolean()) {
-            select.setWhereClause(generator.generatePredicate());
-        }
-        // GROUP BY
-        if (Randomly.getBoolean()) {
-            select.setGroupByClause(generator.generateExpressions(Randomly.smallNumber() + 1));
-            // HAVING
-            if (Randomly.getBoolean()) {
-                select.setHavingClause(generator.generatePredicate());
+    public synchronized void ensureValidDatabaseState() throws Exception {
+        // 1. Delete random tables until we're not over the specified limit...
+        final OxlaOptions options = globalState.getDbmsSpecificOptions();
+        int presentTablesCount = globalState.getSchema().getDatabaseTables().size();
+        while (presentTablesCount > options.maxTableCount) {
+            if (globalState.executeStatement(deleteFromGenerator.getQuery())) {
+                presentTablesCount--;
             }
         }
-        // ORDER BY
-        if (Randomly.getBoolean()) {
-            select.setOrderByClauses(generator.generateExpressions(Randomly.smallNumber() + 1));
+
+        // 2. ...but if we're under, then generate them until the upper limit is reached...
+        if (presentTablesCount < options.minTableCount) {
+            while (presentTablesCount < options.maxTableCount) {
+                if(globalState.executeStatement(createTableGenerator.getQuery())) {
+                    presentTablesCount++;
+                }
+            }
         }
-        // LIMIT
-        if (Randomly.getBoolean()) {
-            select.setLimitClause(generator.generateConstant(Randomly.fromOptions(OxlaDataType.NUMERIC)));
+
+        // 3. ... while making sure that each table has sufficient number of rows.
+        for (OxlaTable table : globalState.getSchema().getDatabaseTables()) {
+            final SQLQueryAdapter rowCountQuery = new SQLQueryAdapter(String.format("SELECT COUNT(*) FROM %s", table.getName()));
+            try (SQLancerResultSet rowCountResult = globalState.executeStatementAndGet(rowCountQuery)) {
+                rowCountResult.next();
+                int rowCount = rowCountResult.getInt(1);
+                assert !rowCountResult.next();
+                if (rowCount < options.minRowCount) {
+                    globalState.executeStatement(insertIntoGenerator.getQueryForTable(table));
+                }
+            } catch (Exception e) {
+                throw new AssertionError("[OxlaFuzzer] failed to insert rows to a table '" + table.getName() + "', because: " + e);
+            }
         }
-        // OFFSET
-        if (Randomly.getBoolean()) {
-            select.setOffsetClause(generator.generateConstant(Randomly.fromOptions(OxlaDataType.NUMERIC)));
-        }
-        return new SQLQueryAdapter(select.toString(), this.errors);
+
+        // FIXME: What about cases where we've run an UPDATE? Should we just drop all rows and repopulate?
     }
 }
