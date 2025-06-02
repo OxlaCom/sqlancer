@@ -37,8 +37,8 @@ public class OxlaDropTableGenerator extends OxlaQueryGenerator {
     public SQLQueryAdapter tableRule() {
         final OxlaTable randomTable = globalState.getSchema().getRandomTable();
         final StringBuilder queryBuilder = new StringBuilder()
-                .append("DROP TABLE")
-                .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
+                .append("DROP TABLE ")
+                .append(Randomly.getBoolean() ? "IF EXISTS " : "")
                 .append(randomTable.getName());
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
@@ -47,7 +47,7 @@ public class OxlaDropTableGenerator extends OxlaQueryGenerator {
         final OxlaTable randomTable = globalState.getSchema().getRandomTable();
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("DROP VIEW ")
-                .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
+                .append(Randomly.getBoolean() ? "IF EXISTS " : "")
                 .append(randomTable.getName());
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
