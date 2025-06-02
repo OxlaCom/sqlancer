@@ -14,7 +14,7 @@ import sqlancer.oxla.util.RandomCollection;
 public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
     private final OxlaGlobalState globalState;
     private final ExpectedErrors errors;
-    private RandomCollection<OxlaQueryGenerator> generators;
+    private final RandomCollection<OxlaQueryGenerator> generators;
 
     public OxlaFuzzer(OxlaGlobalState globalState, ExpectedErrors errors) {
         this.globalState = globalState;
