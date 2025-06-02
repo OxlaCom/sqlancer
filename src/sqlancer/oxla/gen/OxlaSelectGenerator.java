@@ -51,14 +51,6 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("SELECT ");
 
-        // TOP
-        if (Randomly.getBoolean()) {
-            final OxlaExpression intValue = generator.generateConstant(Randomly.fromOptions(OxlaDataType.INTEGER));
-            queryBuilder.append("TOP ")
-                    .append(intValue)
-                    .append(' ');
-        }
-
         // TYPE
         if (Randomly.getBoolean()) {
             queryBuilder.append("DISTINCT ");
