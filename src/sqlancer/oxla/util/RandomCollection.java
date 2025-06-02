@@ -7,12 +7,7 @@ import java.util.TreeMap;
 
 public class RandomCollection<E> {
     private final NavigableMap<Integer, E> map = new TreeMap<>();
-    private final Randomly randomly;
     private int total = 0;
-
-    public RandomCollection(Randomly randomly) {
-        this.randomly = randomly;
-    }
 
     public RandomCollection<E> add(int weight, E result) {
         if (weight <= 0) {
@@ -24,8 +19,8 @@ public class RandomCollection<E> {
     }
 
     public E getRandom() {
-        final int value = randomly.getInteger(0, total + 1);
-        return map.higherEntry(value).getValue();
+        final long value = Randomly.getNotCachedInteger(0, total + 1);
+        return map.higherEntry((int)value).getValue();
     }
 }
 

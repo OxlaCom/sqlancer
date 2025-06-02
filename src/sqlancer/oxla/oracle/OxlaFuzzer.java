@@ -20,7 +20,7 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         this.globalState = globalState;
         this.errors = errors;
 
-        generators = new RandomCollection<OxlaQueryGenerator>(this.globalState.getRandomly())
+        generators = new RandomCollection<OxlaQueryGenerator>()
                 .add(5, new OxlaCreateTableGenerator(this.globalState))
                 .add(2, new OxlaDeleteFromGenerator(this.globalState))
                 .add(10, new OxlaInsertIntoGenerator(this.globalState))
