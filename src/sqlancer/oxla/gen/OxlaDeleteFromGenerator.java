@@ -7,10 +7,19 @@ import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.schema.OxlaTable;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
     enum Rule {SIMPLE, WITH_CLAUSE}
 
-    private static final ExpectedErrors errors = new ExpectedErrors();
+    private static final List<String> errors = List.of(
+            "ONLY clause in DELETE statement is not supported"
+    );
+    private static final List<Pattern> regexErrors = List.of(
+            Pattern.compile("other modification of table \"[^\"]+\" is in progress")
+    );
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
     public OxlaDeleteFromGenerator(OxlaGlobalState globalState) {
         super(globalState);
@@ -33,14 +42,14 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
         final OxlaTable table = Randomly.fromList(globalState.getSchema().getDatabaseTables());
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder = appendCommonPart(queryBuilder, table);
-        return new SQLQueryAdapter(queryBuilder.toString(), errors);
+        return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 
     private SQLQueryAdapter withClauseRule() {
         final String query = new StringBuilder()
                 .toString();
         // TODO OXLA-8192 WITH clause rule.
-        return new SQLQueryAdapter(query, errors);
+        return new SQLQueryAdapter(query, expectedErrors);
     }
 
     private StringBuilder appendCommonPart(StringBuilder queryBuilder, OxlaTable table) {
@@ -57,7 +66,7 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
         }
 
         if (Randomly.getBoolean()) {
-            queryBuilder.append("WHERE ").append(OxlaToStringVisitor.asString(generator.generatePredicate()));
+            queryBuilder.append(" WHERE ").append(OxlaToStringVisitor.asString(generator.generatePredicate()));
         }
 
         return queryBuilder;

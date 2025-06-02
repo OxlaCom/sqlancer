@@ -5,6 +5,7 @@ import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
+import sqlancer.oxla.ast.OxlaColumnReference;
 import sqlancer.oxla.ast.OxlaExpression;
 import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaDataType;
@@ -76,14 +77,15 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         // TODO OXLA-8192 INTO
 
         // FROM
-        if (Randomly.getBoolean()) {
+        final boolean containsColumns = what.stream().anyMatch(e -> e instanceof OxlaColumnReference);
+        if (containsColumns || Randomly.getBoolean()) {
             queryBuilder
                     .append(" FROM ")
                     .append(randomSelectTables
                             .getColumns()
                             .stream()
                             .map(OxlaColumn::getTable)
-                            .map(OxlaTable::toString)
+                            .map(OxlaTable::getName)
                             .collect(Collectors.joining(",")));
         }
 

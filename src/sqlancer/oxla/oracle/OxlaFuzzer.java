@@ -23,6 +23,7 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         generators = new RandomCollection<OxlaQueryGenerator>()
                 .add(5, new OxlaCreateTableGenerator(this.globalState))
                 .add(2, new OxlaDeleteFromGenerator(this.globalState))
+                .add(3, new OxlaDropTableGenerator(this.globalState))
                 .add(10, new OxlaInsertIntoGenerator(this.globalState))
                 .add(200, new OxlaSelectGenerator(this.globalState));
     }
@@ -47,9 +48,9 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         final OxlaOptions options = globalState.getDbmsSpecificOptions();
         int presentTablesCount = globalState.getSchema().getDatabaseTables().size();
         if (presentTablesCount > options.maxTableCount) {
-            OxlaDeleteFromGenerator deleteFromGenerator = new OxlaDeleteFromGenerator(this.globalState);
+            OxlaDropTableGenerator dropTableGenerator = new OxlaDropTableGenerator(this.globalState);
             while (presentTablesCount > options.maxTableCount) {
-                if (globalState.executeStatement(deleteFromGenerator.getQuery())) {
+                if (globalState.executeStatement(dropTableGenerator.getQuery())) {
                     presentTablesCount--;
                 }
             }
