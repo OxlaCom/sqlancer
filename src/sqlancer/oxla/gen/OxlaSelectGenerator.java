@@ -111,8 +111,8 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
     }
 
     private SQLQueryAdapter unionRule() {
-        SQLQueryAdapter firstSelectQuery = getQuery();
-        SQLQueryAdapter secondSelectQuery = getQuery();
+        final String firstSelectQuery = getQuery().getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery().getUnterminatedQueryString();
         boolean isUnionAll = Randomly.getBoolean();
         return new SQLQueryAdapter(
                 String.format("%s UNION%s %s", firstSelectQuery, isUnionAll ? " ALL" : "", secondSelectQuery),
@@ -120,16 +120,16 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
     }
 
     private SQLQueryAdapter intersectRule() {
-        SQLQueryAdapter firstSelectQuery = getQuery();
-        SQLQueryAdapter secondSelectQuery = getQuery();
+        final String firstSelectQuery = getQuery().getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery().getUnterminatedQueryString();
         return new SQLQueryAdapter(
                 String.format("%s INTERSECT %s", firstSelectQuery, secondSelectQuery),
                 errors);
     }
 
     private SQLQueryAdapter exceptRule() {
-        SQLQueryAdapter firstSelectQuery = getQuery();
-        SQLQueryAdapter secondSelectQuery = getQuery();
+        final String firstSelectQuery = getQuery().getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery().getUnterminatedQueryString();
         return new SQLQueryAdapter(
                 String.format("%s EXPECT %s", firstSelectQuery, secondSelectQuery),
                 errors);
