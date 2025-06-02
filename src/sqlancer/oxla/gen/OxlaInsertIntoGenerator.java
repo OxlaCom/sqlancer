@@ -86,7 +86,7 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
 
     private SQLQueryAdapter selectRule(OxlaTable table) {
         final StringBuilder queryBuilder = new StringBuilder();
-
+        // TODO OXLA-8192: SELECT rule.
         return new SQLQueryAdapter(queryBuilder.toString(), errors);
     }
 }

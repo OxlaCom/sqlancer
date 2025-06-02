@@ -7,36 +7,32 @@ import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.common.query.SQLancerResultSet;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaOptions;
-import sqlancer.oxla.gen.OxlaCreateTableGenerator;
-import sqlancer.oxla.gen.OxlaDeleteFromGenerator;
-import sqlancer.oxla.gen.OxlaInsertIntoGenerator;
-import sqlancer.oxla.gen.OxlaSelectGenerator;
+import sqlancer.oxla.util.RandomCollection;
+import sqlancer.oxla.gen.*;
 import sqlancer.oxla.schema.OxlaTable;
 
 public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
     private final OxlaGlobalState globalState;
     private final ExpectedErrors errors;
+    private RandomCollection<OxlaQueryGenerator> generators;
 
-    private final OxlaCreateTableGenerator createTableGenerator;
-    private final OxlaDeleteFromGenerator deleteFromGenerator;
-    private final OxlaInsertIntoGenerator insertIntoGenerator;
-    private final OxlaSelectGenerator selectGenerator;
 
     public OxlaFuzzer(OxlaGlobalState globalState, ExpectedErrors errors) {
         this.globalState = globalState;
         this.errors = errors;
 
-        createTableGenerator = new OxlaCreateTableGenerator(this.globalState);
-        deleteFromGenerator = new OxlaDeleteFromGenerator(this.globalState);
-        insertIntoGenerator = new OxlaInsertIntoGenerator(this.globalState);
-        selectGenerator = new OxlaSelectGenerator(this.globalState);
+        generators = new RandomCollection<OxlaQueryGenerator>(this.globalState.getRandomly())
+                .add(5, new OxlaCreateTableGenerator(this.globalState))
+                .add(2, new OxlaDeleteFromGenerator(this.globalState))
+                .add(10, new OxlaInsertIntoGenerator(this.globalState))
+                .add(200, new OxlaSelectGenerator(this.globalState));
     }
 
     @Override
     public void check() throws Exception {
         try {
             ensureValidDatabaseState();
-            SQLQueryAdapter query = selectGenerator.getQuery();
+            SQLQueryAdapter query = generators.getRandom().getQuery();
             globalState.executeStatement(query);
             globalState.getManager().incrementSelectQueryCount();
         } catch (Error e) {
@@ -51,22 +47,27 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         // 1. Delete random tables until we're not over the specified limit...
         final OxlaOptions options = globalState.getDbmsSpecificOptions();
         int presentTablesCount = globalState.getSchema().getDatabaseTables().size();
-        while (presentTablesCount > options.maxTableCount) {
-            if (globalState.executeStatement(deleteFromGenerator.getQuery())) {
-                presentTablesCount--;
+        if (presentTablesCount > options.maxTableCount) {
+            OxlaDeleteFromGenerator deleteFromGenerator = new OxlaDeleteFromGenerator(this.globalState);
+            while (presentTablesCount > options.maxTableCount) {
+                if (globalState.executeStatement(deleteFromGenerator.getQuery())) {
+                    presentTablesCount--;
+                }
             }
         }
 
         // 2. ...but if we're under, then generate them until the upper limit is reached...
         if (presentTablesCount < options.minTableCount) {
+            OxlaCreateTableGenerator createTableGenerator = new OxlaCreateTableGenerator(this.globalState);
             while (presentTablesCount < options.maxTableCount) {
-                if(globalState.executeStatement(createTableGenerator.getQuery())) {
+                if (globalState.executeStatement(createTableGenerator.getQuery())) {
                     presentTablesCount++;
                 }
             }
         }
 
         // 3. ... while making sure that each table has sufficient number of rows.
+        OxlaInsertIntoGenerator insertIntoGenerator = new OxlaInsertIntoGenerator(this.globalState);
         for (OxlaTable table : globalState.getSchema().getDatabaseTables()) {
             final SQLQueryAdapter rowCountQuery = new SQLQueryAdapter(String.format("SELECT COUNT(*) FROM %s", table.getName()));
             try (SQLancerResultSet rowCountResult = globalState.executeStatementAndGet(rowCountQuery)) {

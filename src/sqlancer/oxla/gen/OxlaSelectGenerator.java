@@ -73,10 +73,7 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         queryBuilder.append(OxlaToStringVisitor.asString(what));
 
         // INTO
-//        if (Randomly.getBoolean()) {
-//            queryBuilder.append(" INTO ");
-//            // TODO
-//        }
+        // TODO OXLA-8192 INTO
 
         // FROM
         if (Randomly.getBoolean()) {
@@ -108,9 +105,7 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         }
 
         // WINDOWS
-//        if (Randomly.getBoolean()) {
-//            // TODO
-//        }
+        // TODO OXLA-8192 WINDOWS
 
         return new SQLQueryAdapter(queryBuilder.toString(), errors);
     }

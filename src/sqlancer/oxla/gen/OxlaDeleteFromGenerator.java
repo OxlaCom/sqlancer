@@ -37,9 +37,9 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
     }
 
     private SQLQueryAdapter withClauseRule() {
-//        final OxlaTable table = Randomly.fromList(globalState.getSchema().getDatabaseTables());
         final String query = new StringBuilder()
                 .toString();
+        // TODO OXLA-8192 WITH clause rule.
         return new SQLQueryAdapter(query, errors);
     }
 
