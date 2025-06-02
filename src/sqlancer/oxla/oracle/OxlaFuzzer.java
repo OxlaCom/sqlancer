@@ -7,15 +7,14 @@ import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.common.query.SQLancerResultSet;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaOptions;
-import sqlancer.oxla.util.RandomCollection;
 import sqlancer.oxla.gen.*;
 import sqlancer.oxla.schema.OxlaTable;
+import sqlancer.oxla.util.RandomCollection;
 
 public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
     private final OxlaGlobalState globalState;
     private final ExpectedErrors errors;
     private RandomCollection<OxlaQueryGenerator> generators;
-
 
     public OxlaFuzzer(OxlaGlobalState globalState, ExpectedErrors errors) {
         this.globalState = globalState;
