@@ -3,6 +3,7 @@ package sqlancer.oxla.gen;
 import sqlancer.Randomly;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.OxlaColumnReference;
@@ -20,28 +21,31 @@ import java.util.stream.Collectors;
 public class OxlaSelectGenerator extends OxlaQueryGenerator {
     private enum Rule {SIMPLE, UNION, INTERSECT, EXCEPT}
 
-    private static final ExpectedErrors errors = new ExpectedErrors();
+    private static final ExpectedErrors errors = OxlaCommon.ALL_ERRORS;
 
     public OxlaSelectGenerator(OxlaGlobalState globalState) {
         super(globalState);
     }
 
-    public static SQLQueryAdapter generate(OxlaGlobalState globalState) {
-        return new OxlaSelectGenerator(globalState).getQuery();
+    public static SQLQueryAdapter generate(OxlaGlobalState globalState, int depth) {
+        return new OxlaSelectGenerator(globalState).getQuery(depth);
     }
 
     @Override
-    public SQLQueryAdapter getQuery() {
+    public SQLQueryAdapter getQuery(int depth) {
+        if (depth > globalState.getOptions().getMaxExpressionDepth() || Randomly.getBoolean()) {
+            return simpleRule();
+        }
         final Rule rule = Randomly.fromOptions(Rule.values());
         switch (rule) {
             case SIMPLE:
                 return simpleRule();
             case UNION:
-                return unionRule();
+                return unionRule(depth + 1);
             case INTERSECT:
-                return intersectRule();
+                return intersectRule(depth + 1);
             case EXCEPT:
-                return exceptRule();
+                return exceptRule(depth + 1);
             default:
                 throw new AssertionError(rule);
         }
@@ -81,6 +85,9 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
                             .collect(Collectors.joining(",")));
         }
 
+        // JOIN
+        // TODO OXLA-8192 JOIN
+
         // WHERE
         if (Randomly.getBoolean()) {
             queryBuilder.append(" WHERE ")
@@ -104,28 +111,28 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         return new SQLQueryAdapter(queryBuilder.toString(), errors);
     }
 
-    private SQLQueryAdapter unionRule() {
-        final String firstSelectQuery = getQuery().getUnterminatedQueryString();
-        final String secondSelectQuery = getQuery().getUnterminatedQueryString();
+    private SQLQueryAdapter unionRule(int depth) {
+        final String firstSelectQuery = getQuery(depth).getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery(depth).getUnterminatedQueryString();
         boolean isUnionAll = Randomly.getBoolean();
         return new SQLQueryAdapter(
-                String.format("%s UNION%s %s", firstSelectQuery, isUnionAll ? " ALL" : "", secondSelectQuery),
+                String.format("(%s) UNION%s (%s)", firstSelectQuery, isUnionAll ? " ALL" : "", secondSelectQuery),
                 errors);
     }
 
-    private SQLQueryAdapter intersectRule() {
-        final String firstSelectQuery = getQuery().getUnterminatedQueryString();
-        final String secondSelectQuery = getQuery().getUnterminatedQueryString();
+    private SQLQueryAdapter intersectRule(int depth) {
+        final String firstSelectQuery = getQuery(depth).getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery(depth).getUnterminatedQueryString();
         return new SQLQueryAdapter(
-                String.format("%s INTERSECT %s", firstSelectQuery, secondSelectQuery),
+                String.format("(%s) INTERSECT (%s)", firstSelectQuery, secondSelectQuery),
                 errors);
     }
 
-    private SQLQueryAdapter exceptRule() {
-        final String firstSelectQuery = getQuery().getUnterminatedQueryString();
-        final String secondSelectQuery = getQuery().getUnterminatedQueryString();
+    private SQLQueryAdapter exceptRule(int depth) {
+        final String firstSelectQuery = getQuery(depth).getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery(depth).getUnterminatedQueryString();
         return new SQLQueryAdapter(
-                String.format("%s EXPECT %s", firstSelectQuery, secondSelectQuery),
+                String.format("(%s) EXCEPT (%s)", firstSelectQuery, secondSelectQuery),
                 errors);
     }
 }

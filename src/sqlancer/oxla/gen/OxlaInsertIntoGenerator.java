@@ -31,14 +31,14 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
     }
 
     @Override
-    public SQLQueryAdapter getQuery() {
+    public SQLQueryAdapter getQuery(int depth) {
         final Rule rule = Randomly.fromOptions(Rule.values());
         final OxlaTable table = globalState.getSchema().getRandomTable();
         switch (rule) {
             case SIMPLE:
                 return simpleRule(table);
             case SELECT:
-                return selectRule(table);
+                return selectRule(table, depth + 1);
             default:
                 throw new AssertionError(rule);
         }
@@ -84,7 +84,7 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
         return new SQLQueryAdapter(queryBuilder.toString(), errors);
     }
 
-    private SQLQueryAdapter selectRule(OxlaTable table) {
+    private SQLQueryAdapter selectRule(OxlaTable table, int depth) {
         final StringBuilder queryBuilder = new StringBuilder();
         // TODO OXLA-8192: SELECT rule.
         return new SQLQueryAdapter(queryBuilder.toString(), errors);

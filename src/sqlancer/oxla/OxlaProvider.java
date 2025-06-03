@@ -72,7 +72,7 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
         if (presentTablesCount > options.maxTableCount) {
             OxlaDropTableGenerator dropTableGenerator = new OxlaDropTableGenerator(globalState);
             while (presentTablesCount > options.maxTableCount) {
-                if (globalState.executeStatement(dropTableGenerator.getQuery())) {
+                if (globalState.executeStatement(dropTableGenerator.getQuery(0))) {
                     presentTablesCount--;
                 }
             }
@@ -82,7 +82,7 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
         if (presentTablesCount < options.minTableCount) {
             OxlaCreateTableGenerator createTableGenerator = new OxlaCreateTableGenerator(globalState);
             while (presentTablesCount < options.maxTableCount) {
-                if (globalState.executeStatement(createTableGenerator.getQuery())) {
+                if (globalState.executeStatement(createTableGenerator.getQuery(0))) {
                     presentTablesCount++;
                 }
             }

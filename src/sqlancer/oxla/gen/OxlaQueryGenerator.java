@@ -12,5 +12,5 @@ public abstract class OxlaQueryGenerator {
         this.generator = new OxlaExpressionGenerator(globalState);
     }
 
-    public abstract SQLQueryAdapter getQuery();
+    public abstract SQLQueryAdapter getQuery(int depth);
 }

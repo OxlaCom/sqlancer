@@ -20,7 +20,11 @@ public class RandomCollection<E> {
 
     public E getRandom() {
         final long value = Randomly.getNotCachedInteger(0, total + 1);
-        return map.higherEntry((int)value).getValue();
+        final NavigableMap.Entry<Integer, E> entry = map.higherEntry((int)value);
+        if (entry != null) {
+            return entry.getValue();
+        }
+        return map.firstEntry().getValue();
     }
 }
 

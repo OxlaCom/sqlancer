@@ -26,7 +26,7 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
     }
 
     @Override
-    public SQLQueryAdapter getQuery() {
+    public SQLQueryAdapter getQuery(int ignored) {
         final Rule rule = Randomly.fromOptions(Rule.values());
         switch (rule) {
             case SIMPLE:
@@ -41,7 +41,7 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
     private SQLQueryAdapter simpleRule() {
         final OxlaTable table = Randomly.fromList(globalState.getSchema().getDatabaseTables());
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder = appendCommonPart(queryBuilder, table);
+        appendCommonPart(queryBuilder, table);
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 
@@ -52,7 +52,7 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
         return new SQLQueryAdapter(query, expectedErrors);
     }
 
-    private StringBuilder appendCommonPart(StringBuilder queryBuilder, OxlaTable table) {
+    private void appendCommonPart(StringBuilder queryBuilder, OxlaTable table) {
         queryBuilder.append("DELETE FROM ")
                 .append(Randomly.getBoolean() ? "ONLY " : "")
                 .append(table.getName());
@@ -68,7 +68,5 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
         if (Randomly.getBoolean()) {
             queryBuilder.append(" WHERE ").append(OxlaToStringVisitor.asString(generator.generatePredicate()));
         }
-
-        return queryBuilder;
     }
 }

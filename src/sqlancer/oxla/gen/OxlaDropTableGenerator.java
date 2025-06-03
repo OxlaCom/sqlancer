@@ -22,7 +22,7 @@ public class OxlaDropTableGenerator extends OxlaQueryGenerator {
     }
 
     @Override
-    public SQLQueryAdapter getQuery() {
+    public SQLQueryAdapter getQuery(int ignored) {
         final Rule rule = Randomly.fromOptions(Rule.values());
         switch (rule) {
             case TABLE:
