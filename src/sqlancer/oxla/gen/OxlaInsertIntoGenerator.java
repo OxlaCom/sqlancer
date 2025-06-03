@@ -4,7 +4,6 @@ import sqlancer.Randomly;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaGlobalState;
-import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.ast.OxlaColumnReference;
 import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaTable;
@@ -55,12 +54,12 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
         if (Randomly.getBoolean()) {
             queryBuilder
                     .append('(')
-                    .append(
-                            OxlaToStringVisitor.asString(
-                                    randomColumns
-                                            .stream()
-                                            .map(OxlaColumnReference::new)
-                                            .collect(Collectors.toList())))
+                    .append(randomColumns
+                            .stream()
+                            .map(OxlaColumnReference::new)
+                            .map(OxlaColumnReference::getColumn)
+                            .map(OxlaColumn::getName)
+                            .collect(Collectors.joining(",")))
                     .append(") ");
         }
 
@@ -70,7 +69,8 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
         for (int rowIndex = 0; rowIndex < rowCount; ++rowIndex) {
             queryBuilder.append('(');
             for (int columnIndex = 0; columnIndex < columnCount; ++columnIndex) {
-                queryBuilder.append(generator.generateExpression(randomColumns.get(columnIndex).getType()));
+                // FIXME: Replace with generateExpression after supporting this in Oxla.
+                queryBuilder.append(generator.generateConstant(randomColumns.get(columnIndex).getType()));
                 if (columnIndex + 1 != columnCount) {
                     queryBuilder.append(',');
                 }
