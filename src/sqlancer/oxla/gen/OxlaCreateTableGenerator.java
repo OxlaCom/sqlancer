@@ -56,7 +56,10 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
                 .append(DBMSCommon.createTableName(getTableIndex()))
                 .append(" FROM ")
-                .append(generator.generateExpression(OxlaDataType.TEXT).toString().replaceAll("'", ""))
+                .append(generator.generateExpression(OxlaDataType.TEXT)
+                        .toString()
+                        .replaceAll("'", "")
+                        .replaceAll("TEXT ", ""))
                 .append(" FILE ")
                 .append(generator.generateExpression(OxlaDataType.TEXT));
 

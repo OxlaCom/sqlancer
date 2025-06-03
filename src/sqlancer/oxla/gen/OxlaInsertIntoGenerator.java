@@ -9,21 +9,23 @@ import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaTable;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 // TODO OXLA-8192 WITH clause rule.
 public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
     enum Rule {SIMPLE, SELECT}
 
-    private static final ExpectedErrors errors = new ExpectedErrors();
-    private final int minRowCount;
-    private final int maxRowCount;
-
+    private static final List<String> errors = List.of(
+            "Could not translate expression because: unsupported expression type 26",
+            "syntax error, unexpected CAST",
+            "syntax error, unexpected POSTGRES_CAST"
+    );
+    private static final List<Pattern> regexErrors = List.of();
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
     public OxlaInsertIntoGenerator(OxlaGlobalState globalState) {
         super(globalState);
-        minRowCount = globalState.getDbmsSpecificOptions().minRowCount;
-        maxRowCount = globalState.getDbmsSpecificOptions().maxRowCount;
     }
 
     public SQLQueryAdapter getQueryForTable(OxlaTable table) {
@@ -45,6 +47,9 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
     }
 
     private SQLQueryAdapter simpleRule(OxlaTable table) {
+        final int minRowCount = globalState.getDbmsSpecificOptions().minRowCount;
+        final int maxRowCount = globalState.getDbmsSpecificOptions().maxRowCount;
+        final int rowCount = globalState.getRandomly().getInteger(minRowCount, maxRowCount + 1); // [)
         final StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("INSERT INTO ")
                 .append(table.getName())
@@ -64,14 +69,12 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
         }
 
         queryBuilder.append("VALUES ");
-        final int rowCount = globalState.getRandomly().getInteger(minRowCount, maxRowCount + 1); // [)
-        final int columnCount = randomColumns.size();
         for (int rowIndex = 0; rowIndex < rowCount; ++rowIndex) {
             queryBuilder.append('(');
-            for (int columnIndex = 0; columnIndex < columnCount; ++columnIndex) {
+            for (int columnIndex = 0; columnIndex < randomColumns.size(); ++columnIndex) {
                 // FIXME: Replace with generateExpression after supporting this in Oxla.
                 queryBuilder.append(generator.generateConstant(randomColumns.get(columnIndex).getType()));
-                if (columnIndex + 1 != columnCount) {
+                if (columnIndex + 1 != randomColumns.size()) {
                     queryBuilder.append(',');
                 }
             }
@@ -81,12 +84,12 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
             }
         }
 
-        return new SQLQueryAdapter(queryBuilder.toString(), errors);
+        return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 
     private SQLQueryAdapter selectRule(OxlaTable table, int depth) {
         final StringBuilder queryBuilder = new StringBuilder();
         // TODO OXLA-8192: SELECT rule.
-        return new SQLQueryAdapter(queryBuilder.toString(), errors);
+        return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 }
