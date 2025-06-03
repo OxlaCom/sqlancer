@@ -80,7 +80,7 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
 
         // 2. ...but if we're under, then generate them until the upper limit is reached...
         if (presentTablesCount < options.minTableCount) {
-            OxlaCreateTableGenerator createTableGenerator = new OxlaCreateTableGenerator(globalState);
+            OxlaCreateTableGenerator createTableGenerator = new OxlaCreateTableGenerator(globalState );
             while (presentTablesCount < options.minTableCount) {
                 if (globalState.executeStatement(createTableGenerator.getQuery(0))) {
                     presentTablesCount++;

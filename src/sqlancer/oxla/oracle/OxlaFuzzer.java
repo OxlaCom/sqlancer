@@ -15,10 +15,10 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         this.globalState = globalState;
 
         generators = new RandomCollection<OxlaQueryGenerator>()
-//                .add(5, new OxlaCreateTableGenerator(this.globalState))
-//                .add(2, new OxlaDeleteFromGenerator(this.globalState))
-//                .add(3, new OxlaDropTableGenerator(this.globalState))
-//                .add(10, new OxlaInsertIntoGenerator(this.globalState))
+                .add(5, new OxlaCreateTableGenerator(this.globalState))
+                .add(2, new OxlaDeleteFromGenerator(this.globalState))
+                .add(3, new OxlaDropTableGenerator(this.globalState))
+                .add(10, new OxlaInsertIntoGenerator(this.globalState))
                 .add(200, new OxlaSelectGenerator(this.globalState));
     }
 

@@ -9,6 +9,7 @@ import sqlancer.oxla.schema.OxlaDataType;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
@@ -23,6 +24,7 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
             Pattern.compile("column \"[^\"]*\" has unsupported type")
     );
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    private static final AtomicInteger tableIndex = new AtomicInteger();
 
     public OxlaCreateTableGenerator(OxlaGlobalState globalState) {
         super(globalState);
@@ -52,7 +54,7 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE TABLE ")
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
-                .append(DBMSCommon.createTableName(globalState.getSchema().getDatabaseTables().size()))
+                .append(DBMSCommon.createTableName(getTableIndex()))
                 .append(" FROM ")
                 .append(generator.generateExpression(OxlaDataType.TEXT).toString().replaceAll("'", ""))
                 .append(" FILE ")
@@ -65,7 +67,7 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE TABLE ")
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
-                .append(DBMSCommon.createTableName(globalState.getSchema().getDatabaseTables().size()))
+                .append(DBMSCommon.createTableName(getTableIndex()))
                 .append('(');
 
         final int columnCount = Randomly.smallNumber() + 1;
@@ -88,7 +90,7 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE TABLE ")
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
-                .append(DBMSCommon.createTableName(globalState.getSchema().getDatabaseTables().size()))
+                .append(DBMSCommon.createTableName(getTableIndex()))
                 .append(" AS ")
                 .append(OxlaSelectGenerator.generate(globalState, depth));
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
@@ -99,10 +101,17 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE VIEW ")
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
-                .append(DBMSCommon.createTableName(globalState.getSchema().getDatabaseTables().size()))
+                .append(DBMSCommon.createTableName(getTableIndex()))
                 .append("_view")
                 .append(" AS ")
                 .append(OxlaSelectGenerator.generate(globalState, depth));
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
+    }
+
+    private int getTableIndex() {
+        final int minTableCount = globalState.getDbmsSpecificOptions().minTableCount;
+        final int maxTableCount = globalState.getDbmsSpecificOptions().maxTableCount;
+        final int maxTables = Math.abs(maxTableCount - minTableCount);
+        return tableIndex.incrementAndGet() % maxTables;
     }
 }
