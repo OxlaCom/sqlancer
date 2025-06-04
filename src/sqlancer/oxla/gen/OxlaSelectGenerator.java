@@ -1,6 +1,8 @@
 package sqlancer.oxla.gen;
 
+import sqlancer.IgnoreMeException;
 import sqlancer.Randomly;
+import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaCommon;
@@ -79,7 +81,11 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         // INTO
         if (Randomly.getBooleanWithRatherLowProbability()) {
             queryBuilder.append(" INTO ");
-            // TODO
+            enum IntoRule {TABLE, FILE}
+            switch (Randomly.fromOptions(IntoRule.values())) {
+                case TABLE -> queryBuilder.append(DBMSCommon.createTableName(Randomly.smallNumber()));
+                case FILE -> throw new IgnoreMeException(); // FIXME: To file testing.
+            }
         }
 
         // FROM (SOURCE)
