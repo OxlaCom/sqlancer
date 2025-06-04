@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-// TODO OXLA-8192 WITH clause rule.
 public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
-    enum Rule {SIMPLE, SELECT}
-
     private static final List<String> errors = List.of(
             "Could not translate expression because: unsupported expression type 26",
             "syntax error, unexpected CAST",
@@ -29,28 +26,26 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
     }
 
     public SQLQueryAdapter getQueryForTable(OxlaTable table) {
-        return simpleRule(table);
+        return new SQLQueryAdapter(simpleRule(new StringBuilder(), table), expectedErrors);
     }
 
     @Override
     public SQLQueryAdapter getQuery(int depth) {
-        final Rule rule = Randomly.fromOptions(Rule.values());
         final OxlaTable table = globalState.getSchema().getRandomTable();
-        switch (rule) {
-            case SIMPLE:
-                return simpleRule(table);
-            case SELECT:
-                return selectRule(table, depth + 1);
-            default:
-                throw new AssertionError(rule);
-        }
+        final StringBuilder queryBuilder = new StringBuilder();
+
+        enum Rule {SIMPLE, SELECT}
+        final String query = switch (Randomly.fromOptions(Rule.values())) {
+            case SIMPLE -> simpleRule(queryBuilder, table);
+            case SELECT -> selectRule(queryBuilder, table, depth + 1);
+        };
+        return new SQLQueryAdapter(query, expectedErrors);
     }
 
-    private SQLQueryAdapter simpleRule(OxlaTable table) {
+    private String simpleRule(StringBuilder queryBuilder, OxlaTable table) {
         final int minRowCount = globalState.getDbmsSpecificOptions().minRowCount;
         final int maxRowCount = globalState.getDbmsSpecificOptions().maxRowCount;
         final int rowCount = globalState.getRandomly().getInteger(minRowCount, maxRowCount + 1); // [)
-        final StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("INSERT INTO ")
                 .append(table.getName())
                 .append(' ');
@@ -64,7 +59,7 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
                             .map(OxlaColumnReference::new)
                             .map(OxlaColumnReference::getColumn)
                             .map(OxlaColumn::getName)
-                            .collect(Collectors.joining(",")))
+                            .collect(Collectors.joining(", ")))
                     .append(") ");
         }
 
@@ -84,12 +79,27 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
             }
         }
 
-        return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
+        return queryBuilder.toString();
     }
 
-    private SQLQueryAdapter selectRule(OxlaTable table, int depth) {
-        final StringBuilder queryBuilder = new StringBuilder();
-        // TODO OXLA-8192: SELECT rule.
-        return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
+    private String selectRule(StringBuilder queryBuilder, OxlaTable table, int depth) {
+        queryBuilder.append("INSERT INTO ")
+                .append(table.getName())
+                .append(' ');
+
+        final List<OxlaColumn> randomColumns = Randomly.nonEmptySubset(table.getColumns());
+        if (Randomly.getBoolean()) {
+            queryBuilder
+                    .append('(')
+                    .append(randomColumns
+                            .stream()
+                            .map(OxlaColumnReference::new)
+                            .map(OxlaColumnReference::getColumn)
+                            .map(OxlaColumn::getName)
+                            .collect(Collectors.joining(", ")))
+                    .append(") ");
+        }
+        queryBuilder.append(OxlaSelectGenerator.generate(this.globalState, depth + 1));
+        return queryBuilder.toString();
     }
 }
