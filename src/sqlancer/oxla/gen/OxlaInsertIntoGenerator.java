@@ -5,6 +5,8 @@ import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.ast.OxlaColumnReference;
+import sqlancer.oxla.ast.OxlaConstant;
+import sqlancer.oxla.ast.OxlaExpression;
 import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaTable;
 
@@ -68,7 +70,9 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
             queryBuilder.append('(');
             for (int columnIndex = 0; columnIndex < randomColumns.size(); ++columnIndex) {
                 // FIXME: Replace with generateExpression after supporting this in Oxla.
-                queryBuilder.append(generator.generateConstant(randomColumns.get(columnIndex).getType()));
+                final OxlaExpression constant = generator.generateConstant(randomColumns.get(columnIndex).getType());
+                assert constant instanceof OxlaConstant;
+                queryBuilder.append(((OxlaConstant)constant).asPlainLiteral());
                 if (columnIndex + 1 != randomColumns.size()) {
                     queryBuilder.append(',');
                 }

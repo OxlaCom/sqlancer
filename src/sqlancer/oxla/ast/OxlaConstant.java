@@ -28,6 +28,11 @@ public abstract class OxlaConstant implements OxlaExpression {
      */
     public abstract int compareTo(OxlaConstant toType);
 
+    /** Returns the constant as a string (possibly) without a type coercion prefix. */
+    public String asPlainLiteral() {
+        return toString();
+    }
+
     @Override
     public OxlaConstant getExpectedValue() {
         return this;
@@ -35,34 +40,21 @@ public abstract class OxlaConstant implements OxlaExpression {
 
     public static OxlaConstant getRandomForType(OxlaGlobalState state, OxlaDataType type) {
         final Randomly randomly = state.getRandomly();
-        switch (type) {
-            case BOOLEAN:
-                return createBooleanConstant(Randomly.getBoolean());
-            case DATE:
-                return createDateConstant(randomly.getInteger32());
-            case FLOAT32:
-                return createFloat32Constant(randomly.getFloat());
-            case FLOAT64:
-                return createFloat64Constant(randomly.getDouble());
-            case INT32:
-                return createInt32Constant(randomly.getInteger32());
-            case INT64:
-                return createInt64Constant(randomly.getLong());
-            case INTERVAL:
-                return createIntervalConstant(randomly.getInteger32(), randomly.getInteger32(), randomly.getLong());
-            case JSON:
-                return createJsonConstant(randomly.getString());
-            case TEXT:
-                return createTextConstant(randomly.getString());
-            case TIME:
-                return createTimeConstant(randomly.getInteger32());
-            case TIMESTAMP:
-                return createTimestampConstant(randomly.getLong());
-            case TIMESTAMPTZ:
-                return createTimestamptzConstant(randomly.getLong());
-            default:
-                throw new AssertionError();
-        }
+        return switch (type) {
+            case BOOLEAN -> createBooleanConstant(Randomly.getBoolean());
+            case DATE -> createDateConstant(randomly.getInteger32());
+            case FLOAT32 -> createFloat32Constant(randomly.getFloat());
+            case FLOAT64 -> createFloat64Constant(randomly.getDouble());
+            case INT32 -> createInt32Constant(randomly.getInteger32());
+            case INT64 -> createInt64Constant(randomly.getLong());
+            case INTERVAL -> createIntervalConstant(randomly.getInteger32(), randomly.getInteger32(), randomly.getLong());
+            case JSON -> createJsonConstant(randomly.getString());
+            case TEXT -> createTextConstant(randomly.getString());
+            case TIME -> createTimeConstant(randomly.getInteger32());
+            case TIMESTAMP -> createTimestampConstant(randomly.getLong());
+            case TIMESTAMPTZ -> createTimestamptzConstant(randomly.getLong());
+            default -> throw new AssertionError(type);
+        };
     }
 
     public static OxlaConstant getRandom(OxlaGlobalState state) {
@@ -180,8 +172,13 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
+        public String asPlainLiteral() {
+            return String.format("'%s'", new SimpleDateFormat("yyyy-MM-dd").format(new Timestamp(value)));
+        }
+
+        @Override
         public String toString() {
-            return String.format("DATE '%s'", new SimpleDateFormat("yyyy-MM-dd").format(new Timestamp(value)));
+            return String.format("DATE %s", asPlainLiteral());
         }
 
         @Override
@@ -211,6 +208,11 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         public OxlaFloat32Constant(float value) {
             this.value = value;
+        }
+
+        @Override
+        public String asPlainLiteral() {
+            return String.valueOf(value);
         }
 
         @Override
@@ -255,6 +257,11 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         public OxlaFloat64Constant(double value) {
             this.value = value;
+        }
+
+        @Override
+        public String asPlainLiteral() {
+            return String.valueOf(value);
         }
 
         @Override
@@ -386,8 +393,13 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
+        public String asPlainLiteral() {
+            return String.format("'%d months %d days %d microseconds'", months, days, microseconds);
+        }
+
+        @Override
         public String toString() {
-            return String.format("INTERVAL '%d months %d days %d microseconds'", months, days, microseconds);
+            return String.format("INTERVAL %s", asPlainLiteral());
         }
 
         @Override
@@ -426,11 +438,16 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public String toString() {
+        public String asPlainLiteral() {
             final String valString = value
                     .replace("'", "")
                     .replace("\\", "\\\\");
-            return String.format("JSON '%s'", String.format("{\"key\":\"%s\"}", valString));
+            return String.format("'%s'", String.format("{\"key\":\"%s\"}", valString));
+        }
+
+        @Override
+        public String toString() {
+            return String.format("JSON %s", asPlainLiteral());
         }
 
         @Override
@@ -488,11 +505,16 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
-        public String toString() {
+        public String asPlainLiteral() {
             final String valString = value
                     .replace("'", "")
                     .replace("\\", "\\\\");
-            return String.format("TEXT '%s'", valString);
+            return String.format("'%s'", valString);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("TEXT %s", asPlainLiteral());
         }
 
         @Override
@@ -584,8 +606,13 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
+        public String asPlainLiteral() {
+            return String.format("'%s'", new Time(value));
+        }
+
+        @Override
         public String toString() {
-            return String.format("TIME '%s'", new Time(value));
+            return String.format("TIME %s", asPlainLiteral());
         }
 
         @Override
@@ -615,8 +642,13 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
+        public String asPlainLiteral() {
+            return String.format("'%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value));
+        }
+
+        @Override
         public String toString() {
-            return String.format("TIMESTAMP WITHOUT TIME ZONE '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value));
+            return String.format("TIMESTAMP WITHOUT TIME ZONE %s", asPlainLiteral());
         }
 
         @Override
@@ -652,8 +684,13 @@ public abstract class OxlaConstant implements OxlaExpression {
         }
 
         @Override
+        public String asPlainLiteral() {
+            return String.format("'%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss+00").format(value));
+        }
+
+        @Override
         public String toString() {
-            return String.format("TIMESTAMP WITH TIME ZONE '%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss+00").format(value));
+            return String.format("TIMESTAMP WITH TIME ZONE %s", asPlainLiteral());
         }
 
         @Override
