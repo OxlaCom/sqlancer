@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
-    enum Rule {SIMPLE, WITH_CLAUSE}
-
     private static final List<String> errors = List.of(
             "ONLY clause in DELETE statement is not supported"
     );
@@ -27,33 +25,10 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
 
     @Override
     public SQLQueryAdapter getQuery(int ignored) {
-        final Rule rule = Randomly.fromOptions(Rule.values());
-        switch (rule) {
-            case SIMPLE:
-                return simpleRule();
-            case WITH_CLAUSE:
-                return withClauseRule();
-            default:
-                throw new AssertionError(rule);
-        }
-    }
-
-    private SQLQueryAdapter simpleRule() {
+        // delete_statement := DELETE FROM [ ONLY ] table_name [ AS [ alias ] ] [ WHERE condition ]
         final OxlaTable table = Randomly.fromList(globalState.getSchema().getDatabaseTables());
-        StringBuilder queryBuilder = new StringBuilder();
-        appendCommonPart(queryBuilder, table);
-        return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
-    }
-
-    private SQLQueryAdapter withClauseRule() {
-        final String query = new StringBuilder()
-                .toString();
-        // TODO OXLA-8192 WITH clause rule.
-        return new SQLQueryAdapter(query, expectedErrors);
-    }
-
-    private void appendCommonPart(StringBuilder queryBuilder, OxlaTable table) {
-        queryBuilder.append("DELETE FROM ")
+        StringBuilder queryBuilder = new StringBuilder()
+                .append("DELETE FROM ")
                 .append(Randomly.getBoolean() ? "ONLY " : "")
                 .append(table.getName());
 
@@ -68,5 +43,6 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
         if (Randomly.getBoolean()) {
             queryBuilder.append(" WHERE ").append(OxlaToStringVisitor.asString(generator.generatePredicate()));
         }
+        return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 }

@@ -13,8 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
-    enum Rule {FILE, SIMPLE, SELECT, VIEW}
-
     private static final Collection<String> errors = List.of(
             "CreateStatement.type not supported",
             "select within create is not supported"
@@ -35,19 +33,14 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
         if (depth > globalState.getOptions().getMaxExpressionDepth() || Randomly.getBoolean()) {
             return simpleRule();
         }
-        final Rule rule = Randomly.fromOptions(Rule.values());
-        switch (rule) {
-            case FILE:
-                return fileRule();
-            case SIMPLE:
-                return simpleRule();
-            case SELECT:
-                return selectRule(depth + 1);
-            case VIEW:
-                return viewRule(depth + 1);
-            default:
-                throw new AssertionError(rule);
-        }
+
+        enum Rule {FILE, SIMPLE, SELECT, VIEW}
+        return switch (Randomly.fromOptions(Rule.values())) {
+            case FILE -> fileRule();
+            case SIMPLE -> simpleRule();
+            case SELECT -> selectRule(depth + 1);
+            case VIEW -> viewRule(depth + 1);
+        };
     }
 
     private SQLQueryAdapter fileRule() {
