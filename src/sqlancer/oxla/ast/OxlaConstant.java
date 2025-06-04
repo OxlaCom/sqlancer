@@ -156,14 +156,11 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case BOOLEAN:
-                    return this;
-                case INT32:
-                    return createInt32Constant(value ? 1 : 0);
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case BOOLEAN -> this;
+                case INT32 -> createInt32Constant(value ? 1 : 0);
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -189,16 +186,12 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case DATE:
-                    return this;
-                case TIMESTAMP:
-                    return OxlaTimestamptzConstant.createTimestampConstant(value);
-                case TIMESTAMPTZ:
-                    return OxlaTimestamptzConstant.createTimestamptzConstant(value);
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case DATE -> this;
+                case TIMESTAMP -> OxlaTimestamptzConstant.createTimestampConstant(value);
+                case TIMESTAMPTZ -> OxlaTimestamptzConstant.createTimestamptzConstant(value);
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -232,20 +225,14 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case FLOAT32:
-                    return this;
-                case FLOAT64:
-                    OxlaConstant.createFloat64Constant(value);
-                case INT32:
-                    OxlaConstant.createInt32Constant((int) value);
-                case INT64:
-                    OxlaConstant.createInt64Constant((long) value);
-                case TEXT:
-                    return OxlaConstant.createTextConstant(toString());
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case FLOAT32 -> this;
+                case FLOAT64 -> OxlaConstant.createFloat64Constant(value);
+                case INT32 -> OxlaConstant.createInt32Constant((int) value);
+                case INT64 -> OxlaConstant.createInt64Constant((long) value);
+                case TEXT -> OxlaConstant.createTextConstant(toString());
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -282,20 +269,14 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case FLOAT32:
-                    return OxlaConstant.createFloat32Constant((float) value);
-                case FLOAT64:
-                    return this;
-                case INT32:
-                    return OxlaConstant.createInt32Constant((int) value);
-                case INT64:
-                    return OxlaConstant.createInt64Constant((long) value);
-                case TEXT:
-                    return OxlaConstant.createTextConstant(toString());
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case FLOAT32 -> OxlaConstant.createFloat32Constant((float) value);
+                case FLOAT64 -> this;
+                case INT32 -> OxlaConstant.createInt32Constant((int) value);
+                case INT64 -> OxlaConstant.createInt64Constant((long) value);
+                case TEXT -> OxlaConstant.createTextConstant(toString());
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -327,22 +308,15 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case BOOLEAN:
-                    return OxlaConstant.createBooleanConstant(value != 0);
-                case FLOAT32:
-                    return OxlaConstant.createFloat32Constant(value);
-                case FLOAT64:
-                    return OxlaConstant.createFloat64Constant(value);
-                case INT32:
-                    return this;
-                case INT64:
-                    return OxlaConstant.createInt64Constant(value);
-                case TEXT:
-                    return OxlaConstant.createTextConstant(toString());
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case BOOLEAN -> OxlaConstant.createBooleanConstant(value != 0);
+                case FLOAT32 -> OxlaConstant.createFloat32Constant(value);
+                case FLOAT64 -> OxlaConstant.createFloat64Constant(value);
+                case INT32 -> this;
+                case INT64 -> OxlaConstant.createInt64Constant(value);
+                case TEXT -> OxlaConstant.createTextConstant(toString());
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -374,22 +348,15 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case BOOLEAN:
-                    return OxlaConstant.createBooleanConstant(value != 0);
-                case FLOAT32:
-                    return OxlaConstant.createFloat32Constant(value);
-                case FLOAT64:
-                    return OxlaConstant.createFloat64Constant(value);
-                case INT32:
-                    return OxlaConstant.createInt32Constant((int) value);
-                case INT64:
-                    return this;
-                case TEXT:
-                    return OxlaConstant.createTextConstant(toString());
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case BOOLEAN -> OxlaConstant.createBooleanConstant(value != 0);
+                case FLOAT32 -> OxlaConstant.createFloat32Constant(value);
+                case FLOAT64 -> OxlaConstant.createFloat64Constant(value);
+                case INT32 -> OxlaConstant.createInt32Constant((int) value);
+                case INT64 -> this;
+                case TEXT -> OxlaConstant.createTextConstant(toString());
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -425,14 +392,11 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case INTERVAL:
-                    return this;
-                case TEXT:
-                    return OxlaConstant.createTextConstant(toString());
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case INTERVAL -> this;
+                case TEXT -> OxlaConstant.createTextConstant(toString());
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -626,16 +590,12 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case INTERVAL:
-                    return OxlaConstant.createIntervalConstant(0, 0, value);
-                case TEXT:
-                    return OxlaConstant.createTextConstant(toString());
-                case TIME:
-                    return this;
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case INTERVAL -> OxlaConstant.createIntervalConstant(0, 0, value);
+                case TEXT -> OxlaConstant.createTextConstant(toString());
+                case TIME -> this;
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -661,20 +621,14 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case DATE:
-                    return OxlaConstant.createDateConstant((int) value);
-                case TEXT:
-                    return OxlaConstant.createTextConstant(toString());
-                case TIME:
-                    return OxlaConstant.createTimeConstant((int) value);
-                case TIMESTAMP:
-                    return this;
-                case TIMESTAMPTZ:
-                    return OxlaConstant.createTimestamptzConstant(value);
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case DATE -> OxlaConstant.createDateConstant((int) value);
+                case TEXT -> OxlaConstant.createTextConstant(toString());
+                case TIME -> OxlaConstant.createTimeConstant((int) value);
+                case TIMESTAMP -> this;
+                case TIMESTAMPTZ -> OxlaConstant.createTimestamptzConstant(value);
+                default -> null; // Impossible.
+            };
         }
 
         @Override
@@ -704,20 +658,14 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public OxlaConstant tryCast(OxlaDataType toType) {
-            switch (toType) {
-                case DATE:
-                    return OxlaConstant.createDateConstant((int) value);
-                case TEXT:
-                    return OxlaConstant.createTextConstant(toString());
-                case TIME:
-                    return OxlaConstant.createTimeConstant((int) value);
-                case TIMESTAMP:
-                    return OxlaConstant.createTimestampConstant(value);
-                case TIMESTAMPTZ:
-                    return this;
-                default:
-                    return null; // Impossible.
-            }
+            return switch (toType) {
+                case DATE -> OxlaConstant.createDateConstant((int) value);
+                case TEXT -> OxlaConstant.createTextConstant(toString());
+                case TIME -> OxlaConstant.createTimeConstant((int) value);
+                case TIMESTAMP -> OxlaConstant.createTimestampConstant(value);
+                case TIMESTAMPTZ -> this;
+                default -> null; // Impossible.
+            };
         }
 
         @Override
