@@ -32,4 +32,9 @@ public class OxlaDropTableGenerator extends OxlaQueryGenerator {
                 .append(randomTable.getName());
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
+
+    @Override
+    public boolean modifiesDatabaseState() {
+        return true;
+    }
 }

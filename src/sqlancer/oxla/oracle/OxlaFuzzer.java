@@ -30,6 +30,9 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         try {
             globalState.executeStatement(query);
             globalState.getManager().incrementSelectQueryCount();
+            if (generator.modifiesDatabaseState()) {
+                globalState.updateSchema();
+            }
         } catch (Error e) {
             if (query.getExpectedErrors().errorIsExpected(e.getMessage())) {
                 throw new IgnoreMeException();

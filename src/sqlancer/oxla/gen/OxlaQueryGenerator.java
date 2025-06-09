@@ -5,4 +5,8 @@ import sqlancer.oxla.OxlaGlobalState;
 
 public abstract class OxlaQueryGenerator {
     public abstract SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth);
+
+    public boolean modifiesDatabaseState() {
+        return false;
+    }
 }

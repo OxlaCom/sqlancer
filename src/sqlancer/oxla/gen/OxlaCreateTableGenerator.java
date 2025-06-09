@@ -47,6 +47,11 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
         };
     }
 
+    @Override
+    public boolean modifiesDatabaseState() {
+        return true;
+    }
+
     private SQLQueryAdapter fileRule(OxlaGlobalState globalState) {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE TABLE ")
