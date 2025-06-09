@@ -14,7 +14,9 @@ public class OxlaDropTableGenerator extends OxlaQueryGenerator {
     private static final Collection<String> errors = List.of(
             "only DROP SCHEMA and TABLE are currently supported"
     );
-    private static final Collection<Pattern> regexErrors = List.of();
+    private static final Collection<Pattern> regexErrors = List.of(
+            Pattern.compile("relation \"[^\"]*\" does not exist")
+    );
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
     public OxlaDropTableGenerator() {
