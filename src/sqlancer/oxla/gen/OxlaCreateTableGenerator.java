@@ -29,30 +29,29 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
             .addAll(OxlaCommon.ALL_ERRORS);
     private static final AtomicInteger tableIndex = new AtomicInteger();
 
-    public OxlaCreateTableGenerator(OxlaGlobalState globalState) {
-        super(globalState);
+    public OxlaCreateTableGenerator() {
     }
 
     @Override
-    public SQLQueryAdapter getQuery(int depth) {
+    public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {
         if (depth > globalState.getOptions().getMaxExpressionDepth() || Randomly.getBoolean()) {
-            return simpleRule();
+            return simpleRule(globalState);
         }
 
         enum Rule {FILE, SIMPLE, SELECT, VIEW}
         return switch (Randomly.fromOptions(Rule.values())) {
-            case FILE -> fileRule();
-            case SIMPLE -> simpleRule();
-            case SELECT -> selectRule(depth + 1);
-            case VIEW -> viewRule(depth + 1);
+            case FILE -> fileRule(globalState);
+            case SIMPLE -> simpleRule(globalState);
+            case SELECT -> selectRule(globalState, depth + 1);
+            case VIEW -> viewRule(globalState, depth + 1);
         };
     }
 
-    private SQLQueryAdapter fileRule() {
+    private SQLQueryAdapter fileRule(OxlaGlobalState globalState) {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE TABLE ")
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
-                .append(DBMSCommon.createTableName(getTableIndex()))
+                .append(DBMSCommon.createTableName(getTableIndex(globalState)))
                 .append(" FROM ")
                 .append(OxlaConstant.getRandomForType(globalState, OxlaDataType.TEXT).asPlainLiteral().replace("'", ""))
                 .append(" FILE ")
@@ -60,11 +59,11 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 
-    private SQLQueryAdapter simpleRule() {
+    private SQLQueryAdapter simpleRule(OxlaGlobalState globalState) {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE TABLE ")
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
-                .append(DBMSCommon.createTableName(getTableIndex()))
+                .append(DBMSCommon.createTableName(getTableIndex(globalState)))
                 .append('(');
 
         final int columnCount = Randomly.smallNumber() + 1;
@@ -83,29 +82,29 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 
-    private SQLQueryAdapter selectRule(int depth) {
+    private SQLQueryAdapter selectRule(OxlaGlobalState globalState, int depth) {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE TABLE ")
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
-                .append(DBMSCommon.createTableName(getTableIndex()))
+                .append(DBMSCommon.createTableName(getTableIndex(globalState)))
                 .append(" AS ")
                 .append(OxlaSelectGenerator.generate(globalState, depth));
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 
-    private SQLQueryAdapter viewRule(int depth) {
+    private SQLQueryAdapter viewRule(OxlaGlobalState globalState, int depth) {
         // FIXME: This rule also takes optional list of columns (literals) matching the count of SELECT statements' WHAT.
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("CREATE VIEW ")
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
-                .append(DBMSCommon.createTableName(getTableIndex()))
+                .append(DBMSCommon.createTableName(getTableIndex(globalState)))
                 .append("_view")
                 .append(" AS ")
                 .append(OxlaSelectGenerator.generate(globalState, depth));
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 
-    private int getTableIndex() {
+    private int getTableIndex(OxlaGlobalState globalState) {
         final int minTableCount = globalState.getDbmsSpecificOptions().minTableCount;
         final int maxTableCount = globalState.getDbmsSpecificOptions().maxTableCount;
         final int maxTables = Math.abs(maxTableCount - minTableCount);

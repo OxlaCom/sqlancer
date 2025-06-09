@@ -17,12 +17,11 @@ public class OxlaDropTableGenerator extends OxlaQueryGenerator {
     private static final Collection<Pattern> regexErrors = List.of();
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
-    public OxlaDropTableGenerator(OxlaGlobalState globalState) {
-        super(globalState);
+    public OxlaDropTableGenerator() {
     }
 
     @Override
-    public SQLQueryAdapter getQuery(int ignored) {
+    public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int ignored) {
         final OxlaTable randomTable = globalState.getSchema().getRandomTable();
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("DROP ")

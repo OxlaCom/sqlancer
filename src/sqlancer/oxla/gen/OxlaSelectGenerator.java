@@ -37,26 +37,26 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
 
-    public OxlaSelectGenerator(OxlaGlobalState globalState) {
-        super(globalState);
+    public OxlaSelectGenerator() {
     }
 
     public static SQLQueryAdapter generate(OxlaGlobalState globalState, int depth) {
-        return new OxlaSelectGenerator(globalState).getQuery(depth);
+        return new OxlaSelectGenerator().getQuery(globalState, depth);
     }
 
     @Override
-    public SQLQueryAdapter getQuery(int depth) {
+    public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {
+        final var generator = new OxlaExpressionGenerator(globalState);
         if (depth > globalState.getOptions().getMaxExpressionDepth() || Randomly.getBoolean()) {
-            return new SQLQueryAdapter(simpleRule(), expectedErrors);
+            return new SQLQueryAdapter(simpleRule(globalState, generator), expectedErrors);
         }
 
         enum Rule {SIMPLE, UNION, INTERSECT, EXCEPT}
         final String query = switch (Randomly.fromOptions(Rule.values())) {
-            case SIMPLE -> simpleRule();
-            case UNION -> unionRule(depth + 1);
-            case INTERSECT -> intersectRule(depth + 1);
-            case EXCEPT -> exceptRule(depth + 1);
+            case SIMPLE -> simpleRule(globalState, generator);
+            case UNION -> unionRule(globalState, depth + 1);
+            case INTERSECT -> intersectRule(globalState, depth + 1);
+            case EXCEPT -> exceptRule(globalState, depth + 1);
         };
         final StringBuilder queryBuilder = new StringBuilder()
                 .append(query);
@@ -79,7 +79,7 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 
-    private String simpleRule() {
+    private String simpleRule(OxlaGlobalState globalState, OxlaExpressionGenerator generator) {
         final StringBuilder queryBuilder = new StringBuilder()
                 .append("SELECT ")
                 .append(/* TYPE */ Randomly.getBoolean() ? "DISTINCT " : "");
@@ -94,7 +94,8 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
             if (expr instanceof OxlaFunctionOperation) {
                 // We are looking at a potential window function.
                 final var functionName = ((OxlaFunctionOperation) expr).getFunc().textRepresentation;
-                final var isWindowable = OxlaFunctionOperation.WINDOW.stream().anyMatch(f -> f.textRepresentation.equalsIgnoreCase(functionName)) || OxlaFunctionOperation.AGGREGATE.stream().anyMatch(f -> f.textRepresentation.equalsIgnoreCase(functionName));
+                final var isWindowable = OxlaFunctionOperation.WINDOW.stream().anyMatch(f -> f.textRepresentation.equalsIgnoreCase(functionName))
+                        || OxlaFunctionOperation.AGGREGATE.stream().anyMatch(f -> f.textRepresentation.equalsIgnoreCase(functionName));
                 if (isWindowable) {
                     queryBuilder
                             .append(" OVER ")
@@ -106,7 +107,6 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
                 queryBuilder.append(", ");
             }
         }
-
 
         // INTO
         if (Randomly.getBooleanWithRatherLowProbability()) {
@@ -169,33 +169,33 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
                     .append(" WINDOW ")
                     .append(possibleWindowFunctions
                             .stream()
-                            .map(ignored -> getWindowClause())
+                            .map(ignored -> getWindowClause(generator))
                             .collect(Collectors.joining(", ")));
         }
 
         return queryBuilder.toString();
     }
 
-    private String unionRule(int depth) {
-        final String firstSelectQuery = getQuery(depth).getUnterminatedQueryString();
-        final String secondSelectQuery = getQuery(depth).getUnterminatedQueryString();
+    private String unionRule(OxlaGlobalState globalState, int depth) {
+        final String firstSelectQuery = getQuery(globalState, depth).getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery(globalState, depth).getUnterminatedQueryString();
         boolean isUnionAll = Randomly.getBoolean();
         return String.format("(%s) UNION%s (%s)", firstSelectQuery, isUnionAll ? " ALL" : "", secondSelectQuery);
     }
 
-    private String intersectRule(int depth) {
-        final String firstSelectQuery = getQuery(depth).getUnterminatedQueryString();
-        final String secondSelectQuery = getQuery(depth).getUnterminatedQueryString();
+    private String intersectRule(OxlaGlobalState globalState, int depth) {
+        final String firstSelectQuery = getQuery(globalState, depth).getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery(globalState, depth).getUnterminatedQueryString();
         return String.format("(%s) INTERSECT (%s)", firstSelectQuery, secondSelectQuery);
     }
 
-    private String exceptRule(int depth) {
-        final String firstSelectQuery = getQuery(depth).getUnterminatedQueryString();
-        final String secondSelectQuery = getQuery(depth).getUnterminatedQueryString();
+    private String exceptRule(OxlaGlobalState globalState, int depth) {
+        final String firstSelectQuery = getQuery(globalState, depth).getUnterminatedQueryString();
+        final String secondSelectQuery = getQuery(globalState, depth).getUnterminatedQueryString();
         return String.format("(%s) EXCEPT (%s)", firstSelectQuery, secondSelectQuery);
     }
 
-    private String getWindowClause() {
+    private String getWindowClause(OxlaExpressionGenerator generator) {
         // frame_mode     := RANGE | ROWS | GROUPS
         // frame_boundary := UNBOUNDED PRECEDING | expr PRECEDING | CURRENT ROW | expr FOLLOWING | UNBOUNDED FOLLOWING
         // frame          := frame_mode frame_boundary | frame_mode BETWEEN frame_boundary AND frame_boundary

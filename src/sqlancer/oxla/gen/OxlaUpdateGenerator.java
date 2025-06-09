@@ -21,12 +21,11 @@ public class OxlaUpdateGenerator extends OxlaQueryGenerator {
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
-    public OxlaUpdateGenerator(OxlaGlobalState globalState) {
-        super(globalState);
+    public OxlaUpdateGenerator() {
     }
 
     @Override
-    public SQLQueryAdapter getQuery(int ignored) {
+    public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int ignored) {
         // update_statement := UPDATE [ ONLY ] table_name [ [ AS ] alias ] SET { column_name = expression [, ...] } [ FROM [, ...] ] [ WHERE condition ]
         final OxlaTable table = Randomly.fromList(globalState.getSchema().getDatabaseTables());
 
@@ -47,6 +46,7 @@ public class OxlaUpdateGenerator extends OxlaQueryGenerator {
         // SET
         queryBuilder.append(" SET ");
         final List<OxlaColumn> columns = table.getRandomNonEmptyColumnSubset();
+        final var generator = new OxlaExpressionGenerator(globalState);
         for (int index = 0; index < columns.size(); ++index) {
             final OxlaColumn column = columns.get(index);
             queryBuilder

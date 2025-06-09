@@ -19,12 +19,11 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
-    public OxlaDeleteFromGenerator(OxlaGlobalState globalState) {
-        super(globalState);
+    public OxlaDeleteFromGenerator() {
     }
 
     @Override
-    public SQLQueryAdapter getQuery(int ignored) {
+    public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int ignored) {
         // delete_statement := DELETE FROM [ ONLY ] table_name [ AS [ alias ] ] [ WHERE condition ]
         final OxlaTable table = Randomly.fromList(globalState.getSchema().getDatabaseTables());
         StringBuilder queryBuilder = new StringBuilder()
@@ -41,7 +40,7 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
         }
 
         if (Randomly.getBoolean()) {
-            queryBuilder.append(" WHERE ").append(OxlaToStringVisitor.asString(generator.generatePredicate()));
+            queryBuilder.append(" WHERE ").append(OxlaToStringVisitor.asString(new OxlaExpressionGenerator(globalState).generatePredicate()));
         }
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }

@@ -70,9 +70,10 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
         final OxlaOptions options = globalState.getDbmsSpecificOptions();
         int presentTablesCount = globalState.getSchema().getDatabaseTables().size();
         if (presentTablesCount > options.maxTableCount) {
-            OxlaDropTableGenerator dropTableGenerator = new OxlaDropTableGenerator(globalState);
+            OxlaDropTableGenerator dropTableGenerator = new OxlaDropTableGenerator();
             while (presentTablesCount > options.maxTableCount) {
-                if (globalState.executeStatement(dropTableGenerator.getQuery(0))) {
+                if (globalState.executeStatement(dropTableGenerator.getQuery(globalState, 0))) {
+
                     presentTablesCount--;
                 }
             }
@@ -80,16 +81,16 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
 
         // 2. ...but if we're under, then generate them until the upper limit is reached...
         if (presentTablesCount < options.minTableCount) {
-            OxlaCreateTableGenerator createTableGenerator = new OxlaCreateTableGenerator(globalState );
+            OxlaCreateTableGenerator createTableGenerator = new OxlaCreateTableGenerator();
             while (presentTablesCount < options.minTableCount) {
-                if (globalState.executeStatement(createTableGenerator.getQuery(0))) {
+                if (globalState.executeStatement(createTableGenerator.getQuery(globalState, 0))) {
                     presentTablesCount++;
                 }
             }
         }
 
         // 3. ... while making sure that each table has sufficient number of rows.
-        OxlaInsertIntoGenerator insertIntoGenerator = new OxlaInsertIntoGenerator(globalState);
+        OxlaInsertIntoGenerator insertIntoGenerator = new OxlaInsertIntoGenerator();
         for (OxlaTable table : globalState.getSchema().getDatabaseTables()) {
             final SQLQueryAdapter rowCountQuery = new SQLQueryAdapter(String.format("SELECT COUNT(*) FROM %s", table.getName()));
             try (SQLancerResultSet rowCountResult = globalState.executeStatementAndGet(rowCountQuery)) {
@@ -97,7 +98,7 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
                 int rowCount = rowCountResult.getInt(1);
                 assert !rowCountResult.next();
                 if (rowCount < options.minRowCount) {
-                    globalState.executeStatement(insertIntoGenerator.getQueryForTable(table));
+                    globalState.executeStatement(insertIntoGenerator.getQueryForTable(globalState, table));
                 }
             } catch (Exception e) {
                 throw new AssertionError("[OxlaFuzzer] failed to insert rows to a table '" + table.getName() + "', because: " + e);

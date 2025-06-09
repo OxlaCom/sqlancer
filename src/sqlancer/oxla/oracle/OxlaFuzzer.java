@@ -15,18 +15,18 @@ public class OxlaFuzzer implements TestOracle<OxlaGlobalState> {
         this.globalState = globalState;
 
         generators = new RandomCollection<OxlaQueryGenerator>()
-                .add(5, new OxlaCreateTableGenerator(this.globalState))
-                .add(2, new OxlaDeleteFromGenerator(this.globalState))
-                .add(2, new OxlaUpdateGenerator(this.globalState))
-                .add(3, new OxlaDropTableGenerator(this.globalState))
-                .add(10, new OxlaInsertIntoGenerator(this.globalState))
-                .add(200, new OxlaSelectGenerator(this.globalState));
+                .add(5, new OxlaCreateTableGenerator())
+                .add(2, new OxlaDeleteFromGenerator())
+                .add(2, new OxlaUpdateGenerator())
+                .add(3, new OxlaDropTableGenerator())
+                .add(10, new OxlaInsertIntoGenerator())
+                .add(200, new OxlaSelectGenerator());
     }
 
     @Override
     public void check() throws Exception {
         final OxlaQueryGenerator generator = generators.getRandom();
-        final SQLQueryAdapter query = generator.getQuery(0);
+        final SQLQueryAdapter query = generator.getQuery(globalState, 0);
         try {
             globalState.executeStatement(query);
             globalState.getManager().incrementSelectQueryCount();

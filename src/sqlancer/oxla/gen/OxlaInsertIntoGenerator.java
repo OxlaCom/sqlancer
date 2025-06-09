@@ -31,28 +31,27 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
 
-    public OxlaInsertIntoGenerator(OxlaGlobalState globalState) {
-        super(globalState);
+    public OxlaInsertIntoGenerator() {
     }
 
-    public SQLQueryAdapter getQueryForTable(OxlaTable table) {
-        return new SQLQueryAdapter(simpleRule(new StringBuilder(), table), expectedErrors);
+    public SQLQueryAdapter getQueryForTable(OxlaGlobalState globalState, OxlaTable table) {
+        return new SQLQueryAdapter(simpleRule(globalState, new StringBuilder(), table), expectedErrors);
     }
 
     @Override
-    public SQLQueryAdapter getQuery(int depth) {
+    public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {
         final OxlaTable table = globalState.getSchema().getRandomTable();
         final StringBuilder queryBuilder = new StringBuilder();
 
         enum Rule {SIMPLE, SELECT}
         final String query = switch (Randomly.fromOptions(Rule.values())) {
-            case SIMPLE -> simpleRule(queryBuilder, table);
-            case SELECT -> selectRule(queryBuilder, table, depth + 1);
+            case SIMPLE -> simpleRule(globalState, queryBuilder, table);
+            case SELECT -> selectRule(globalState, queryBuilder, table, depth + 1);
         };
         return new SQLQueryAdapter(query, expectedErrors);
     }
 
-    private String simpleRule(StringBuilder queryBuilder, OxlaTable table) {
+    private String simpleRule(OxlaGlobalState globalState, StringBuilder queryBuilder, OxlaTable table) {
         final int minRowCount = globalState.getDbmsSpecificOptions().minRowCount;
         final int maxRowCount = globalState.getDbmsSpecificOptions().maxRowCount;
         final int rowCount = globalState.getRandomly().getInteger(minRowCount, maxRowCount + 1); // [)
@@ -96,7 +95,7 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
         return queryBuilder.toString();
     }
 
-    private String selectRule(StringBuilder queryBuilder, OxlaTable table, int depth) {
+    private String selectRule(OxlaGlobalState globalState, StringBuilder queryBuilder, OxlaTable table, int depth) {
         queryBuilder.append("INSERT INTO ")
                 .append(table.getName())
                 .append(' ');
@@ -113,7 +112,7 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
                             .collect(Collectors.joining(", ")))
                     .append(") ");
         }
-        queryBuilder.append(OxlaSelectGenerator.generate(this.globalState, depth + 1));
+        queryBuilder.append(OxlaSelectGenerator.generate(globalState, depth + 1));
         return queryBuilder.toString();
     }
 }
