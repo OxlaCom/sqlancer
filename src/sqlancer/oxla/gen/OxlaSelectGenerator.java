@@ -31,7 +31,7 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
     private static final List<Pattern> regexErrors = List.of(
             Pattern.compile("window \"[^\"]*\" does not exist"),
             Pattern.compile("column reference \"[^\"]*\" is ambiguous"),
-            Pattern.compile("function (\\S+) is not window function"),
+            Pattern.compile("function \\S+ is not window function"),
             Pattern.compile("window \"[^\"]*\" is already defined")
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
