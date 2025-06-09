@@ -19,12 +19,14 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
             "Could not translate expression because: unsupported expression type 26",
             "syntax error, unexpected CAST",
             "syntax error, unexpected POSTGRES_CAST",
-            "INSERT has more expressions than target columns"
+            "INSERT has more expressions than target columns",
+            "INSERT has more target columns than expressions"
     );
     private static final List<Pattern> regexErrors = List.of(
             Pattern.compile("Attempted operation INSERT encountered invalid data in column\\s+(.*)"),
             Pattern.compile("null value in column \"[^\"]*\" of relation \"[^\"]*\" violates not-null constraint \\(was omitted\\)"),
-            Pattern.compile("invalid input syntax for type timestamp:\\s+\"[^\"]*\"")
+            Pattern.compile("invalid input syntax for type timestamp:\\s+\"[^\"]*\""),
+            Pattern.compile("cannot implicitly cast from \\S+ to \\S+")
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
@@ -58,8 +60,9 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
                 .append(table.getName())
                 .append(' ');
 
-        final List<OxlaColumn> randomColumns = Randomly.nonEmptySubset(table.getColumns());
-        if (Randomly.getBoolean()) {
+        final var randomColumns = Randomly.nonEmptySubset(table.getColumns());
+        final var useSubsetOfColumns = Randomly.getBoolean();
+        if (useSubsetOfColumns) {
             queryBuilder
                     .append('(')
                     .append(randomColumns
@@ -74,12 +77,13 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
         queryBuilder.append("VALUES ");
         for (int rowIndex = 0; rowIndex < rowCount; ++rowIndex) {
             queryBuilder.append('(');
-            for (int columnIndex = 0; columnIndex < randomColumns.size(); ++columnIndex) {
+            final var columns = useSubsetOfColumns ? randomColumns : table.getColumns();
+            for (int columnIndex = 0; columnIndex < columns.size(); ++columnIndex) {
                 // FIXME: Replace with generateExpression after supporting this in Oxla.
                 queryBuilder.append(OxlaConstant
-                        .getRandomForType(globalState, randomColumns.get(columnIndex).getType())
+                        .getRandomForType(globalState, columns.get(columnIndex).getType())
                         .asPlainLiteral());
-                if (columnIndex + 1 != randomColumns.size()) {
+                if (columnIndex + 1 != columns.size()) {
                     queryBuilder.append(',');
                 }
             }

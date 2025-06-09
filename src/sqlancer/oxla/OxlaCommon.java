@@ -52,8 +52,7 @@ public class OxlaCommon {
             "expecting only literal for percentiles",
             "could not determine polymorphic type because input has type unknown",
             "cannot get array length of a non-array",
-            "empty format provided",
-            "each INTERSECT query must have the same number of columns"
+            "empty format provided"
     );
     public static final List<Pattern> EXPRESSION_REGEX_ERRORS = List.of(
             Pattern.compile("operator is not unique:\\s+(.+)"),
@@ -68,7 +67,9 @@ public class OxlaCommon {
             Pattern.compile("HAS_SCHEMA_PRIVILEGE function got unrecognized privilege type:\\s+\"[^\"]*\""),
             Pattern.compile("found multiple function overloads taking arguments from different type categories, when trying to match function\\s+(.+)"),
             Pattern.compile("nrecognized privilege type:\\s+\"[^\"]*\""),
-            Pattern.compile("missing FROM-clause entry for table \"[^\"]*\"")
+            Pattern.compile("missing FROM-clause entry for table \"[^\"]*\""),
+            Pattern.compile("\\S+ types .*?(?=and)and .*?(?=cannot)cannot be matched"),
+            Pattern.compile("each \\S+ query must have the same number of columns")
     );
 
     public static List<String> bugErrors() {

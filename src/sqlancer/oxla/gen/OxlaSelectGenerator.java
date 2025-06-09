@@ -20,16 +20,19 @@ import java.util.stream.Collectors;
 
 public class OxlaSelectGenerator extends OxlaQueryGenerator {
     private static final List<String> errors = List.of(
-            "frame starting from current row cannot have preceding rows",
             "frame start cannot be UNBOUNDED FOLLOWING",
             "frame end cannot be UNBOUNDED PRECEDING",
+            "frame starting from current row cannot have preceding rows",
+            "frame starting from following row cannot have preceding rows",
+            "frame starting from following row cannot end with current row",
             "Expected frame clause with ROWS or RANGE mode",
             "RANGE with offset PRECEDING/FOLLOWING requires exactly one ORDER BY column"
     );
     private static final List<Pattern> regexErrors = List.of(
             Pattern.compile("window \"[^\"]*\" does not exist"),
             Pattern.compile("column reference \"[^\"]*\" is ambiguous"),
-            Pattern.compile("function (\\S+) is not window function")
+            Pattern.compile("function (\\S+) is not window function"),
+            Pattern.compile("window \"[^\"]*\" is already defined")
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
