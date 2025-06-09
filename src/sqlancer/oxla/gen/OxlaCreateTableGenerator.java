@@ -4,6 +4,7 @@ import sqlancer.Randomly;
 import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.ast.OxlaConstant;
 import sqlancer.oxla.schema.OxlaDataType;
@@ -24,7 +25,8 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
             Pattern.compile("column \"[^\"]*\" has unsupported type"),
             Pattern.compile("syntax error, unexpected\\s+")
     );
-    public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
+            .addAll(OxlaCommon.ALL_ERRORS);
     private static final AtomicInteger tableIndex = new AtomicInteger();
 
     public OxlaCreateTableGenerator(OxlaGlobalState globalState) {

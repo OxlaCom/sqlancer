@@ -3,6 +3,7 @@ package sqlancer.oxla.gen;
 import sqlancer.Randomly;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.ast.OxlaColumnReference;
 import sqlancer.oxla.ast.OxlaConstant;
@@ -17,13 +18,16 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
     private static final List<String> errors = List.of(
             "Could not translate expression because: unsupported expression type 26",
             "syntax error, unexpected CAST",
-            "syntax error, unexpected POSTGRES_CAST"
+            "syntax error, unexpected POSTGRES_CAST",
+            "INSERT has more expressions than target columns"
     );
     private static final List<Pattern> regexErrors = List.of(
             Pattern.compile("Attempted operation INSERT encountered invalid data in column\\s+(.*)"),
-            Pattern.compile("null value in column \"[^\"]*\" of relation \"[^\"]*\" violates not-null constraint \\(was omitted\\)")
+            Pattern.compile("null value in column \"[^\"]*\" of relation \"[^\"]*\" violates not-null constraint \\(was omitted\\)"),
+            Pattern.compile("invalid input syntax for type timestamp:\\s+\"[^\"]*\"")
     );
-    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
+            .addAll(OxlaCommon.ALL_ERRORS);
 
     public OxlaInsertIntoGenerator(OxlaGlobalState globalState) {
         super(globalState);

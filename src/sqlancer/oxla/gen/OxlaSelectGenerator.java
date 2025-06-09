@@ -14,7 +14,6 @@ import sqlancer.oxla.schema.OxlaDataType;
 import sqlancer.oxla.schema.OxlaTable;
 import sqlancer.oxla.schema.OxlaTables;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,11 +21,15 @@ import java.util.stream.Collectors;
 public class OxlaSelectGenerator extends OxlaQueryGenerator {
     private static final List<String> errors = List.of(
             "frame starting from current row cannot have preceding rows",
-            "frame start cannot be UNBOUNDED FOLLOWING"
+            "frame start cannot be UNBOUNDED FOLLOWING",
+            "frame end cannot be UNBOUNDED PRECEDING",
+            "Expected frame clause with ROWS or RANGE mode",
+            "RANGE with offset PRECEDING/FOLLOWING requires exactly one ORDER BY column"
     );
     private static final List<Pattern> regexErrors = List.of(
             Pattern.compile("window \"[^\"]*\" does not exist"),
-            Pattern.compile("column reference \"[^\"]*\" is ambiguous")
+            Pattern.compile("column reference \"[^\"]*\" is ambiguous"),
+            Pattern.compile("function (\\S+) is not window function")
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
@@ -81,11 +84,26 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         // WHAT
         final OxlaTables randomSelectTables = globalState.getSchema().getRandomTableNonEmptyTables();
         generator.setTablesAndColumns(randomSelectTables); // TODO: Separate generator for this?
-        List<OxlaExpression> what = new ArrayList<>();
-        for (int index = 0; index < Randomly.smallNumber() + 1; ++index) {
-            what.add(generator.generateExpression(OxlaDataType.getRandomType()));
+        List<OxlaExpression> what = generator.generateExpressions(Randomly.smallNumber() + 1);
+        for (var index = 0; index < what.size(); ++index) {
+            final OxlaExpression expr = what.get(index);
+            queryBuilder.append(OxlaToStringVisitor.asString(expr));
+            if (expr instanceof OxlaFunctionOperation) {
+                // We are looking at a potential window function.
+                final var functionName = ((OxlaFunctionOperation) expr).getFunc().textRepresentation;
+                final var isWindowable = OxlaFunctionOperation.WINDOW.stream().anyMatch(f -> f.textRepresentation.equalsIgnoreCase(functionName)) || OxlaFunctionOperation.AGGREGATE.stream().anyMatch(f -> f.textRepresentation.equalsIgnoreCase(functionName));
+                if (isWindowable) {
+                    queryBuilder
+                            .append(" OVER ")
+                            .append('w')
+                            .append(Randomly.smallNumber());
+                }
+            }
+            if (index + 1 != what.size()) {
+                queryBuilder.append(", ");
+            }
         }
-        queryBuilder.append(OxlaToStringVisitor.asString(what));
+
 
         // INTO
         if (Randomly.getBooleanWithRatherLowProbability()) {
@@ -198,11 +216,11 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         if (Randomly.getBoolean()) {
             clauseBuilder
                     .append("PARTITION BY ")
-                    .append(' ')
                     .append(generator
                             .generateExpressions(Randomly.smallNumber() + 1)
                             .stream().map(OxlaExpression::toString)
-                            .collect(Collectors.joining(", ")));
+                            .collect(Collectors.joining(", ")))
+                    .append(' ');
         }
 
         // ORDER BY
@@ -245,9 +263,9 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
 
         public String asString() {
             return switch (this) {
-                case RANGE -> "range";
-                case ROWS -> "rows";
-                case GROUPS -> "groups";
+                case RANGE -> "RANGE";
+                case ROWS -> "ROWS";
+                case GROUPS -> "GROUPS";
             };
         }
     }
