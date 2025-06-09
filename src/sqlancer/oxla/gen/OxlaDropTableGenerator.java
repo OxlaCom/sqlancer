@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class OxlaDropTableGenerator extends OxlaQueryGenerator {
-    private static final Collection<String> errors = List.of();
+    private static final Collection<String> errors = List.of(
+            "only DROP SCHEMA and TABLE are currently supported"
+    );
     private static final Collection<Pattern> regexErrors = List.of();
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 

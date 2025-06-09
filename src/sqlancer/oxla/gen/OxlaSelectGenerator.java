@@ -8,10 +8,8 @@ import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
-import sqlancer.oxla.ast.OxlaColumnReference;
 import sqlancer.oxla.ast.OxlaExpression;
 import sqlancer.oxla.ast.OxlaFunctionOperation;
-import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaDataType;
 import sqlancer.oxla.schema.OxlaTable;
 import sqlancer.oxla.schema.OxlaTables;
@@ -22,8 +20,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class OxlaSelectGenerator extends OxlaQueryGenerator {
-    private static final List<String> errors = List.of();
-    private static final List<Pattern> regexErrors = List.of();
+    private static final List<String> errors = List.of(
+            "frame starting from current row cannot have preceding rows",
+            "frame start cannot be UNBOUNDED FOLLOWING"
+    );
+    private static final List<Pattern> regexErrors = List.of(
+            Pattern.compile("window \"[^\"]*\" does not exist"),
+            Pattern.compile("column reference \"[^\"]*\" is ambiguous")
+    );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
 
@@ -53,12 +57,17 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
 
         // ORDER BY
         if (Randomly.getBoolean()) {
-            queryBuilder.append(" ORDER BY ").append(OxlaToStringVisitor.asString(generator.generateOrderBys()));
+            queryBuilder
+                    .append(" ORDER BY ")
+                    .append(OxlaToStringVisitor.asString(generator.generateOrderBys()))
+                    .append(Randomly.getBoolean() ? " ASC" : " DESC");
         }
 
         // LIMIT
         if (Randomly.getBoolean()) {
-            queryBuilder.append(" LIMIT ").append(Randomly.getNonCachedInteger());
+            queryBuilder
+                    .append(" LIMIT ")
+                    .append(Randomly.getNonCachedInteger());
         }
 
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
@@ -90,26 +99,24 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
 
         // FROM (SOURCE)
         {
-            final boolean containsColumns = what.stream().anyMatch(OxlaColumnReference.class::isInstance);
-            if (containsColumns || Randomly.getBoolean()) {
-                queryBuilder
-                        .append(" FROM ")
-                        .append(randomSelectTables
-                                .getColumns()
-                                .stream()
-                                .map(OxlaColumn::getTable)
-                                .map(OxlaTable::getName)
-                                .collect(Collectors.joining(", ")));
-            }
+            queryBuilder
+                    .append(" FROM ")
+                    .append(randomSelectTables
+                            .getTables()
+                            .stream()
+                            .map(OxlaTable::getName)
+                            .collect(Collectors.joining(", ")));
 
             // JOIN
             if (Randomly.getBooleanWithRatherLowProbability()) {
-                queryBuilder.append(OxlaToStringVisitor
-                        .asString(generator
-                                .getRandomJoinClauses()
-                                .stream()
-                                .map(OxlaExpression.class::cast)
-                                .collect(Collectors.toList())));
+                final var joinClauses = generator
+                        .getRandomJoinClauses()
+                        .stream()
+                        .map(OxlaExpression.class::cast)
+                        .toList();
+                if (!joinClauses.isEmpty()) {
+                    queryBuilder.append(", ").append(OxlaToStringVisitor.asString(joinClauses));
+                }
             }
         }
 
@@ -191,12 +198,19 @@ public class OxlaSelectGenerator extends OxlaQueryGenerator {
         if (Randomly.getBoolean()) {
             clauseBuilder
                     .append("PARTITION BY ")
-                    .append(' ');
+                    .append(' ')
+                    .append(generator
+                            .generateExpressions(Randomly.smallNumber() + 1)
+                            .stream().map(OxlaExpression::toString)
+                            .collect(Collectors.joining(", ")));
         }
 
         // ORDER BY
         if (Randomly.getBoolean()) {
-
+            clauseBuilder
+                    .append(" ORDER BY ")
+                    .append(OxlaToStringVisitor.asString(generator.generateOrderBys()))
+                    .append(Randomly.getBoolean() ? " ASC " : " DESC ");
         }
 
         // FRAME

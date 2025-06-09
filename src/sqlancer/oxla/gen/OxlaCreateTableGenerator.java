@@ -5,6 +5,7 @@ import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaGlobalState;
+import sqlancer.oxla.ast.OxlaConstant;
 import sqlancer.oxla.schema.OxlaDataType;
 
 import java.util.Collection;
@@ -15,11 +16,13 @@ import java.util.regex.Pattern;
 public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
     private static final Collection<String> errors = List.of(
             "CreateStatement.type not supported",
-            "select within create is not supported"
+            "select within create is not supported",
+            "File type is unknown"
     );
     private static final Collection<Pattern> regexErrors = List.of(
             Pattern.compile("relation \"[^\"]*\" already exists"),
-            Pattern.compile("column \"[^\"]*\" has unsupported type")
+            Pattern.compile("column \"[^\"]*\" has unsupported type"),
+            Pattern.compile("syntax error, unexpected\\s+")
     );
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
     private static final AtomicInteger tableIndex = new AtomicInteger();
@@ -49,13 +52,9 @@ public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
                 .append(Randomly.getBoolean() ? "IF NOT EXISTS " : "")
                 .append(DBMSCommon.createTableName(getTableIndex()))
                 .append(" FROM ")
-                .append(generator.generateExpression(OxlaDataType.TEXT)
-                        .toString()
-                        .replaceAll("'", "")
-                        .replaceAll("TEXT ", ""))
+                .append(OxlaConstant.getRandomForType(globalState, OxlaDataType.TEXT).asPlainLiteral().replace("'", ""))
                 .append(" FILE ")
-                .append(generator.generateExpression(OxlaDataType.TEXT));
-
+                .append(OxlaConstant.getRandomForType(globalState, OxlaDataType.TEXT).asPlainLiteral());
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 

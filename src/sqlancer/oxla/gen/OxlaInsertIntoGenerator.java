@@ -6,7 +6,6 @@ import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.ast.OxlaColumnReference;
 import sqlancer.oxla.ast.OxlaConstant;
-import sqlancer.oxla.ast.OxlaExpression;
 import sqlancer.oxla.schema.OxlaColumn;
 import sqlancer.oxla.schema.OxlaTable;
 
@@ -20,7 +19,10 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
             "syntax error, unexpected CAST",
             "syntax error, unexpected POSTGRES_CAST"
     );
-    private static final List<Pattern> regexErrors = List.of();
+    private static final List<Pattern> regexErrors = List.of(
+            Pattern.compile("Attempted operation INSERT encountered invalid data in column\\s+(.*)"),
+            Pattern.compile("null value in column \"[^\"]*\" of relation \"[^\"]*\" violates not-null constraint \\(was omitted\\)")
+    );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
     public OxlaInsertIntoGenerator(OxlaGlobalState globalState) {
@@ -70,9 +72,9 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
             queryBuilder.append('(');
             for (int columnIndex = 0; columnIndex < randomColumns.size(); ++columnIndex) {
                 // FIXME: Replace with generateExpression after supporting this in Oxla.
-                final OxlaExpression constant = generator.generateConstant(randomColumns.get(columnIndex).getType());
-                assert constant instanceof OxlaConstant;
-                queryBuilder.append(((OxlaConstant)constant).asPlainLiteral());
+                queryBuilder.append(OxlaConstant
+                        .getRandomForType(globalState, randomColumns.get(columnIndex).getType())
+                        .asPlainLiteral());
                 if (columnIndex + 1 != randomColumns.size()) {
                     queryBuilder.append(',');
                 }
