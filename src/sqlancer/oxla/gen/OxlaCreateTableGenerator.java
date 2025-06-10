@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-// TODO Syntax comments.
 public class OxlaCreateTableGenerator extends OxlaQueryGenerator {
     private static final Collection<String> errors = List.of(
             "CreateStatement.type not supported",

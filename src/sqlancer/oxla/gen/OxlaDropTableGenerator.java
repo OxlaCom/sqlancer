@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-// TODO: Syntax comments.
 public class OxlaDropTableGenerator extends OxlaQueryGenerator {
     private static final Collection<String> errors = List.of(
             "only DROP SCHEMA and TABLE are currently supported"
