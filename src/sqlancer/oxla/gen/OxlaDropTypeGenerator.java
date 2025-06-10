@@ -4,6 +4,7 @@ import sqlancer.Randomly;
 import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 
 import java.util.List;
@@ -14,7 +15,8 @@ public class OxlaDropTypeGenerator extends OxlaQueryGenerator {
             "DROP TYPE statement is not supported"
     );
     private static final List<Pattern> regexErrors = List.of();
-    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
+            .addAll(OxlaCommon.ALL_ERRORS);
 
     @Override
     public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {

@@ -4,6 +4,7 @@ import sqlancer.Randomly;
 import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.schema.OxlaColumn;
 
@@ -12,9 +13,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class OxlaCreateIndexGenerator extends OxlaQueryGenerator {
-    private static final List<String> errors = List.of();
-    private static final List<Pattern> regexErrors = List.of();
-    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    private static final List<String> errors = List.of(
+            "cannot create index in non empty table"
+    );
+    private static final List<Pattern> regexErrors = List.of(
+            Pattern.compile("already have index:\\s+(.*)"),
+            Pattern.compile(".*?(?=column)column not supported in index:\\s+(.*)"),
+            Pattern.compile("no index column:\\s+(.*)")
+    );
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
+            .addAll(OxlaCommon.ALL_ERRORS);
 
     @Override
     public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {

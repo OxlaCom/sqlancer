@@ -75,22 +75,41 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
         if (presentTablesCount > options.maxTableCount) {
             OxlaDropTableGenerator dropTableGenerator = new OxlaDropTableGenerator();
             while (presentTablesCount > options.maxTableCount) {
-                if (globalState.executeStatement(dropTableGenerator.getQuery(globalState, 0))) {
-
-                    presentTablesCount--;
+                final var query = dropTableGenerator.getQuery(globalState, 0);
+                try {
+                    if (globalState.executeStatement(query)) {
+                        presentTablesCount--;
+                    }
+                } catch (Error e) {
+                    if (query.getExpectedErrors().errorIsExpected(e.getMessage())) {
+                        continue; // Try again.
+                    }
+                    throw new AssertionError(e); // Something went wrong.
                 }
             }
         }
+        globalState.updateSchema();
 
         // 2. ...but if we're under, then generate them until the upper limit is reached...
+        presentTablesCount = globalState.getSchema().getDatabaseTables().size();
         if (presentTablesCount < options.minTableCount) {
             OxlaCreateTableGenerator createTableGenerator = new OxlaCreateTableGenerator();
-            while (presentTablesCount < options.minTableCount) {
-                if (globalState.executeStatement(createTableGenerator.getQuery(globalState, 0))) {
-                    presentTablesCount++;
+            final var nextCount = globalState.getRandomly().getInteger(options.minTableCount, options.maxTableCount + 1); // [)
+            while (presentTablesCount < nextCount) {
+                final var query = createTableGenerator.getQuery(globalState, 0);
+                try {
+                    if (globalState.executeStatement(query)) {
+                        presentTablesCount++;
+                    }
+                } catch (Error e) {
+                    if (query.getExpectedErrors().errorIsExpected(e.getMessage())) {
+                        continue; // Try again.
+                    }
+                    throw new AssertionError(e); // Something went wrong.
                 }
             }
         }
+        globalState.updateSchema();
 
         // 3. ... while making sure that each table has sufficient number of rows.
         OxlaInsertIntoGenerator insertIntoGenerator = new OxlaInsertIntoGenerator();

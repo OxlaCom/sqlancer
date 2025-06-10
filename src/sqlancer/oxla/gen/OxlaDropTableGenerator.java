@@ -3,6 +3,7 @@ package sqlancer.oxla.gen;
 import sqlancer.Randomly;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.schema.OxlaTable;
 
@@ -18,7 +19,8 @@ public class OxlaDropTableGenerator extends OxlaQueryGenerator {
     private static final Collection<Pattern> regexErrors = List.of(
             Pattern.compile("relation \"[^\"]*\" does not exist")
     );
-    public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
+            .addAll(OxlaCommon.ALL_ERRORS);
 
     public OxlaDropTableGenerator() {
     }

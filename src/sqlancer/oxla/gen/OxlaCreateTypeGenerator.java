@@ -4,6 +4,7 @@ import sqlancer.Randomly;
 import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.schema.OxlaDataType;
 
@@ -16,7 +17,8 @@ public class OxlaCreateTypeGenerator extends OxlaQueryGenerator {
             "base type creation not supported"
     );
     private static final List<Pattern> regexErrors = List.of();
-    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
+            .addAll(OxlaCommon.ALL_ERRORS);
 
     @Override
     public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {

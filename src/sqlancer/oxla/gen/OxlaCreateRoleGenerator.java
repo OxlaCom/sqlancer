@@ -4,6 +4,7 @@ import sqlancer.Randomly;
 import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 
 import java.util.Arrays;
@@ -15,11 +16,13 @@ public class OxlaCreateRoleGenerator extends OxlaQueryGenerator {
     enum RoleOption {LOGIN, USERTYPE, PASSWORD}
 
     private static final List<String> errors = List.of(
+            "conflicting or redundant options",
             "password must be provided",
             "password cannot be empty"
     );
     private static final List<Pattern> regexErrors = List.of();
-    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
+            .addAll(OxlaCommon.ALL_ERRORS);
 
     @Override
     public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {

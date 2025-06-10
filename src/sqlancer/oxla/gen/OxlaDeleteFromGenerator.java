@@ -3,6 +3,7 @@ package sqlancer.oxla.gen;
 import sqlancer.Randomly;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.schema.OxlaTable;
@@ -17,7 +18,8 @@ public class OxlaDeleteFromGenerator extends OxlaQueryGenerator {
     private static final List<Pattern> regexErrors = List.of(
             Pattern.compile("other modification of table \"[^\"]+\" is in progress")
     );
-    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
+    private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
+            .addAll(OxlaCommon.ALL_ERRORS);
 
     public OxlaDeleteFromGenerator() {
     }
