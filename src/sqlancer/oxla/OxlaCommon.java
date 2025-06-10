@@ -14,6 +14,7 @@ public class OxlaCommon {
             "'*' can be used only in the SELECT clause.",
             "Expected frame clause with ROWS or RANGE mode",
             "LIMIT must not be negative",
+            "Not all provided names_to_validate were found in the schema",
             "OFFSET must not be negative",
             "RANGE with offset PRECEDING/FOLLOWING requires exactly one ORDER BY column",
             "aggregate function calls cannot be nested",
