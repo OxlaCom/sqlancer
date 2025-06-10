@@ -27,7 +27,8 @@ public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
             Pattern.compile("Attempted operation INSERT encountered invalid data in column\\s+(.*)"),
             Pattern.compile("null value in column \"[^\"]*\" of relation \"[^\"]*\" violates not-null constraint"),
             Pattern.compile("invalid input syntax for type timestamp:\\s+\"[^\"]*\""),
-            Pattern.compile("cannot implicitly cast from .*?(?=to)to\\s+(.*)")
+            Pattern.compile("Incorrect number of literals, \\d+ columns were selected, but \\d+ literals were passed."),
+            Pattern.compile("cannot implicitly cast from .*?(?=to)to (.*)")
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);

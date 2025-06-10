@@ -78,6 +78,7 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
                 final var query = dropTableGenerator.getQuery(globalState, 0);
                 try {
                     if (globalState.executeStatement(query)) {
+                        globalState.updateSchema();
                         presentTablesCount--;
                     }
                 } catch (Error e) {
@@ -88,7 +89,6 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
                 }
             }
         }
-        globalState.updateSchema();
 
         // 2. ...but if we're under, then generate them until the upper limit is reached...
         presentTablesCount = globalState.getSchema().getDatabaseTables().size();
@@ -99,6 +99,7 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
                 final var query = createTableGenerator.getQuery(globalState, 0);
                 try {
                     if (globalState.executeStatement(query)) {
+                        globalState.updateSchema();
                         presentTablesCount++;
                     }
                 } catch (Error e) {
@@ -109,7 +110,6 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
                 }
             }
         }
-        globalState.updateSchema();
 
         // 3. ... while making sure that each table has sufficient number of rows.
         OxlaInsertIntoGenerator insertIntoGenerator = new OxlaInsertIntoGenerator();

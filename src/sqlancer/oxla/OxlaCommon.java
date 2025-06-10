@@ -18,6 +18,7 @@ public class OxlaCommon {
             "OFFSET must not be negative",
             "RANGE with offset PRECEDING/FOLLOWING requires exactly one ORDER BY column",
             "aggregate function calls cannot be nested",
+            "argument of nth_value must be greater than zero",
             "both sides of \"=\" operator in JOIN ON condition must come from different sources",
             "cannot get array length of a non-array",
             "could not determine polymorphic type because input has type unknown",
@@ -85,7 +86,9 @@ public class OxlaCommon {
         if (OxlaBugs.bugOxla8332) {
             list.add("std::get: wrong index for variant");
         }
-        list.add("is not supported"); // TODO TEMP
+        if (OxlaBugs.bugOxla8408) {
+            list.add("Logic error in QueryPlanner (if you see this, there is a bug): _Map_base::at");
+        }
         return list;
     }
 
