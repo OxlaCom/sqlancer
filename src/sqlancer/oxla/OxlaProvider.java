@@ -1,7 +1,10 @@
 package sqlancer.oxla;
 
 import com.google.auto.service.AutoService;
-import sqlancer.*;
+import sqlancer.DatabaseProvider;
+import sqlancer.MainOptions;
+import sqlancer.SQLConnection;
+import sqlancer.SQLProviderAdapter;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.common.query.SQLancerResultSet;
 import sqlancer.oxla.gen.OxlaCreateTableGenerator;
@@ -95,7 +98,7 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
             final SQLQueryAdapter rowCountQuery = new SQLQueryAdapter(String.format("SELECT COUNT(*) FROM %s", table.getName()));
             try (SQLancerResultSet rowCountResult = globalState.executeStatementAndGet(rowCountQuery)) {
                 rowCountResult.next();
-                int rowCount = rowCountResult.getInt(1);
+                final int rowCount = rowCountResult.getInt(1);
                 assert !rowCountResult.next();
                 if (rowCount < options.minRowCount) {
                     globalState.executeStatement(insertIntoGenerator.getQueryForTable(globalState, table));
