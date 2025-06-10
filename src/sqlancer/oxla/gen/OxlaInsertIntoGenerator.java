@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+// TODO: Syntax comments.
 public class OxlaInsertIntoGenerator extends OxlaQueryGenerator {
     private static final List<String> errors = List.of(
             "Could not translate expression because: unsupported expression type 26",

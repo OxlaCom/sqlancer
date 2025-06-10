@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+// TODO: Syntax comments.
 public class OxlaSelectGenerator extends OxlaQueryGenerator {
     private static final List<String> errors = List.of(
             "frame start cannot be UNBOUNDED FOLLOWING",

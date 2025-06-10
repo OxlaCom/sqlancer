@@ -49,7 +49,7 @@ public class OxlaCreateRoleGenerator extends OxlaQueryGenerator {
         return switch (option) {
             case LOGIN -> "LOGIN";
             case USERTYPE -> Randomly.getBoolean() ? "SUPERUSER" : "NOSUPERUSER";
-            case PASSWORD -> String.format("PASSWORD %s", globalState.getRandomly().getString());
+            case PASSWORD -> String.format("PASSWORD '%s'", globalState.getRandomly().getString());
         };
     }
 }
