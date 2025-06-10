@@ -14,7 +14,8 @@ public abstract class OxlaQueryGenerator {
     public abstract SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth);
 
     /**
-     *
+     * Notifies the Oracle if after this query SQLancer's database state is left in an inconsistent state, ex.
+     * tables / roles / schemas were created or removed.
      */
     public boolean modifiesDatabaseState() {
         return false;

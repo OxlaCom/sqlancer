@@ -9,16 +9,16 @@ import sqlancer.oxla.OxlaGlobalState;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class OxlaDropSchemaGenerator extends OxlaQueryGenerator {
+public class OxlaDropTypeGenerator extends OxlaQueryGenerator {
     private static final List<String> errors = List.of();
     private static final List<Pattern> regexErrors = List.of();
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
     @Override
     public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {
-        // drop_schema := DROP SCHEMA [IF EXISTS] database_object_name [ CASCADE | RESTRICT ]
+        // drop_type := DROP TYPE [IF EXISTS] database_object_name [ CASCADE | RESTRICT ]
         final var queryBuilder = new StringBuilder()
-                .append("DROP SCHEMA ")
+                .append("DROP TYPE ")
                 .append(Randomly.getBoolean() ? "IF EXISTS " : "")
                 .append(DBMSCommon.createSchemaName(Randomly.smallNumber()))
                 .append(Randomly.getBoolean() ? (Randomly.getBoolean() ? " CASCADE" : " RESTRICT") : "");
