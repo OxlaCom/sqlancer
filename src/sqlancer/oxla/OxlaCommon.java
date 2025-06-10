@@ -17,6 +17,7 @@ public class OxlaCommon {
             "Not all provided names_to_validate were found in the schema",
             "OFFSET must not be negative",
             "RANGE with offset PRECEDING/FOLLOWING requires exactly one ORDER BY column",
+            "SELECT ... INTO table is not supported",
             "aggregate function calls cannot be nested",
             "argument of nth_value must be greater than zero",
             "both sides of \"=\" operator in JOIN ON condition must come from different sources",

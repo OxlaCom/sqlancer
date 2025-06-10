@@ -17,7 +17,6 @@ import sqlancer.oxla.schema.OxlaTables;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO: Syntax comments.
 public class OxlaSelectGenerator extends OxlaQueryGenerator {
     private static final ExpectedErrors expectedErrors = OxlaCommon.ALL_ERRORS;
 

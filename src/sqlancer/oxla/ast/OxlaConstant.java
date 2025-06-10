@@ -212,6 +212,11 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String asPlainLiteral() {
+            if (value == Float.POSITIVE_INFINITY) {
+                return "'infinity'";
+            } else if (value == Float.NEGATIVE_INFINITY) {
+                return "'-infinity'";
+            }
             return String.valueOf(value);
         }
 
@@ -261,6 +266,11 @@ public abstract class OxlaConstant implements OxlaExpression {
 
         @Override
         public String asPlainLiteral() {
+            if (value == Double.POSITIVE_INFINITY) {
+                return "'infinity'";
+            } else if (value == Double.NEGATIVE_INFINITY) {
+                return "'-infinity'";
+            }
             return String.valueOf(value);
         }
 
