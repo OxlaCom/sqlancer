@@ -11,7 +11,9 @@ import java.util.regex.Pattern;
 
 public class OxlaDropRoleGenerator extends OxlaQueryGenerator {
     private static final List<String> errors = List.of();
-    private static final List<Pattern> regexErrors = List.of();
+    private static final List<Pattern> regexErrors = List.of(
+            Pattern.compile("role \"[^\"]*\" does not exist")
+    );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
     @Override

@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class OxlaDropTypeGenerator extends OxlaQueryGenerator {
-    private static final List<String> errors = List.of();
+    private static final List<String> errors = List.of(
+            "DROP TYPE statement is not supported"
+    );
     private static final List<Pattern> regexErrors = List.of();
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors);
 
