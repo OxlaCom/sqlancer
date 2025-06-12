@@ -14,7 +14,9 @@ import java.util.stream.Collectors;
 public class OxlaSetGenerator extends OxlaQueryGenerator {
     enum ValueType {PLAIN, STRING, INT_LITERAL, FLOAT_LITERAL, ON_KEYWORD}
 
-    private static final List<String> errors = List.of();
+    private static final List<String> errors = List.of(
+            "SET LOCAL ... is not supported"
+    );
     private static final List<Pattern> regexErrors = List.of();
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
@@ -28,9 +30,8 @@ public class OxlaSetGenerator extends OxlaQueryGenerator {
                 .append("SET ")
                 .append(Randomly.getBoolean() ? (Randomly.getBoolean() ? "SESSION " : "LOCAL ") : "")
                 .append(randomly.getString())
-                .append(' ')
-                .append(Randomly.getBoolean() ? String.format("DOT %s ", randomly.getString()) : "")
-                .append(Randomly.getBoolean() ? "TO " : "= ")
+                .append(Randomly.getBoolean() ? String.format(".%s", randomly.getString()) : "")
+                .append(Randomly.getBoolean() ? " TO " : " = ")
                 .append(Randomly.nonEmptySubsetPotentialDuplicates(Arrays.asList(ValueType.values()))
                         .stream()
                         .map(type -> value(globalState, type))
