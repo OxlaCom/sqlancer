@@ -1,15 +1,33 @@
 package sqlancer.oxla.gen;
 
+import sqlancer.Randomly;
+import sqlancer.common.DBMSCommon;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
 import sqlancer.oxla.OxlaCommon;
 import sqlancer.oxla.OxlaGlobalState;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class OxlaPrivilegeGenerator extends OxlaQueryGenerator {
+    enum StatementType {
+        GRANT, REVOKE, REVOKE_GRANT;
+
+        @Override
+        public String toString() {
+            return switch (this) {
+                case GRANT -> "GRANT";
+                case REVOKE -> "REVOKE";
+                case REVOKE_GRANT -> "REVOKE GRANT OPTION FOR";
+            };
+        }
+    }
+    enum ClauseType {ALL, DATABASE, EXTERNAL_SOURCE, SCHEMA, TABLE}
+
     private static final Collection<String> errors = List.of();
     private static final Collection<Pattern> regexErrors = List.of();
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
@@ -17,27 +35,48 @@ public class OxlaPrivilegeGenerator extends OxlaQueryGenerator {
 
     @Override
     public SQLQueryAdapter getQuery(OxlaGlobalState globalState, int depth) {
-        // privilege_type := (ALL PRIVILEGES | (SELECT | INSERT | UPDATE | DELETE | CREATE | CONNECT | USAGE | [, ...]))
-        // privilege_statement := GRANT privilege_type ON ALL database_object_name IN SCHEMA database_object_name TO database_object_name
-        //                      | GRANT privilege_type ON DATABASE database_object_name TO database_object_name
-        //                      | GRANT privilege_type ON EXTERNAL SOURCE database_object_name TO database_object_name
-        //                      | GRANT privilege_type ON SCHEMA database_object_name TO database_object_name
-        //                      | GRANT privilege_type ON TABLE table_name TO database_object_name
-        //                      | GRANT privilege_type ON table_name TO database_object_name
-        //                      | REVOKE GRANT OPTION FOR privilege_type ON DATABASE database_object_name FROM database_object_name
-        //                      | REVOKE GRANT OPTION FOR privilege_type ON EXTERNAL SOURCE database_object_name FROM database_object_name
-        //                      | REVOKE GRANT OPTION FOR privilege_type ON SCHEMA database_object_name FROM database_object_name
-        //                      | REVOKE GRANT OPTION FOR privilege_type ON TABLE table_name FROM database_object
-        //                      | REVOKE GRANT OPTION FRO privilege_type ON ALL database_object_name IN SCHEMA database_object_name FROM database_object_name
-        //                      | REVOKE GRANT OPTION privilege_type ON table_name FROM database_object_name
-        //                      | REVOKE privilege_type ON ALL database_object_name IN SCHEMA database_object_name FROM database_object_name
-        //                      | REVOKE privilege_type ON DATABASE database_object_name FROM database_object_name
-        //                      | REVOKE privilege_type ON EXTERNAL SOURCE database_object_name FROM database_object_name
-        //                      | REVOKE privilege_type ON SCHEMA database_object_name FROM database_object_name
-        //                      | REVOKE privilege_type ON table_name FROM database_object_name
-        //                      | REVOKE privilege_type ONE TABLE table_name FROM database_object_name
+        // 1. (GRANT | REVOKE | REVOKE GRANT OPTION FOR) privilege_type
+        final var statementType = Randomly.fromOptions(StatementType.values());
+        final var queryBuilder = new StringBuilder()
+                .append(statementType)
+                .append(' ')
+                .append(getPrivilegeType());
 
-        final var queryBuilder = new StringBuilder();
+        // 2. ON (ALL database_object_name IN SCHEMA | DATABASE | EXTERNAL SOURCE | SCHEMA | [TABLE])
+        final var clauseType = Randomly.fromOptions(ClauseType.values());
+        queryBuilder
+                .append(" ON ")
+                .append(getOnClause(clauseType, globalState))
+                .append(' ');
+
+        // 3. (database_object_name | table_name) (FROM | TO) database_object_name
+        final var randomly = globalState.getRandomly();
+        queryBuilder
+                .append(clauseType != ClauseType.TABLE ? randomly.getString() : DBMSCommon.createTableName(Randomly.smallNumber()))
+                .append(statementType == StatementType.GRANT ? " TO " : " FROM ")
+                .append(randomly.getString());
+
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
+    }
+
+    private String getPrivilegeType() {
+        // privilege_type := (ALL PRIVILEGES | (SELECT | INSERT | UPDATE | DELETE | CREATE | CONNECT | USAGE | [, ...]))
+        enum PrivilegeType {SELECT, INSERT, UPDATE, CREATE, CONNECT, USAGE}
+        return Randomly.getBooleanWithRatherLowProbability()
+                ? "ALL PRIVILEGES"
+                : Randomly.nonEmptySubsetPotentialDuplicates(Arrays.asList(PrivilegeType.values()))
+                .stream()
+                .map(PrivilegeType::name)
+                .collect(Collectors.joining(", "));
+    }
+
+    private String getOnClause(ClauseType type, OxlaGlobalState globalState) {
+        return switch (type) {
+            case ALL -> String.format("ALL %s IN SCHEMA", globalState.getRandomly().getString());
+            case DATABASE -> "DATABASE";
+            case EXTERNAL_SOURCE -> "EXTERNAL SOURCE";
+            case SCHEMA -> "SCHEMA";
+            case TABLE -> Randomly.getBoolean() ? "TABLE" : "";
+        };
     }
 }
