@@ -53,7 +53,7 @@ public class OxlaAlterGenerator extends OxlaQueryGenerator {
                 .append(' ');
         if (type == Rule.USER || type == Rule.ROLE) {
             queryBuilder
-                    .append(randomly.getString())
+                    .append(randomly.getString(1))
                     .append(Randomly.getBoolean() ? " WITH " : "")
                     .append(options
                             .stream()
@@ -61,9 +61,9 @@ public class OxlaAlterGenerator extends OxlaQueryGenerator {
                             .collect(Collectors.joining(" ")));
         } else {
             queryBuilder
-                    .append(type != Rule.OWNER_TABLE ? randomly.getString() : DBMSCommon.createTableName(Randomly.smallNumber()))
+                    .append(type != Rule.OWNER_TABLE ? randomly.getString(1) : DBMSCommon.createTableName(Randomly.smallNumber()))
                     .append(" OWNER TO ")
-                    .append(randomly.getString());
+                    .append(randomly.getString(1));
         }
 
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);

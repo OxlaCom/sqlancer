@@ -52,9 +52,9 @@ public class OxlaPrivilegeGenerator extends OxlaQueryGenerator {
         // 3. (database_object_name | table_name) (FROM | TO) database_object_name
         final var randomly = globalState.getRandomly();
         queryBuilder
-                .append(clauseType != ClauseType.TABLE ? randomly.getString() : DBMSCommon.createTableName(Randomly.smallNumber()))
+                .append(clauseType != ClauseType.TABLE ? randomly.getString(1) : DBMSCommon.createTableName(Randomly.smallNumber()))
                 .append(statementType == StatementType.GRANT ? " TO " : " FROM ")
-                .append(randomly.getString());
+                .append(randomly.getString(1));
 
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
@@ -72,7 +72,7 @@ public class OxlaPrivilegeGenerator extends OxlaQueryGenerator {
 
     private String getOnClause(ClauseType type, OxlaGlobalState globalState) {
         return switch (type) {
-            case ALL -> String.format("ALL %s IN SCHEMA", globalState.getRandomly().getString());
+            case ALL -> String.format("ALL %s IN SCHEMA", globalState.getRandomly().getString(1));
             case DATABASE -> "DATABASE";
             case EXTERNAL_SOURCE -> "EXTERNAL SOURCE";
             case SCHEMA -> "SCHEMA";

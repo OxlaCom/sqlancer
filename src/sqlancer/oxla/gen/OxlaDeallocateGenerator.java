@@ -24,7 +24,7 @@ public class OxlaDeallocateGenerator extends OxlaQueryGenerator {
         final var queryBuilder = new StringBuilder()
                 .append("DEALLOCATE ")
                 .append(Randomly.getBoolean() ? "PREPARE " : "")
-                .append(Randomly.getBooleanWithRatherLowProbability() ? "ALL" : globalState.getRandomly().getString());
+                .append(Randomly.getBooleanWithRatherLowProbability() ? "ALL" : globalState.getRandomly().getString(1));
         return new SQLQueryAdapter(queryBuilder.toString(), expectedErrors);
     }
 }

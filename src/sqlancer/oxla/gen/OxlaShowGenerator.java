@@ -22,7 +22,7 @@ public class OxlaShowGenerator extends OxlaQueryGenerator {
                 case COLUMNS ->
                         Randomly.getBoolean() ? "COLUMNS" : String.format("COLUMNS %s", globalState.getSchema().getRandomTable().getName());
                 case RUNTIME ->
-                        Randomly.getBoolean() ? randomly.getString() : String.format("%s.%s", randomly.getString(), randomly.getString());
+                        Randomly.getBoolean() ? randomly.getString(1) : String.format("%s.%s", randomly.getString(1), randomly.getString(1));
             };
         }
     }

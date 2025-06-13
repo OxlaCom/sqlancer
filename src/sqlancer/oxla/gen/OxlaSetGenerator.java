@@ -31,8 +31,8 @@ public class OxlaSetGenerator extends OxlaQueryGenerator {
         final var queryBuilder = new StringBuilder()
                 .append("SET ")
                 .append(Randomly.getBoolean() ? (Randomly.getBoolean() ? "SESSION " : "LOCAL ") : "")
-                .append(randomly.getString())
-                .append(Randomly.getBoolean() ? String.format(".%s", randomly.getString()) : "")
+                .append(randomly.getString(1))
+                .append(Randomly.getBoolean() ? String.format(".%s", randomly.getString(1)) : "")
                 .append(Randomly.getBoolean() ? " TO " : " = ")
                 .append(Randomly.nonEmptySubsetPotentialDuplicates(Arrays.asList(ValueType.values()))
                         .stream()
@@ -44,8 +44,8 @@ public class OxlaSetGenerator extends OxlaQueryGenerator {
     private String value(OxlaGlobalState globalState, ValueType type) {
         final var randomly = globalState.getRandomly();
         return switch (type) {
-            case PLAIN -> randomly.getString();
-            case STRING -> String.format("'%s'", randomly.getString());
+            case PLAIN -> randomly.getString(1);
+            case STRING -> String.format("'%s'", randomly.getString(1));
             case INT_LITERAL -> String.valueOf(randomly.getInteger());
             case FLOAT_LITERAL -> String.valueOf(randomly.getFloat());
             case ON_KEYWORD -> "ON";
