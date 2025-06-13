@@ -119,9 +119,7 @@ public class OxlaProvider extends SQLProviderAdapter<OxlaGlobalState, OxlaOption
                 if (rowCount < options.minRowCount) {
                     globalState.executeStatement(insertIntoGenerator.getQueryForTable(globalState, table));
                 }
-            } catch (AssertionError e) {
-                throw new IgnoreMeException();
-            } catch (Exception e) {
+            } catch (Error e) {
                 throw new AssertionError("[OxlaFuzzer] failed to insert rows to a table '" + table.getName() + "', because: " + e);
             }
         }
