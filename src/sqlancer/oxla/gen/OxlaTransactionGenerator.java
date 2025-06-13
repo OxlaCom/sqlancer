@@ -27,8 +27,12 @@ public class OxlaTransactionGenerator extends OxlaQueryGenerator {
         }
     }
 
-    private static final List<String> errors = List.of();
-    private static final List<Pattern> regexErrors = List.of();
+    private static final List<String> errors = List.of(
+            "READ ONLY transactions are not supported"
+    );
+    private static final List<Pattern> regexErrors = List.of(
+            Pattern.compile("\\S+ options in transactions \\S+ not supported")
+    );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
 
