@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
 public class OxlaDeallocateGenerator extends OxlaQueryGenerator {
     private static final Collection<String> errors = List.of();
     private static final Collection<Pattern> regexErrors = List.of(
-            Pattern.compile("no prepared statement with name '[^']*'")
+            Pattern.compile("no prepared statement with name '[^']*'"),
+            Pattern.compile("syntax error, unexpected (.+)")
     );
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);

@@ -18,7 +18,8 @@ public class OxlaSetGenerator extends OxlaQueryGenerator {
             "SET LOCAL ... is not supported"
     );
     private static final List<Pattern> regexErrors = List.of(
-            Pattern.compile("unrecognized configuration parameter (.*)")
+            Pattern.compile("unrecognized configuration parameter (.*)"),
+            Pattern.compile("syntax error, unexpected (.+)")
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);

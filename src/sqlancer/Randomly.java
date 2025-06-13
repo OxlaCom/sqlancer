@@ -347,7 +347,7 @@ public final class Randomly {
         private static int getStringLength(Randomly r, int minChars) {
             int chars;
             if (Randomly.getBoolean()) {
-                chars = Randomly.smallNumber();
+                chars = Math.max(minChars, Randomly.smallNumber());
             } else {
                 chars = r.getInteger(minChars, maxStringLength);
             }

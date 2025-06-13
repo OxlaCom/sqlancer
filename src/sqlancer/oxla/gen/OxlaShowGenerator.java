@@ -32,7 +32,8 @@ public class OxlaShowGenerator extends OxlaQueryGenerator {
     );
     private static final List<Pattern> regexErrors = List.of(
             Pattern.compile("SYSTEM table: \\S+ does not exist"),
-            Pattern.compile("unrecognized configuration parameter \"[^\"]*\"")
+            Pattern.compile("unrecognized configuration parameter \"[^\"]*\""),
+            Pattern.compile("syntax error, unexpected (.+)")
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);

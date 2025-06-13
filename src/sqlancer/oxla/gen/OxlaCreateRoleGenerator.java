@@ -35,7 +35,7 @@ public class OxlaCreateRoleGenerator extends OxlaQueryGenerator {
                 .append("CREATE ")
                 .append(isRole ? "ROLE " : "USER ")
                 .append(isRole ? DBMSCommon.createRoleName(index) : DBMSCommon.createUserName(index))
-                .append(Randomly.getBoolean() ? " WITH " : "")
+                .append(Randomly.getBoolean() ? " WITH " : " ")
                 .append(options
                         .stream()
                         .map(o -> asRoleOption(globalState, o))

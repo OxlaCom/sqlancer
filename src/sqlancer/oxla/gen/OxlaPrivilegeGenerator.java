@@ -29,7 +29,10 @@ public class OxlaPrivilegeGenerator extends OxlaQueryGenerator {
     enum ClauseType {ALL, DATABASE, EXTERNAL_SOURCE, SCHEMA, TABLE}
 
     private static final Collection<String> errors = List.of();
-    private static final Collection<Pattern> regexErrors = List.of();
+    private static final Collection<Pattern> regexErrors = List.of(
+            Pattern.compile("syntax error at or near \"[^\"]*\""),
+            Pattern.compile("syntax error, unexpected (.+)")
+    );
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
 

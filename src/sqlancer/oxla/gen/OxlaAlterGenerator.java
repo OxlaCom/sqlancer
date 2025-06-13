@@ -14,8 +14,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class OxlaAlterGenerator extends OxlaQueryGenerator {
-    private static final Collection<String> errors = List.of();
+    private static final Collection<String> errors = List.of(
+            "password cannot be empty",
+            "conflicting or redundant options"
+    );
     private static final Collection<Pattern> regexErrors = List.of(
+            Pattern.compile("schema \"[^\"]*\" does not exist"),
+            Pattern.compile("role \"[^\"]*\" already exist"),
             Pattern.compile("syntax error, unexpected (.+)")
     );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
