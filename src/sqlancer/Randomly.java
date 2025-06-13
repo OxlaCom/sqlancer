@@ -253,19 +253,19 @@ public final class Randomly {
         NUMERIC {
             @Override
             public String getString(Randomly r, int minChars) {
-                return StringGenerationStrategy.getStringOfAlphabet(r, NUMERIC_ALPHABET, minChars);
+                return getStringOfAlphabet(r, NUMERIC_ALPHABET, minChars);
             }
         },
         ALPHANUMERIC {
             @Override
             public String getString(Randomly r, int minChars) {
-                return StringGenerationStrategy.getStringOfAlphabet(r, ALPHANUMERIC_ALPHABET, minChars);
+                return getStringOfAlphabet(r, ALPHANUMERIC_ALPHABET, minChars);
             }
         },
         ALPHANUMERIC_SPECIALCHAR {
             @Override
             public String getString(Randomly r, int minChars) {
-                return StringGenerationStrategy.getStringOfAlphabet(r, ALPHANUMERIC_SPECIALCHAR_ALPHABET, minChars);
+                return getStringOfAlphabet(r, ALPHANUMERIC_SPECIALCHAR_ALPHABET, minChars);
             }
         },
         SOPHISTICATED {
