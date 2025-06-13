@@ -20,7 +20,9 @@ public class OxlaCreateRoleGenerator extends OxlaQueryGenerator {
             "password must be provided",
             "password cannot be empty"
     );
-    private static final List<Pattern> regexErrors = List.of();
+    private static final List<Pattern> regexErrors = List.of(
+            Pattern.compile("role \"[^\"]*\" already exists")
+    );
     private static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
 

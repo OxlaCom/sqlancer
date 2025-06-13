@@ -31,7 +31,8 @@ public class OxlaPrivilegeGenerator extends OxlaQueryGenerator {
     private static final Collection<String> errors = List.of();
     private static final Collection<Pattern> regexErrors = List.of(
             Pattern.compile("syntax error at or near \"[^\"]*\""),
-            Pattern.compile("syntax error, unexpected (.+)")
+            Pattern.compile("syntax error, unexpected (.+)"),
+            Pattern.compile("schema \"[^\"]*\" does not exist")
     );
     public static final ExpectedErrors expectedErrors = new ExpectedErrors(errors, regexErrors)
             .addAll(OxlaCommon.ALL_ERRORS);
