@@ -24,7 +24,7 @@ public class OxlaOptions implements DBMSSpecificOptions<OxlaOracleFactory> {
     @Parameter(names = {"--max-row-count"}, description = "The maximum number of rows that can be created.")
     public int maxRowCount = 25;
 
-    @Parameter(names = {"--enable-transaction-testing"}, description = "Should TRANSACTION statements be generated as a part of testing oracle(s)?")
+    @Parameter(names = {"--enable-transaction-testing"}, arity = 1, description = "Should TRANSACTION statements be generated as a part of testing oracle(s)?")
     public boolean enableTransactionTesting = false;
 
     @Parameter(names = "--oracle", description = "Specifies which test oracle should be used with Oxla")
