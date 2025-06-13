@@ -28,6 +28,7 @@ public class OxlaCommon {
             "could not determine polymorphic type because input has type unknown",
             "division by zero",
             "empty format provided",
+            "empty input provided",
             "expecting only literal for percentiles",
             "expression on one side of \"=\" operator in JOIN ON condition must come from exactly one source",
             "frame end cannot be UNBOUNDED PRECEDING",
