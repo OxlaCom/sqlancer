@@ -6,4 +6,4 @@ RUN mvn package -DskipTests -X
 
 RUN echo "Running SQLancer"
 WORKDIR /target
-ENTRYPOINT ["java", "-jar", "sqlancer-*.jar"]
+ENTRYPOINT ["java", "-jar", "sqlancer-2.0.0.jar"]
