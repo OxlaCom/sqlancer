@@ -47,4 +47,9 @@ public final class OxlaBugs {
     /// See: https://oxla.atlassian.net/browse/OXLA-8408
     /// `WHERE false` queries with multiple FROM tables return _Map_base::at error(s).
     public static boolean bugOxla8408 = true;
+
+    /// See: https://oxla.atlassian.net/browse/OXLA-8546
+    /// Some `ORDER BY` statements in `SELECT DISTINCT` result in incorrect error messages that contain internal
+    //  intrinsic functions.
+    public static boolean bugOxla8546 = true;
 }

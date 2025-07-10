@@ -105,9 +105,19 @@ public class OxlaCommon {
         return list;
     }
 
+    public static List<Pattern> bugRegexErrors() {
+        List<Pattern> list = new ArrayList<>();
+        if (OxlaBugs.bugOxla8546) {
+            list.add(Pattern.compile("function __\\S+ is not supported"));
+            list.add(Pattern.compile("for SELECT DISTINCT, expression .*?(?=\" must)\" must appear in select list"));
+        }
+        return list;
+    }
+
     public static final ExpectedErrors ALL_ERRORS = ExpectedErrors.newErrors()
             .with(OxlaCommon.EXACT_ERRORS)
             .withRegex(OxlaCommon.REGEX_ERRORS)
             .with(OxlaCommon.bugErrors())
+            .withRegex(OxlaCommon.bugRegexErrors())
             .build();
 }
