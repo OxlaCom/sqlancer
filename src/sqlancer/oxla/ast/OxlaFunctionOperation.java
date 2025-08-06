@@ -5,6 +5,7 @@ import sqlancer.common.ast.newast.NewFunctionNode;
 import sqlancer.oxla.OxlaToStringVisitor;
 import sqlancer.oxla.schema.OxlaDataType;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,6 +158,7 @@ public class OxlaFunctionOperation extends NewFunctionNode<OxlaExpression, OxlaF
             .addNoParamOverload("current_database", OxlaDataType.TEXT, (ignored) -> OxlaConstant.createTextConstant("oxla"))
             .addNoParamOverload("current_schema", OxlaDataType.TEXT, null)
             .addNoParamOverload("version", OxlaDataType.TEXT, null)
+            .addNoParamOverload("now", OxlaDataType.TIMESTAMPTZ, (ignored) -> OxlaConstant.createTimestamptzConstant(Instant.now().toEpochMilli()))
             .addOneParamMatchReturnOverload("quote_ident", OxlaDataType.TEXT, null)
             .addMultipleParamOverload("format_type", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT32}, OxlaDataType.TEXT, null)
             .addTwoParamMatrixOverloads("to_char", new OxlaDataType[]{OxlaDataType.INT32, OxlaDataType.INT64, OxlaDataType.INTERVAL, OxlaDataType.FLOAT32, OxlaDataType.FLOAT64, OxlaDataType.TIMESTAMP, OxlaDataType.TIMESTAMPTZ}, new OxlaDataType[]{OxlaDataType.TEXT}, false, null)
